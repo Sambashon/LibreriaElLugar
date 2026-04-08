@@ -12,13 +12,21 @@
             padding: 0;
             margin: 0;
         }
+        body{
+            width: 100%;
+        }
         .main-nav{
-            background-color: white;
+            background-color: #2b2617;
             height: 20vh;
-            width: 100vw;
+            width: 100%;
 
             display: flex;
             flex-direction: column;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
         .sub-nav{
             display: flex;
@@ -46,17 +54,18 @@
             align-items: center;
         }
         .logo-container{
-            height: 100%;
+            height: 120%;
             width: 10vw;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding-top: 20px;
         }
         .logo-container img{
             height: 100%;
             width: auto;
             object-fit: contain;
-            filter: drop-shadow(0 0 3px #72a785);
+            filter: drop-shadow(0 0 3px #fff);
         }
 
         .searchbar-form button {
@@ -70,10 +79,10 @@
 
         .searchbar-form {
             --timing: 0.3s;
-            --width-of-input: 250px;
-            --height-of-input: 60px;
+            --width-of-input: clamp(180px, 20vw, 275px);
+            --height-of-input: clamp(35px, 4vw, 60px);
             --border-height: 2px;
-            --input-bg: #C2A85A;
+            --input-bg: #fff;
             --border-color: #1DB954;
             --border-radius: 30px;
             --after-border-radius: 1px;
@@ -140,6 +149,7 @@
         position: relative;
         display: inline-block;
         text-decoration: none;
+        color: #fff;
         }
 
         .nav-item::after {
@@ -159,6 +169,19 @@
         }
         .nav-item:hover{
             color: #C2A85A;
+        }
+
+        .main-section{
+            height: 100vh;
+            width: 100%;
+            
+        }
+        .main-section img{
+            height: 100%;
+            width: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
         }
     </style>
 </head>
@@ -208,5 +231,13 @@
             </ul>
         </section>
     </nav>
+    <main>
+        <section class="main-section" style="background-color: #e7d499;">
+            <img src="Resources/image.png" alt="">
+        </section>
+        <section class="main-section" style="background-color: #5ba53e;">
+            
+        </section>
+    </main>
 </body>
 </html>
