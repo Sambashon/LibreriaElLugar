@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Lugar</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .main-nav{
+            background-color: white;
+            height: 20vh;
+            width: 100vw;
+
+            display: flex;
+            flex-direction: column;
+        }
+        .sub-nav{
+            display: flex;
+            flex: 1; 
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+
+            list-style: none;
+            text-decoration: none;
+            margin: 0;
+            padding: 0;
+        }
+        .sub-nav li{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container{
+            display: flex;
+            flex: 1;
+            height: 15vh;
+            flex-direction: row;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+        .logo-container{
+            height: 100%;
+            width: 10vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-container img{
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 3px #72a785);
+        }
+
+        .searchbar-form button {
+            border: none;
+            background: none;
+            color: #1A1A1A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .searchbar-form {
+            --timing: 0.3s;
+            --width-of-input: 250px;
+            --height-of-input: 60px;
+            --border-height: 2px;
+            --input-bg: #C2A85A;
+            --border-color: #1DB954;
+            --border-radius: 30px;
+            --after-border-radius: 1px;
+            position: relative;
+            width: var(--width-of-input);
+            height: var(--height-of-input);
+            display: flex;
+            align-items: center;
+            padding-inline: 0.8em;
+            border-radius: var(--border-radius);
+            transition: border-radius 0.5s ease;
+            background: var(--input-bg,#fff);
+        }
+
+        .input {
+            font-size: 0.9rem;
+            background-color: transparent;
+            width: 100%;
+            height: 100%;
+            padding-inline: 0.5em;
+            padding-block: 0.7em;
+            border: none;
+        }
+
+        .searchbar-form:before {
+            content: "";
+            position: absolute;
+            background: var(--border-color);
+            transform: scaleX(0);
+            transform-origin: center;
+            width: 100%;
+            height: var(--border-height);
+            left: 0;
+            bottom: 0;
+            border-radius: 1px;
+            transition: transform var(--timing) ease;
+        }
+
+        .searchbar-form:focus-within {
+            border-radius: var(--after-border-radius);
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        .searchbar-form:focus-within:before {
+            transform: scale(1);
+        }
+        .reset {
+            border: none;
+            background: none;
+            opacity: 0;
+            visibility: hidden;
+        }
+        input:not(:placeholder-shown) ~ .reset {
+            opacity: 1;
+            visibility: visible;
+        }
+        .searchbar-form svg {
+            width: 17px;
+        }
+        .nav-item {
+        position: relative;
+        display: inline-block;
+        text-decoration: none;
+        }
+
+        .nav-item::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -4px;
+        width: 0;
+        height: 2px;
+        background-color: #72a785;
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+        }
+
+        .nav-item:hover::after {
+        width: 100%;
+        }
+        .nav-item:hover{
+            color: #C2A85A;
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <section class="container">
+            <div class="container">
+                <!--
+                
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Buscar...">
+                    <button class="btn btn-success">
+                        <img src="Resources/icons/lupa.svg" alt="🔍">
+                    </button>
+                </div>
+                -->
+                
+                <!-- From Uiverse.io by satyamchaudharydev --> 
+                <form class="searchbar-form">
+                    <button>
+                        <svg width="17" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="search">
+                            <path d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9" stroke="currentColor" stroke-width="1.333" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </button>
+                    <input class="input" placeholder="Buscar..." required="" type="text">
+                    <button class="reset" type="reset">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+            <div class="logo-container">
+                <img src="Resources/libreriaElLugar.png" alt="Libreria El Lugar">
+            </div>
+            <div class="container">
+
+            </div>
+        </section>
+        <section class="sub-nav">
+            <ul class="sub-nav">
+                <li class="nav-item">Inicio</li>
+                <li class="nav-item">Catálogo</li>
+                <li class="nav-item">Ofertas</li>
+                <li class="nav-item">Destacados</li>
+                <li class="nav-item">Contacto</li>
+            </ul>
+        </section>
+    </nav>
+</body>
+</html>
