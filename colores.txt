@@ -33,3 +33,7 @@ Texto:
 principal: blanco
 secundario: gris claro
 Detalles (bordes, glow): #3CFF9C
+
+
+
+

@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Lugar</title>
-    
+    <title>Librería | El Lugar</title>
+    <link rel="icon" href="Resources/logos/libreriasimple.jpg" type="image/png">
+
     <link rel="stylesheet" href="src/css/index.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+    
 </head>
 <body>
     <header class="main-nav">
-        <section class="container" id="header">
-            <div class="container">
+        <section class="header-container" id="header">
+            <div class="header-container">
                 <form class="searchbar-form">
                     <button>
                         <svg width="17" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="search">
@@ -26,28 +33,56 @@
                 </form>
             </div>
             <div class="logo-container">
-                <img src="Resources/libreriaElLugar.png" alt="Libreria El Lugar">
+                <img src="Resources/logos/libreriaElLugar.png" alt="Libreria El Lugar">
             </div>
-            <div class="container">
+            <div class="header-container">
                 This is where i'll put profile stuff and cart (for desktop only)
             </div>
         </section>
         <nav class="sub-nav">
             <ul class="sub-nav">
-                <li class="nav-item">Inicio</li>
-                <li class="nav-item">Catálogo</li>
-                <li class="nav-item">Ofertas</li>
-                <li class="nav-item">Destacados</li>
-                <li class="nav-item">Contacto</li>
+                <li class="nav-item"><a href="#inicio">Inicio</a></li>
+                <li class="nav-item"><a href="#catalogo">Catálogo</a></li>
+                <li class="nav-item"><a href="">Ofertas</a></li>
+                <li class="nav-item"><a href="">Destacados</a></li>
+                <li class="nav-item"><a href="#contacto">Contacto</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <section class="main-section" style="background-color: #e7d499;">
-            <img src="Resources/image.png" alt="">
+        <section class="main-section" style="background-color: #e7d499;" id="inicio">
+            <img src="Resources/fondos/fondo2.jpg" alt="">
         </section>
-        <section class="main-section" style="background-color: #5ba53e;">
-            <img src="Resources/image copy.png" alt="">
+        <section class="main-section" style="background-color: #5ba53e;" id="catalogo">
+            <img src="Resources/fondos/fondo3.jpg" alt="">
+        </section>
+        <section class="contact-section" id="contacto">
+            <header class="contact-header">
+                <h1>Contáctanos</h1>
+            </header>
+            <main class="contact-body">
+                <div class="contact-container">
+                    <h2>Horario</h2>
+                    <p>Lunes a Viernes de 10:00 a 20:00</p>
+                    <p>Sábados de 10:00 a 18:00</p>
+                </div>
+                <div class="contact-container">
+                    <h2>Dirección</h2>
+                    <p><img src="Resources/icons/ubicacion.svg">Washington 285</p>
+                    
+                </div>
+                <div class="contact-container">
+                    <h2>Contacto</h2>
+                    <p><img src="Resources/icons/telefono.svg">2917 0865</p>
+                    <p><img src="Resources/icons/mail-svgrepo-com.svg">noencontroelmail@gmail.com</p>
+                    <div class="media-nav"></div>
+                </div>
+                
+            </main>
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13088.041158001455!2d-56.217392392587996!3d-34.9061912911164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f7f003e8676e3%3A0x4e95ab7bbfc001b9!2sLibrer%C3%ADa%20El%20Lugar!5e0!3m2!1sen!2suy!4v1775761283451!5m2!1sen!2suy" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+            </div>
         </section>
     </main>
     <script src="src/js/index.js"></script>
