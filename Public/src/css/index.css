@@ -397,7 +397,7 @@ width: 100%;
     scroll-snap-align: start;
 }
 .carousel-wrapper .card{ 
-    min-width: 400px; 
+    width: 350px; 
 }
 
 .card img{
