@@ -98,3 +98,18 @@ function countUp(cifra){
 cifras.forEach(cifra=> {
     countUp(cifra);
 })
+
+//ESTO ESTA MUY MAL SEBA 
+const link = document.querySelector('a[href="#destacados"]');
+const destacados = document.querySelector("#destacados");
+
+link.addEventListener("click", function(e) {
+    if (window.scrollY > destacados.offsetTop) {
+        e.preventDefault();
+
+        window.scrollTo({
+            top: destacados.offsetTop - 120,
+            behavior: "smooth"
+        });
+    }
+});

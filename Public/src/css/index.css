@@ -2,6 +2,7 @@ html{
     scroll-behavior: smooth;
     background-color: #1B4D2E;
 }
+
 *{
     padding: 0;
     margin: 0;
@@ -10,6 +11,16 @@ html{
 body{
     width: 100%;
 }
+h1,h2{
+    font-family: "Fraunces", sans-serif;
+    line-height: 1.15;
+    font-weight: bold;
+}
+h3{font-family: "Fraunces", sans-serif;}
+h1{font-size: clamp(28px, 3.5vw, 46px);}
+h2{font-size: clamp(20px, 3vw, 36px);}
+p{font-family: "Plus Jakarta Sans", sans-serif;}
+
 .main-nav{
     font-family: "Plus Jakarta Sans", sans-serif;
 
@@ -26,7 +37,7 @@ body{
     left: 0;
     z-index: 1;
 
-    border-bottom: #fff 1px solid;
+    border-bottom: #b8b6ad 1px solid;
 }
 .sub-nav{
     display: flex;
@@ -196,17 +207,19 @@ width: 100%;
 .main-section{
     height: 100vh;
     border-bottom: solid 2px #dddddd;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: 'Fraunces', sans-serif;
+
+    position: relative;
 }
+
 .main-section p{
     font-family: "Plus Jakarta Sans", sans-serif;
 }
 .main-section#destacados{
     background-color: #fff;
 }
-.main-section#inicio{
-    margin-top: 15vh;
 
+.main-section#inicio{
     padding: 3rem;
     background-color: #1B4D2E;
 
@@ -214,6 +227,65 @@ width: 100%;
 
     display: flex;
     align-items: center;
+}
+.main-section#destacados{
+    background-color: #EBE9DA;
+    padding: 5rem;
+    display: flex;
+
+    flex-direction: column;
+}
+
+.main-section#destacados h1{
+    color: #C8922B;
+}
+.destacados-body{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    flex: 1;
+
+}
+.libroMes{
+    color: #EBE9DA;
+    height: 100%;
+    width: 30%;
+    background-color: #1B4D2E;
+    padding: 15px;
+    border-radius: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+}
+.lista-libros{
+    width: 65%;
+    height: 600px;
+    border: #C2A85A 2px solid;
+    border-radius: 20px;
+    
+
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+.lista-libros::-webkit-scrollbar {
+    display: none;
+}
+.libro{
+    border: rebeccapurple 1PX solid;
+    height: 250px;
+    width: 100%;
+    background-color: #0E5A2D;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+}
+.section-header{
+    height: fit-content;
+    width: 100%;
+}
+.section-title{
+    width: fit-content;
 }
 .contact-header{
     margin-bottom: 1rem;
@@ -272,4 +344,139 @@ width: 100%;
 .map-container iframe{
     width: 45vw;
     height: 25vw;
+    border-radius: 40px;
+}
+
+#inicio, #contacto {
+    scroll-margin-top: 200px;
+}
+.carousel-wrapper{
+    margin-top: 10vh;
+    position: relative; 
+    padding: 20px;
+
+    border-left: #000 0px solid;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+} 
+.product-row{
+    display: flex; 
+    overflow-x: auto; 
+    gap: 1rem; scroll-behavior: smooth; 
+    padding: 10px;
+    scroll-snap-type: x mandatory;
+    mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 3%,
+        black 97%,
+        transparent
+    );
+
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 10%,
+        black 90%,
+        transparent
+    );
+} 
+.product-row::-webkit-scrollbar { 
+    display: none;
+} 
+.card{ 
+    min-width: 50px ; 
+    flex: 0 0 auto; 
+    background-color: #ffffff00; 
+
+    border-radius: 20px; 
+    transition: transform 0.3s; 
+    overflow: hidden;
+    scroll-snap-align: start;
+}
+.carousel-wrapper .card{ 
+    min-width: 400px; 
+}
+
+.card img{
+    width: 100%;
+    aspect-ratio: 2 / 3; 
+    object-fit: cover;
+    display: block;
+}
+.libroMes .card{
+    width: 150px;
+    min-width: unset; 
+}
+
+
+.scroll-btn{ 
+    position: absolute; 
+    top: 50%; transform: translateY(-50%); 
+    background: rgba(0,0,0,0.7); 
+    border: none; 
+    color: white; 
+    font-size: 24px; 
+    padding: 10px; 
+    cursor: pointer; 
+    border-radius: 50%; 
+} 
+.scroll-left{ 
+    left: 10px; 
+} 
+.scroll-right{ 
+    right: 10px; 
+}
+.two-parter{
+    width: 50% ;
+    
+}
+.two-parter .container{
+    width: fit-content;
+    
+}
+.row{
+    justify-content: space-evenly;
+    
+}
+
+.button{
+    all: unset;
+
+    font-family: "Plus Jakarta Sans", sans-serif;
+    width: fit-content ;
+    padding: 10px 15px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+.button:hover{
+    cursor: pointer;
+    transform: translateY(-5px);
+}
+#btnCatalogue{
+    background-color: #F0C05F;
+    color: black;
+    font-weight: bold;
+}
+#btnLocation{
+    border: 2px solid #fff;
+}
+.book {
+    border-radius: 6px 12px 12px 6px;
+    flex-shrink: 0;
+    transform-origin: bottom center;
+    transition: transform 0.3s;
+}
+.books-illustration {
+    position: absolute;
+    left: 3.5vw;
+    bottom: 5px;
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 12px;
 }
