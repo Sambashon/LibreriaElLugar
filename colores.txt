@@ -37,3 +37,9 @@ Detalles (bordes, glow): #3CFF9C
 
 
 
+
+
+#1B4D2E
+#F0C05F
+#fff
+#000

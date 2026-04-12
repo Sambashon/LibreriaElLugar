@@ -10,9 +10,113 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     
+    <style>
+        .carousel-wrapper{ 
+            position: relative; 
+            padding: 20px;
+
+            border-left: #000 0px solid;
+            border-radius: 10px;
+
+            display: flex;
+            align-items: center;
+        } 
+        .product-row{
+            display: flex; 
+            overflow-x: auto; 
+            gap: 1rem; scroll-behavior: smooth; 
+            padding: 10px;
+            scroll-snap-type: x mandatory;
+            mask-image: linear-gradient(
+                to right,
+                transparent,
+                black 3%,
+                black 97%,
+                transparent
+            );
+
+            -webkit-mask-image: linear-gradient(
+                to right,
+                transparent,
+                black 10%,
+                black 90%,
+                transparent
+            );
+        } 
+        .product-row::-webkit-scrollbar { 
+            display: none;
+        } 
+        .card{ 
+            min-width: 400px; 
+            flex: 0 0 auto; 
+            background-color: #1A1A1A; 
+            border-radius: 20px; 
+            transition: transform 0.3s; 
+            overflow: hidden;
+            scroll-snap-align: start;
+        }
+        .card img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .card:hover{ 
+            transform: scale(1.05); 
+        } 
+        .scroll-btn{ 
+            position: absolute; 
+            top: 50%; transform: translateY(-50%); 
+            background: rgba(0,0,0,0.7); 
+            border: none; 
+            color: white; 
+            font-size: 24px; 
+            padding: 10px; 
+            cursor: pointer; 
+            border-radius: 50%; 
+        } 
+        .scroll-left{ 
+            left: 10px; 
+        } 
+        .scroll-right{ 
+            right: 10px; 
+        }
+        .two-parter{
+            width: 50%;   
+        }
+        .two-parter .container{
+            width: fit-content;
+
+        }
+        .row{
+            justify-content: space-evenly;
+        }
+        .button{
+            all: unset;
+
+            font-family: "Plus Jakarta Sans", sans-serif;
+            width: fit-content;
+            padding: 10px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        .button:hover{
+            cursor: pointer;
+            transform: translateY(-2px);
+        }
+        #btnCatalogue{
+            background-color: #F0C05F;
+            color: black;
+            font-weight: bold;
+        }
+        #btnLocation{
+            border: 2px solid #fff;
+        }
+    </style>
 </head>
 <body>
     <header class="main-nav">
@@ -42,19 +146,65 @@
         <nav class="sub-nav">
             <ul class="sub-nav">
                 <li class="nav-item"><a href="#inicio">Inicio</a></li>
-                <li class="nav-item"><a href="#catalogo">Catálogo</a></li>
+                <li class="nav-item"><a href="">Catálogo</a></li>
                 <li class="nav-item"><a href="">Ofertas</a></li>
-                <li class="nav-item"><a href="">Destacados</a></li>
+                <li class="nav-item"><a href="#destacados">Destacados</a></li>
                 <li class="nav-item"><a href="#contacto">Contacto</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <section class="main-section" style="background-color: #e7d499;" id="inicio">
-            <img src="Resources/fondos/fondo2.jpg" alt="">
+        <section class="main-section" id="inicio">
+            <section class="container two-parter">
+                <h1>Tu próxima historia<span style="color: #C2A85A; font-weight: bold;"> <i>favorita</i> </span> te está esperando</h1>
+                <p>Descubrí cientos de títulos en nuestro local y catálogo online. Literatura, infantil, técnica y mucho más.</p>
+                <div class="row">
+                    <button class="button" id="btnCatalogue">Ver catálogo</button>
+                    <button class="button" id="btnLocation">Como llegar</button>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="container">
+                        <h1><span style="color: #C2A85A;">+</span><span style="color: #C2A85A;" class="cifra">1000</span></h1>
+                        <p>Títulos disponibles</p>
+                    </div>
+                    <div class="container">
+                        <h1><span style="color: #C2A85A;">+</span><span style="color: #C2A85A;" class="cifra">5</span></h1>
+                        <p>Años abiertos</p>
+                    </div>
+                    <div class="container">
+                        <h1><span style="color: #C2A85A;" class="cifra">100</span><span style="color: #C2A85A;">%</span></h1>
+                        <p>Pasión lectora</p>
+                    </div>
+                </div>
+                
+            </section>
+            <aside class="container two-parter">
+                <div class="carousel-wrapper">
+                    <div class="product-row" id="row">
+                        <div class="card"><img src="https://picsum.photos/200/250?1"></div> 
+                        <div class="card"><img src="https://picsum.photos/200/250?2"></div> 
+                        <div class="card"><img src="https://picsum.photos/200/250?3"></div> 
+                    </div>
+                </div>
+            </aside>
         </section>
-        <section class="main-section" style="background-color: #5ba53e;" id="catalogo">
-            <img src="Resources/fondos/fondo3.jpg" alt="">
+        <section class="main-section" id="destacados">
+            <div class="container "> 
+                <h2>Destacados</h2> 
+                <div class="carousel-wrapper"> 
+                    <button class="scroll-btn scroll-left" onclick="manualScroll(-300)">›</button> 
+                        <div class="product-row" id="row"> 
+                            <div class="card"><img src="https://picsum.photos/200/250?1"></div> 
+                            <div class="card"><img src="https://picsum.photos/200/250?2"></div> 
+                            <div class="card"><img src="https://picsum.photos/200/250?3"></div> 
+                            <div class="card"><img src="https://picsum.photos/200/250?4"></div> 
+                            <div class="card"><img src="https://picsum.photos/200/250?5"></div> 
+                            <div class="card"><img src="https://picsum.photos/200/250?6"></div> 
+                        </div> 
+                    <button class="scroll-btn scroll-right" onclick="manualScroll(300)">›</button>
+                </div> 
+            </div>
         </section>
         <section class="contact-section" id="contacto">
             <header class="contact-header">
@@ -68,7 +218,7 @@
                 </div>
                 <div class="contact-container">
                     <h2>Dirección</h2>
-                    <p><img src="Resources/icons/ubicacion.svg">Washington 285</p>
+                    <p><img src="Resources/icons/ubicacion.svg">Ciudad vieja, Washington 285</p>
                     
                 </div>
                 <div class="contact-container">
@@ -86,5 +236,6 @@
         </section>
     </main>
     <script src="src/js/index.js"></script>
+
 </body>
 </html>
