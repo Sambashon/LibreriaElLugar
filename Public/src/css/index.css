@@ -242,9 +242,11 @@ width: 100%;
     flex-direction: row;
     flex: 1;
 
+    position: relative;
 
 }
 .libroMes{
+    margin-top: 15px;
     color: #EBE9DA;
     height: 60vh;
     width: 35vw;
@@ -257,11 +259,13 @@ width: 100%;
 
 }
 .lista-libros{
-    width: 45vw;
-    height: 60vh;
-    border: #C2A85A 2px solid;
+    position: relative;
+    top: -15vh;
+    
     border-radius: 20px;
     
+    width: 40vw;
+    height: 75vh;
 
     overflow-y: auto;
     scroll-behavior: smooth;
@@ -272,10 +276,60 @@ width: 100%;
 .libro{
     border: rebeccapurple 1PX solid;
     height: 250px;
-    width: 100%;
+    width: 90%;
     background-color: #0E5A2D;
     border-radius: 20px;
     margin-bottom: 2rem;
+    padding: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.libro-aside{
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: fit-content;
+
+    align-items: center;
+    justify-content: center;
+
+}
+.libro-aside .card{
+    width: 10vw;
+}
+.libro-content{
+    display: flex;
+    height: 100%;
+    width: 70%;
+
+    flex-direction: column;
+    
+}
+.libro-title{
+    color: #C8922B;
+    border-radius: 20px;
+    padding: 5px;
+}
+.libro-footer{
+    margin-top: auto;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: 1rem;
+}
+.libro-footer .button{
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    background-color: #F0C05F;
+    color: black;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .section-header{
     height: fit-content;
@@ -439,6 +493,8 @@ width: 100%;
 }
 .row{
     justify-content: space-evenly;
+    display: flex;
+    flex-direction: row;
     
 }
 
@@ -468,6 +524,8 @@ width: 100%;
     flex-shrink: 0;
     transform-origin: bottom center;
     transition: transform 0.3s;
+
+    padding-top: 10px;
 }
 .books-illustration {
     position: absolute;
