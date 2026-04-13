@@ -1,3 +1,11 @@
+const underConstructions =  document.querySelectorAll(".uC");
+
+underConstructions.forEach(element => {
+    element.addEventListener("click", function(){
+        alert("Función en construcción");
+    })
+});
+
 const header = document.getElementById("header");
 const mainnav = document.querySelector(".main-nav");
 //scroll detection for dynamic header and elements
