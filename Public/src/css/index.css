@@ -215,9 +215,6 @@ width: 100%;
 .main-section p{
     font-family: "Plus Jakarta Sans", sans-serif;
 }
-.main-section#destacados{
-    background-color: #fff;
-}
 
 .main-section#inicio{
     padding: 3rem;
@@ -230,7 +227,7 @@ width: 100%;
 }
 .main-section#destacados{
     background-color: #EBE9DA;
-    padding: 5rem;
+    padding: 2.5rem;
     display: flex;
 
     flex-direction: column;
@@ -242,15 +239,15 @@ width: 100%;
 .destacados-body{
     display: flex;
     justify-content: space-between;
-    align-items: center;
     flex-direction: row;
     flex: 1;
+
 
 }
 .libroMes{
     color: #EBE9DA;
-    height: 100%;
-    width: 30%;
+    height: 60vh;
+    width: 35vw;
     background-color: #1B4D2E;
     padding: 15px;
     border-radius: 20px;
@@ -260,8 +257,8 @@ width: 100%;
 
 }
 .lista-libros{
-    width: 65%;
-    height: 600px;
+    width: 45vw;
+    height: 60vh;
     border: #C2A85A 2px solid;
     border-radius: 20px;
     
@@ -397,7 +394,7 @@ width: 100%;
     scroll-snap-align: start;
 }
 .carousel-wrapper .card{ 
-    width: 350px; 
+    width: 15vw; 
 }
 
 .card img{
@@ -407,8 +404,11 @@ width: 100%;
     display: block;
 }
 .libroMes .card{
-    width: 150px;
+    width: 9vw;
     min-width: unset; 
+}
+.libroMes>*{
+    margin-bottom: 0;
 }
 
 
@@ -479,4 +479,5 @@ width: 100%;
     align-items: flex-end;
     justify-content: center;
     gap: 12px;
+    
 }
