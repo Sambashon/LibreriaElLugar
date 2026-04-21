@@ -153,7 +153,7 @@ body{
 }
 .contact-section{
     box-sizing: border-box;
-    height: fit-content;
+    height: 85vh;
     width: 100%;
     background-color: black;
     color: white;
@@ -208,8 +208,8 @@ body{
     border-radius: 40px;
 }
 
-#inicio, #contacto {
-    scroll-margin-top: 200px;
+#inicio, #contacto, #destacados {
+    scroll-margin-top: 15vh;
 }
 
 .two-parter{
