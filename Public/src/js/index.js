@@ -6,9 +6,12 @@ underConstructions.forEach(element => {
     })
 });
 
+//scroll detection for dynamic header and elements
+/*
 const header = document.getElementById("header");
 const mainnav = document.querySelector(".main-nav");
-//scroll detection for dynamic header and elements
+
+
 let prevScroll = 0;
 
 window.addEventListener("scroll", function(){
@@ -23,7 +26,7 @@ window.addEventListener("scroll", function(){
     prevScroll = currentScroll;
 });
 
-
+*/
 const row = document.getElementById("row");
 
 const rows = document.querySelectorAll("#row");
@@ -78,15 +81,10 @@ startAutoScroll();
 
 const cifras = document.querySelectorAll(".cifra");
 
-function removeChars(cifra){
-    const str = cifra.innerText;
-    const cleaned = str.replace(/[^a-zA-Z0-9]/g, ""); 
-    return parseInt(cleaned);
-}
 
 function countUp(cifra){
     const original = cifra.innerText;
-    const target = removeChars(cifra);
+    const target = cifra.innerText;
     let current = 0;
 
     const interval = setInterval(() => {
@@ -107,17 +105,3 @@ cifras.forEach(cifra=> {
     countUp(cifra);
 })
 
-//ESTO ESTA MUY MAL SEBA 
-const link = document.querySelector('a[href="#destacados"]');
-const destacados = document.querySelector("#destacados");
-
-link.addEventListener("click", function(e) {
-    if (window.scrollY > destacados.offsetTop) {
-        e.preventDefault();
-
-        window.scrollTo({
-            top: destacados.offsetTop - 120,
-            behavior: "smooth"
-        });
-    }
-});
