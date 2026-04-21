@@ -1,0 +1,135 @@
+h1,h2{
+    font-family: "Fraunces", sans-serif;
+    line-height: 1.15;
+    font-weight: bold;
+}
+h3{font-family: "Fraunces", sans-serif;}
+h1{font-size: clamp(28px, 3.5vw, 46px);}
+h2{font-size: clamp(20px, 3vw, 36px);}
+a{font-size: clamp(10px, 1.1vw, 15px);}
+p{font-family: "Plus Jakarta Sans", sans-serif;}
+
+.carousel-wrapper{
+    position: relative; 
+    padding: 20px;
+
+    border-left: #000 0px solid;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+} 
+.product-row{
+    display: flex; 
+    overflow-x: auto; 
+    gap: 1rem; scroll-behavior: smooth; 
+    padding: 10px;
+    scroll-snap-type: x mandatory;
+    mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 3%,
+        black 97%,
+        transparent
+    );
+
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 10%,
+        black 90%,
+        transparent
+    );
+} 
+.product-row::-webkit-scrollbar { 
+    display: none;
+} 
+.card{ 
+
+    flex: 0 0 auto; 
+    background-color: #ffffff00; 
+
+    border-radius: 20px; 
+    transition: transform 0.3s; 
+    overflow: hidden;
+    scroll-snap-align: start;
+    
+    transition: all 0.3s ease;
+}
+.carousel-wrapper .card{ 
+    width: 15vw; 
+}
+
+.carousel-wrapper .card:hover{
+    width: 16vw;
+    cursor: pointer;
+
+    border: #C2A85A 5px solid;
+}
+
+.card img{
+    width: 100%;
+    aspect-ratio: 2 / 3; 
+    object-fit: cover;
+    display: block;
+}
+.libroMes .card{
+    width: 9vw;
+    min-width: unset; 
+}
+.libroMes>*{
+    margin-bottom: 0;
+}
+.scroll-btn{ 
+    position: absolute; 
+    top: 50%; transform: translateY(-50%); 
+    background: rgba(0,0,0,0.7); 
+    border: none; 
+    color: white; 
+    font-size: 24px; 
+    padding: 10px; 
+    cursor: pointer; 
+    border-radius: 50%; 
+} 
+.scroll-left{ 
+    left: 10px; 
+} 
+.scroll-right{ 
+    right: 10px; 
+}
+
+.button{
+    all: unset;
+
+    font-family: "Plus Jakarta Sans", sans-serif;
+    width: fit-content ;
+    padding: 10px 15px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+.button:hover{
+    cursor: pointer;
+    transform: translateY(-5px);
+}
+
+.book {
+    border-radius: 6px 12px 12px 6px;
+    flex-shrink: 0;
+    transform-origin: bottom center;
+    transition: transform 0.3s;
+
+    padding-top: 10px;
+}
+.books-illustration {
+    position: absolute;
+    left: 3.5vw;
+    bottom: 10px;
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 12px;
+    
+}
