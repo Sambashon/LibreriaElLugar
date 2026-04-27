@@ -1,45 +1,9 @@
-🎨 Paleta recomendada
-🌑 Base (fondos)
-Negro profundo: #0B0B0B
-Gris oscuro: #1A1A1A
-Gris medio (secciones): #2A2A2A
-
-👉 Esto hace que el verde del logo destaque mucho.
-
-🟢 Color principal (branding)
-Verde esmeralda: #1DB954
-Verde oscuro: #0E5A2D
-Verde brillante (hover/accento): #2EFF7B
-
-👉 Inspirado directamente en los tonos del logo.
-
-⚪ Neutrales (texto)
-Blanco suave: #F5F5F5
-Gris claro: #B0B0B0
-✨ Accent (detalles elegantes)
-
-Para darle ese toque “mágico”:
-
-Verde neón suave glow: #3CFF9C
-Morado oscuro (opcional): #2A0F3F
-Dorado apagado (premium): #C2A85A
-🧩 Cómo usarla (importante)
-Fondo: negro (#0B0B0B)
-Navbar: gris oscuro (#1A1A1A)
-Botones:
-normal: verde #1DB954
-hover: #2EFF7B
-Texto:
-principal: blanco
-secundario: gris claro
-Detalles (bordes, glow): #3CFF9C
-
-
-
-
-
-
 #1B4D2E
+#16b151
+#EBE9DA
+#FFFDF7
 #F0C05F
-#fff
-#000
+#C8922B
+#1A1A1A
+#242424
+#133620

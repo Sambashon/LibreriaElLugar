@@ -1,3 +1,16 @@
+html{
+    scroll-behavior: smooth;
+}
+
+*{
+    padding: 0;
+    margin: 0;
+    
+}
+body{
+    width: 100%;
+}
+
 h1,h2{
     font-family: "Fraunces", sans-serif;
     line-height: 1.15;
@@ -18,13 +31,13 @@ p{font-family: "Plus Jakarta Sans", sans-serif;}
 
     display: flex;
     align-items: center;
-    overflow: hidden;
+    overflow-x: auto;
 } 
 .product-row{
     display: flex; 
     overflow-x: auto; 
     gap: 1rem; scroll-behavior: smooth; 
-    padding: 10px;
+    padding: 20px;
     scroll-snap-type: x mandatory;
     mask-image: linear-gradient(
         to right,
@@ -42,30 +55,40 @@ p{font-family: "Plus Jakarta Sans", sans-serif;}
         transparent
     );
 } 
-.product-row::-webkit-scrollbar { 
-    display: none;
-} 
+.product-row::-webkit-scrollbar {
+    height: 6px; 
+}
+
+.product-row::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.product-row::-webkit-scrollbar-thumb {
+    background: #c8c5b0;
+    border-radius: 999px;
+}
+
+.product-row::-webkit-scrollbar-thumb:hover {
+    background: #a8a58f;
+}
 .card{ 
-
+    background-color: #C2A85A;
     flex: 0 0 auto; 
-    background-color: #ffffff00; 
-
-    border-radius: 20px; 
-    transition: transform 0.3s; 
+    border-radius: 20px;
     overflow: hidden;
     scroll-snap-align: start;
     
     transition: all 0.3s ease;
 }
 .carousel-wrapper .card{ 
-    width: 15vw; 
+    width: clamp(150px, 15vw, 300px);
 }
 
 .carousel-wrapper .card:hover{
-    width: 16vw;
+    
     cursor: pointer;
-
-    border: #C2A85A 5px solid;
+    transform: scale(1.05);
+    box-shadow: 0 0 0 5px #C2A85A;
 }
 
 .card img{
@@ -113,23 +136,9 @@ p{font-family: "Plus Jakarta Sans", sans-serif;}
     transform: translateY(-5px);
 }
 
-.book {
-    border-radius: 6px 12px 12px 6px;
-    flex-shrink: 0;
-    transform-origin: bottom center;
-    transition: transform 0.3s;
-
-    padding-top: 10px;
-}
-.books-illustration {
-    position: absolute;
-    left: 3.5vw;
-    bottom: 10px;
-    width: fit-content;
-    height: fit-content;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 12px;
-    
+@media (max-width: 768px){
+    .button{
+        font-size: 0.9rem;
+        padding: 5px 10px;
+    }
 }

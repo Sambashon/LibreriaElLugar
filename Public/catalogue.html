@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo | El lugar</title>
+ 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+ 
+    <link rel="stylesheet" href="src/css/components.css">
+    <link rel="stylesheet" href="src/css/catalogue.css">
+</head>
+ 
+<body>
+    <div class="custom-row">
+        <nav class="nav-menu">
+ 
+            <header class="nav-logo">
+                <div class="logo-container">
+                    <img src="Resources/logos/libreriaElLugar.png">
+                </div>
+                <hr style="margin: 10px 0px; width: 100%;">
+            </header>
+ 
+            <div class="nav-item" id="inicioBtn">
+                <svg class="icon" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor"/></svg>
+                <p>Inicio</p>
+            </div>
+            <div class="nav-item uC">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.29977 5H21L19 12H7.37671M20 16H8L6 3H3M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20ZM20 20C20 20.5523 19.5523 21 19 21C18.4477 21 18 20.5523 18 20C18 19.4477 18.4477 19 19 19C19.5523 19 20 19.4477 20 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <p>Carrito</p>
+            </div>
+            <div class="nav-item uC">
+                <svg class="icon" viewBox="0 0 14 14" fill="none"><path d="M7 2l1.4 2.8 3.1.45-2.25 2.2.53 3.1L7 9.1l-2.78 1.45.53-3.1L2.5 5.25l3.1-.45L7 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                <p>Favoritos</p>
+            </div>
+ 
+            <header class="nav-header">
+                <hr style="margin: 4px 0px; width: 100%;">
+                <h3>Filtros</h3>
+            </header>
+ 
+            <!-- Todo lo de abajo scrollea junto sin mover el logo ni el nav principal -->
+            <div class="filters-wrapper">
+ 
+                <!-- GÉNERO — lista larga con buscador interno -->
+                <div class="filter-item">
+                    <div class="filter-header" onclick="toggleFilter(this)">
+                        <p>Género</p>
+                        <div class="arrow-container">
+                            <svg class="icon" fill="currentColor" viewBox="0 0 30.727 30.727" xml:space="preserve"><path d="M29.994,10.183L15.363,24.812L0.733,10.184c-0.977-0.978-0.977-2.561,0-3.536c0.977-0.977,2.559-0.976,3.536,0l11.095,11.093L26.461,6.647c0.977-0.976,2.559-0.976,3.535,0C30.971,7.624,30.971,9.206,29.994,10.183z"/></svg>
+                        </div>
+                    </div>
+                    <div class="filter-body">
+                        <div class="filter-search">
+                            <input type="text" placeholder="Buscar género…" oninput="filterGenres(this.value)">
+                        </div>
+                        <div class="genre-list" id="genreList"></div>
+                    </div>
+                </div>
+ 
+                <!-- PRECIO -->
+                <div class="filter-item">
+                    <div class="filter-header" onclick="toggleFilter(this)">
+                        <p>Precio</p>
+                        <div class="arrow-container">
+                            <svg class="icon" fill="currentColor" viewBox="0 0 30.727 30.727" xml:space="preserve"><path d="M29.994,10.183L15.363,24.812L0.733,10.184c-0.977-0.978-0.977-2.561,0-3.536c0.977-0.977,2.559-0.976,3.536,0l11.095,11.093L26.461,6.647c0.977-0.976,2.559-0.976,3.535,0C30.971,7.624,30.971,9.206,29.994,10.183z"/></svg>
+                        </div>
+                    </div>
+                    <div class="filter-body">
+                        <div class="price-inputs">
+                            <input type="range" min="100" max="5000" value="2500" step="100"
+                                   oninput="document.getElementById('priceVal').textContent='$'+this.value">
+                            <div class="price-row">
+                                <span>$100</span>
+                                <span id="priceVal">$2500</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- DISPONIBILIDAD -->
+                <div class="filter-item">
+                    <div class="filter-header" onclick="toggleFilter(this)">
+                        <p>Disponibilidad</p>
+                        <div class="arrow-container">
+                            <svg class="icon" fill="currentColor" viewBox="0 0 30.727 30.727" xml:space="preserve"><path d="M29.994,10.183L15.363,24.812L0.733,10.184c-0.977-0.978-0.977-2.561,0-3.536c0.977-0.977,2.559-0.976,3.536,0l11.095,11.093L26.461,6.647c0.977-0.976,2.559-0.976,3.535,0C30.971,7.624,30.971,9.206,29.994,10.183z"/></svg>
+                        </div>
+                    </div>
+                    <div class="filter-body">
+                        <div class="avail-chips">
+                            <label class="avail-chip"><input type="checkbox" checked> En stock</label>
+                            <label class="avail-chip"><input type="checkbox"> Preventa</label>
+                        </div>
+                    </div>
+                </div>
+ 
+            </div><!-- /filters-wrapper -->
+ 
+        </nav>
+    </div>
+    
+    <script src="src/js/catalogue.js"></script>
+</body>
+</html>

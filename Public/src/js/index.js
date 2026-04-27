@@ -6,27 +6,7 @@ underConstructions.forEach(element => {
     })
 });
 
-//scroll detection for dynamic header and elements
 /*
-const header = document.getElementById("header");
-const mainnav = document.querySelector(".main-nav");
-
-
-let prevScroll = 0;
-
-window.addEventListener("scroll", function(){
-    let currentScroll = window.scrollY;
-    if(currentScroll > 80 && currentScroll > prevScroll){
-        mainnav.classList.add("hidden");
-
-    }else{
-        mainnav.classList.remove("hidden");
-
-    }
-    prevScroll = currentScroll;
-});
-
-*/
 const row = document.getElementById("row");
 
 const rows = document.querySelectorAll("#row");
@@ -77,8 +57,8 @@ row.addEventListener("mousedown", resetAutoScroll);
 row.addEventListener("touchstart", resetAutoScroll);
 
 // iniciar
-startAutoScroll();
-
+//startAutoScroll();
+*/
 const cifras = document.querySelectorAll(".cifra");
 
 
