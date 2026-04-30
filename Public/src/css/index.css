@@ -73,7 +73,7 @@
     margin-bottom: 1rem;
 }
 .contact-section{
-    height: fit-content;
+
     box-sizing: border-box;
     background-image: url(../../Resources/fondos/flores2.svg);
     color: white;
@@ -116,16 +116,15 @@
 }
 
 .map-container{
-
-    height: fit-content;
+    height: 35vh;
     display: flex;
     align-items: center;
     justify-content: center;
 
 }
 .map-container iframe{
-    width: 60%;
-    height: 40%;
+    width: 40%;
+    height: 100%;
     border-radius: 10px;
 }
 
