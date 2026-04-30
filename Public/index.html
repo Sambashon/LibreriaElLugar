@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="src/css/header.css">
     <link rel="stylesheet" href="src/css/index.css">
 
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
 </head>
 <body>
     <header class="main-nav">
@@ -101,7 +103,6 @@
                         <div class="card"><img src="Resources/libros/cuentoscompletos.png"></div> 
                         <div class="card"><img src="Resources/libros/Enelcamino.png"></div>
                         <div class="card"><img src="Resources/libros/laciudadmariolevrero.png"></div>
- 
                     </div>
                 </div>
             </aside>
@@ -136,24 +137,85 @@
         </section>
 
         <section class="main-section gallery-section" id="galeria">
-            <div class="gallery-container">
-                <header class="gallery-header">
-                    <h1 style="margin-bottom: 0;">Un poco más sobre <span style="color: #C2A85A;">nosotros</span></h1>
-                    <div class="floral-hr-container">
-                        <svg class="floral-hr" viewBox="0 0 132 20" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><g transform="matrix(1.4114917,0,0,1.4114917,-72.655948,-241.74404)"><path d="m 76.903603,181.34595 c 2.324894,0.93715 4.793986,-0.0405 7.050882,-0.68554 0.236537,-0.0677 1.141941,-0.44926 1.351491,-0.32226 0.188384,0.1143 0.293688,0.79878 0.457729,1.00859 0.370682,0.47387 0.968111,0.81439 1.5621,0.90196 0.463815,0.0685 0.963084,-0.0328 1.325298,-0.3302 0.0471,-0.0386 0.09393,-0.0836 0.110067,-0.14234 0.04339,-0.15663 -0.13679,-0.27279 -0.276754,-0.35481 -1.459442,-0.85487 -0.627063,-2.76595 0.461169,-3.51499 2.061368,-1.41869 4.374091,-2.76966 6.788679,-2.01771 2.652977,0.82629 3.995737,4.25556 1.895739,6.38202 -0.277283,0.28072 -0.615421,0.52334 -1.004623,0.58869 -0.389202,0.0654 -0.832643,-0.0852 -1.022614,-0.431 -0.223838,-0.40693 -0.04551,-0.92075 -0.160867,-1.37054 -0.209285,-0.81519 -1.43219,-1.05093 -2.037821,-0.4662 -0.605366,0.58473 -0.537368,1.6547 0.01773,2.28706 0.555361,0.63235 1.466321,0.86227 2.302934,0.77099 2.173552,-0.23759 3.766873,-2.48179 3.734329,-4.66804 -0.0048,-0.31512 -0.03784,-0.6313 -0.101336,-0.94086 -0.202406,-0.98848 -0.779991,-1.88595 -1.585912,-2.49079 -0.943504,-0.70829 -2.152386,-0.98292 -3.317081,-0.948 -0.141023,0.004 -0.281782,0.0114 -0.421217,0.0249 -2.265627,0.21855 -4.372504,1.27185 -6.262952,2.549 -1.135856,0.59346 -2.32066,1.0332 -3.630083,1.06521 -0.659871,0.0161 -1.330854,0.0132 -1.979084,-0.11218 -0.561975,-0.10875 -1.757891,-0.83661 -0.989277,-1.64227 0.126736,-0.13282 0.04868,-0.33179 -0.118533,-0.32597 -0.964406,0.0341 -1.957652,0.57626 -2.252133,1.68619 -0.07779,0.29342 -0.08996,0.6051 -0.02646,0.90276 0.05556,0.26035 0.245534,0.48419 0.29898,0.72046 -0.709348,0.25612 -1.297782,0.79904 -1.98755,1.11178 -0.334963,0.1524 -0.683948,0.56197 -0.182828,0.76412 z"/><path d="m 122.57545,181.34595 c -2.3249,0.93715 -4.79399,-0.0405 -7.05088,-0.68554 -0.23654,-0.0677 -1.14194,-0.44926 -1.35149,-0.32226 -0.18839,0.1143 -0.29369,0.79878 -0.45773,1.00859 -0.37068,0.47387 -0.96811,0.81439 -1.5621,0.90196 -0.46382,0.0685 -0.96309,-0.0328 -1.3253,-0.3302 -0.0471,-0.0386 -0.0939,-0.0836 -0.11007,-0.14234 -0.0434,-0.15663 0.13679,-0.27279 0.27702,-0.35481 1.45944,-0.85487 0.62706,-2.76595 -0.46143,-3.51499 -2.06137,-1.41869 -4.37409,-2.76966 -6.78868,-2.01771 -2.65298,0.82629 -3.995739,4.25556 -1.89574,6.38202 0.27728,0.28072 0.61542,0.52334 1.00462,0.58869 0.3892,0.0654 0.83265,-0.0852 1.02262,-0.431 0.22383,-0.40693 0.0455,-0.92075 0.16086,-1.37054 0.20929,-0.81519 1.43219,-1.05093 2.03756,-0.4662 0.60537,0.58473 0.53737,1.6547 -0.0177,2.28706 -0.55536,0.63235 -1.46632,0.86227 -2.30293,0.77099 -2.17355,-0.23759 -3.766874,-2.48179 -3.73433,-4.66804 0.005,-0.31512 0.0378,-0.6313 0.10134,-0.94086 0.2024,-0.98848 0.77999,-1.88595 1.58591,-2.49079 0.9435,-0.70829 2.15238,-0.98292 3.31708,-0.948 0.14129,0.004 0.28178,0.0114 0.42122,0.0249 2.26589,0.21855 4.3725,1.27185 6.26295,2.549 1.13585,0.59346 2.32066,1.0332 3.63008,1.06521 0.65987,0.0161 1.33086,0.0132 1.97908,-0.11218 0.56198,-0.10875 1.7579,-0.83661 0.98928,-1.64227 -0.12673,-0.13282 -0.0487,-0.33179 0.11853,-0.32597 0.96441,0.0341 1.95766,0.57626 2.25214,1.68619 0.0778,0.29342 0.09,0.6051 0.0265,0.90276 -0.0556,0.26035 -0.24554,0.48419 -0.29898,0.72046 0.70934,0.25612 1.29778,0.79904 1.98755,1.11178 0.33549,0.1524 0.68447,0.56197 0.18309,0.76412 z"/><path d="m 143.64184,174.21066 c -0.51382,-0.118 -1.21285,-0.13044 -1.85923,-0.13626 -15.73662,-0.14472 -31.48303,-0.20029 -47.226271,-0.20029 -3.020748,-0.003 -6.041761,-0.0135 -9.062509,-0.0135 -5.11757,0 -10.390981,0.009 -15.567024,0.0474 -2.633663,0.0196 -5.267061,0.0468 -7.898871,0.0847 -1.355725,0.0196 -2.711185,0.0418 -4.066117,0.0672 -0.874183,0.0164 -2.571221,-0.0569 -3.169708,0.17515 0.456671,0.10981 1.174221,0.0971 1.74625,0.0971 15.989829,0 31.979658,0.0111 47.96949,0.0167 6.43413,0.002 12.84737,0.0339 19.27251,0.0505 6.66036,0.0175 13.335,0.0344 19.96599,-0.16192 -0.0336,-0.01 -0.0685,-0.0183 -0.10451,-0.0267 z"/><path d="m 56.345214,174.71284 c 0.104775,-0.0955 0.210079,-0.18812 0.323586,-0.27728 0.03122,-0.031 0.068,-0.0598 0.107685,-0.0876 0.0013,-0.0138 -2.65e-4,-0.0278 -0.0074,-0.0418 -0.01588,-0.031 -0.04445,-0.0598 -0.07356,-0.0889 -0.121972,-0.0968 -0.234685,-0.19738 -0.34581,-0.30136 -0.26035,-0.24315 -0.927894,-0.92128 -1.455208,-0.85937 -0.145786,0.0172 -0.276754,0.0659 -0.404284,0.11377 -0.410104,0.15399 -0.820208,0.30798 -1.230577,0.46196 l -0.615156,0.23099 c -0.285221,0.10715 -0.602192,0.15134 -0.752475,0.36115 -0.06403,0.0894 -0.03545,0.16087 0.07461,0.2294 0.178064,0.11059 0.405341,0.17859 0.623093,0.25056 0.228336,0.0754 0.443442,0.16615 0.662782,0.25161 0.408516,0.15928 0.817033,0.31856 1.225285,0.47811 0.127,0.0495 0.25744,0.10001 0.40296,0.11906 0.526786,0.0685 1.201473,-0.60087 1.464469,-0.84032 z"/><path d="m 57.463872,174.34057 c -0.0016,0.31301 -0.233362,0.56542 -0.517789,0.56357 -0.284163,-0.002 -0.513292,-0.25718 -0.51144,-0.57045 0.0016,-0.313 0.233627,-0.56541 0.51779,-0.56356 0.284162,0.002 0.513027,0.25718 0.511439,0.57044 z"/><path d="m 140.12235,174.69776 c -0.10477,-0.0955 -0.21008,-0.18812 -0.32358,-0.27728 -0.0312,-0.031 -0.068,-0.0598 -0.10769,-0.0876 -0.003,-0.0138 2.6e-4,-0.0278 0.007,-0.0418 0.0159,-0.031 0.0445,-0.0598 0.0736,-0.0889 0.12198,-0.0968 0.23469,-0.19738 0.34581,-0.30136 0.26035,-0.24316 0.9279,-0.92128 1.45521,-0.85937 0.14579,0.0172 0.27676,0.0659 0.40428,0.11377 0.41011,0.15399 0.82021,0.30798 1.23058,0.46196 l 0.61516,0.23098 c 0.28522,0.10716 0.60219,0.15135 0.75247,0.36116 0.064,0.0892 0.0357,0.16087 -0.0746,0.22913 -0.17806,0.1106 -0.40534,0.17859 -0.62309,0.25056 -0.22834,0.0754 -0.44345,0.16616 -0.66278,0.25162 -0.40852,0.15928 -0.81704,0.31856 -1.22529,0.4781 -0.127,0.0495 -0.25744,0.10001 -0.40296,0.11906 -0.52652,0.0691 -1.20147,-0.60034 -1.46447,-0.84005 z"/><path d="m 139.00369,174.32549 c 0.003,0.31327 0.23336,0.56542 0.51779,0.56356 0.28416,-0.002 0.51329,-0.25717 0.51144,-0.57044 -0.003,-0.31326 -0.23336,-0.56541 -0.51779,-0.56356 -0.2839,0.002 -0.51303,0.25744 -0.51144,0.57044 z"/></g></svg>
+            <div class="gallery-wrap">
+            <header class="gallery-header" data-aos="fade-down" data-aos-duration="700">
+                <h1 class="gallery-title">Un poco más sobre <span>nosotros</span></h1>
+                <div class="gallery-rule"></div>
+                <p class="gallery-intro">Cada imagen es un fragmento de lo que somos — los espacios donde trabajamos, las personas que nos inspiran y los momentos que nos definen.</p>
+            </header>
+
+            <div class="gallery-grid">
+                <div class="gallery-cell tall" data-aos="fade-right" data-aos-duration="800" data-aos-delay="0">
+                <img src="Resources/gallery/bicicleta.jpg"/>
+                <div class="gallery-veil">
+                    <span class="gallery-tag">personas</span>
+                    <span class="gallery-caption">nuestro equipo</span>
+                </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                <div class="gallery-cell" data-aos="fade-left" data-aos-duration="800" data-aos-delay="100">
+                    <img src="Resources/gallery/aereotrasero.jpg"/>
+                    <div class="gallery-veil">
+                    <span class="gallery-tag">lugar</span>
+                    <span class="gallery-caption">nuestro espacio</span>
                     </div>
-                </header>
-                <div class="gallery-body">
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse placeat nihil id hic rerum, nesciunt molestiae commodi, doloremque animi accusamus, nisi ullam impedit maxime totam illo neque ipsum quas fuga.</p>
+                </div>
+                <div class="gallery-cell" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
+                    <img src="Resources/gallery/fondoLibreria.jpg"/>
+                    <div class="gallery-veil">
+                    <span class="gallery-tag">trabajo</span>
+                    <span class="gallery-caption">nuestro proceso</span>
+                    </div>
+                </div>
                 </div>
             </div>
-            
-            
+
+            <div class="gallery-row2">
+                <div class="gallery-cell square" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="0">
+                <img src="Resources/gallery/libros1.jpg"/>
+                <div class="gallery-veil">
+                    <span class="gallery-tag">cultura</span>
+                    <span class="gallery-caption">lo que nos une</span>
+                </div>
+                </div>
+                <div class="gallery-cell square" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100">
+                <img src="Resources/gallery/fotoPrincipal.jpg"/>
+                <div class="gallery-veil">
+                    <span class="gallery-tag">proyectos</span>
+                    <span class="gallery-caption">lo que creamos</span>
+                </div>
+                </div>
+                <div class="gallery-cell square" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="200">
+                <img src="Resources/gallery/risa.jpg"/>
+                <div class="gallery-veil">
+                    <span class="gallery-tag">momentos</span>
+                    <span class="gallery-caption">lo que vivimos</span>
+                </div>
+                </div>
+            </div>
+
+            <div class="gallery-row3">
+                <div class="gallery-cell short" data-aos="fade-up" data-aos-duration="800" data-aos-delay="0">
+                <img src="Resources/gallery/DSC_5636.jpg"/>
+                <div class="gallery-veil">
+                    <span class="gallery-tag">colaboración</span>
+                    <span class="gallery-caption">juntos construimos más</span>
+                </div>
+                </div>
+                <div class="gallery-cell short" data-aos="fade-up" data-aos-duration="800" data-aos-delay="150">
+                <img src="Resources/gallery/DSC_5737.jpg"/>
+                <div class="gallery-veil">
+                    <span class="gallery-tag">visión</span>
+                    <span class="gallery-caption">hacia dónde vamos</span>
+                </div>
+                </div>
+            </div>
+            </div>
         </section>
         
         <section class="main-section contact-section" id="contacto">
             <header class="contact-header">
-                <h1 style="margin: 0;">Comunícate con nosotros</h1>
+                <h1>Comunícate con nosotros</h1>
             </header>
             <main class="contact-body">
                 <div class="contact-container">
@@ -164,9 +226,7 @@
                 <div class="contact-container">
                     <h2>Dirección</h2>
                     <p><img src="Resources/icons/ubicacion.svg">Ciudad vieja, calle Washington 285</p>
-                    <div class="map-container">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13088.041158001455!2d-56.217392392587996!3d-34.9061912911164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f7f003e8676e3%3A0x4e95ab7bbfc001b9!2sLibrer%C3%ADa%20El%20Lugar!5e0!3m2!1sen!2suy!4v1775761283451!5m2!1sen!2suy" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>                              
-                    </div>
+                    
                 </div>
                 <div class="contact-container">
                     <h2>Contacto</h2>
@@ -176,10 +236,13 @@
                 </div>
                 
             </main>
-            
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13088.041158001455!2d-56.217392392587996!3d-34.9061912911164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f7f003e8676e3%3A0x4e95ab7bbfc001b9!2sLibrer%C3%ADa%20El%20Lugar!5e0!3m2!1sen!2suy!4v1775761283451!5m2!1sen!2suy" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>                              
+            </div>
         </section>
     </main>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="src/js/index.js"></script>
-
+    
 </body>
 </html>

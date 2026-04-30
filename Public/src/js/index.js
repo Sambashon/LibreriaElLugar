@@ -6,6 +6,12 @@ underConstructions.forEach(element => {
     })
 });
 
+AOS.init({
+    once: true,
+    offset: 40,
+    easing: 'ease-out-quart'
+  });
+
 /*
 const row = document.getElementById("row");
 

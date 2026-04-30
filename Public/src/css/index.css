@@ -73,6 +73,7 @@
     margin-bottom: 1rem;
 }
 .contact-section{
+    height: fit-content;
     box-sizing: border-box;
     background-image: url(../../Resources/fondos/flores2.svg);
     color: white;
@@ -125,7 +126,7 @@
 .map-container iframe{
     width: 35vw;
     height: 45vh;
-    border-radius: 40px;
+    border-radius: 10px;
 }
 
 #inicio, #contacto, #destacados, #galeria {
@@ -134,55 +135,207 @@
 
 
 .gallery-section{
-    background-color: grey;
+    height: fit-content;
+    padding: 0;
+    background-color: #1B4D2E;
 
-
-    padding: 2.5rem;
-
-    background-image: url(../../Resources/fondos/fondoLibreria.jpg);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
 
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 2.5rem;
 }
 
-.gallery-container{
-    border-radius: 30px;
-    height: 80%;
-    width: 60%;
-    background-color: #133620c0;
-    border: 2px solid black;
+.gallery-header-container{
+    border-radius: 0px 0px 50px 50px;
+    height: fit-content;
+    width: 100%;
 
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px) grayscale(100%);
+    -webkit-backdrop-filter: blur(10px) grayscale(100%);
 
 }
 
 .gallery-header{
     width: 100%;
     color: #FFFDF7;
-    padding: 1rem;
+
     border-radius: 5px;
 
     height: fit-content;
 
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     flex-direction: column;
 }
 
-.gallery-body{
-    flex: 1;
-    padding: 1rem;
-
-    color: #FFFDF7;
+.gallery-wrap {
+    padding: 3rem 1.5rem;
+    width: 65%;
+    margin: 0 auto;
 }
 
+.gallery-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.gallery-title {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--color-text-primary);
+    margin: 0 0 0.5rem;
+    line-height: 1.15;
+}
+
+.gallery-title span { color: #C2A85A; font-style: italic; }
+
+.gallery-rule {
+    width: 40px;
+    height: 1px;
+    background: #C2A85A;
+    margin: 0 auto;
+    opacity: 0.6;
+}
+
+.gallery-intro {
+    max-width: 480px;
+    line-height: 1.85;
+    margin: 1rem auto 0;
+    letter-spacing: 0.02em;
+
+    font-size: clamp(12px, 2vw, 18px);
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.gallery-row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.gallery-row3 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+}
+
+.gallery-cell {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-background-secondary);
+}
+
+.gallery-cell::after {
+    content: '';
+    display: block;
+    padding-top: 70%;
+}
+
+.gallery-cell.tall::after { padding-top: 130%; }
+.gallery-cell.short::after { padding-top: 56%; }
+.gallery-cell.square::after { padding-top: 100%; }
+
+.gallery-cell img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.gallery-cell:hover img { transform: scale(1.05); }
+
+.gallery-veil {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 14, 3, 0);
+    transition: background 0.4s;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 18px;
+    z-index: 1;
+}
+
+.gallery-cell:hover .gallery-veil {
+    background: rgba(20, 14, 3, 0.42);
+}
+
+.gallery-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #C2A85A;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s, transform 0.35s;
+    margin-bottom: 3px;
+}
+
+.gallery-caption {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 17px;
+    color: rgba(255,255,255,0);
+    transition: color 0.35s 0.05s;
+    line-height: 1.2;
+}
+
+.gallery-cell:hover .gallery-tag {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.gallery-cell:hover .gallery-caption {
+    color: rgba(255,255,255,0.95);
+}
+
+.gallery-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 2.5rem;
+}
+
+.gallery-line {
+    flex: 1;
+    height: 0.5px;
+    background: var(--color-border-tertiary);
+    max-width: 100px;
+}
+
+.gallery-btn {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #C2A85A;
+    border: 0.5px solid #C2A85A;
+    padding: 11px 28px;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+}
+
+.gallery-btn:hover { background: #C2A85A; color: #fff; }
+
+
 .floral-hr-container{
-    margin: 10px 0px;
+    margin: 10px 0px; 
 
     height: fit-content;
     width: 100%;
@@ -191,7 +344,7 @@
     justify-content: center;
 }
 .floral-hr{
-    height: 7vh;
+    height: 5vh;
     width: 100%;
     color: #C2A85A;
 }
@@ -236,10 +389,7 @@
     .books-illustration{
         display: none;
     }
-    html, body {
-        margin: 0;
-        overflow-x: hidden;
-    }
+
 }
 @media (max-width: 520px){
     .cifras-container{
@@ -252,5 +402,9 @@
     }
     .cifras{
         font-size: 26px;
+    }
+    .gallery-wrap{
+        width: 100%;
+        padding: 1rem 1rem;
     }
 }
