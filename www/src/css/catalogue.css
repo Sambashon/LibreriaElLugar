@@ -1,6 +1,9 @@
+body{
+    overflow-x: hidden;
+}
 .custom-row{
     height: 100vh;
-    width: 100vw;
+    width: 100%;
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -294,14 +297,25 @@ svg{
 .product-shell{
     box-sizing: border-box;
     padding: 1rem;
-    background-color: #133620;
-    height: 100%;
-    width: 90%;
+    background-image: none;
+    background-color: #1a4d2e;
+    min-height: 100vh;
+    width: 100%;
+
+
+    margin: 0 auto;
 
     display: flex;
     align-items: center;
 
     flex-direction: column;
+}
+
+.product-body{
+    height: 100%;
+    width: 100%;
+    
+    
 }
 
 
