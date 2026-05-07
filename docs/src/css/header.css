@@ -215,3 +215,9 @@ width: 100%;
   height: 100%;
   fill: none;
 }
+
+@media (max-width: 512px){
+    .searchbar-form{
+        --width-of-input: 120px;
+    }
+}

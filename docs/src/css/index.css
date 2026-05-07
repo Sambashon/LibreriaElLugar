@@ -406,6 +406,10 @@
         width: 100%;
         padding: 1rem 1rem;
     }
+    
+}
+
+@media (max-width: 768px){
     .contact-section{
         height: fit-content;
     }
@@ -420,6 +424,25 @@
         width: 100%;
     }
     .map-container{
+        width: 100%;
+    }.contact-section{
+        height: fit-content;
+    }
+    .contact-body{
+        flex-direction: column;
+        align-items: center;
+    }
+    .contact-container{
+        display: flex;
+        align-items: center !important; 
+        justify-content: center;
+        width: 100%;
+    }
+    .map-container{
+        width: 100%;
+    }
+    .map-container iframe{
+        height: 100%;
         width: 100%;
     }
     .map-container iframe{
