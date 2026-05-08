@@ -60,3 +60,71 @@ function filterGenres(q) {
 }
 
 renderGenres(genres);
+
+
+const libros = [
+  {
+    titulo: "Poesía completa",
+    autor: "Villariño Idea",
+    precio: 1200,
+    stock: 1,
+    genero: "Poesía",
+    editoral: "Técnica"
+  },
+  {
+    titulo: "Las flores del mal",
+    autor: "Baudelaire, Charles",
+    precio: 500,
+    stock: 1,
+    genero: "Poesía",
+    editorial: "Técnica"
+  },
+  {
+    titulo: "Úselo y tírelo",
+    autor: "Galeano, Eduardo",
+    precio: 600,
+    stock: 1,
+    genero: "Literatura Nacional",
+    editorial: "Planeta"
+  },
+  {
+    titulo: "La Patagonia rebelde",
+    autor: "Bayer, Osvaldo",
+    precio: 870,
+    stock: 1,
+    genero: "Historia Latinoamericana",
+    editorial: "Planeta"
+  }
+];
+
+
+function renderBooks(list){
+    const productBody = document.querySelector(".product-body");
+
+    productBody.innerHTML = "";
+
+    list.forEach(book => {
+        const card = document.createElement("div");
+        card.classList.add("product-card");
+
+        card.innerHTML = `
+            <div class="card-cover"></div>
+
+            <div class="card-info">
+                <div>
+                    <p class="card-title">${book.titulo}</p>
+                    <p class="card-author">${book.autor}</p>
+                </div>
+
+                <p class="card-price">$${book.precio}</p>
+            </div>
+
+            <div class="card-btn">
+                Agregar al carrito
+            </div>
+        `;
+        productBody.appendChild(card);
+    });
+}
+
+renderBooks(libros);
