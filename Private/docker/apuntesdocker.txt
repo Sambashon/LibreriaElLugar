@@ -1,0 +1,7 @@
+docker compose -f Private/docker/docker-compose.yaml build
+
+docker compose -f Private/docker/docker-compose.yaml up -d libreriaweb libreriadb
+
+docker compose -f Private/docker/docker-compose.yaml up -d --build
+
+docker compose -f Private/docker/docker-compose.yaml down

@@ -1,29 +1,28 @@
 services:
-  libreriaWeb:
+  libreriaweb:
     build:
       context: ../
-      dockerfile: ./docker/Dockerfile
+      dockerfile: docker/Dockerfile
     container_name: apache_web
     ports:
       - "8080:80"
       - "443:443"
     volumes:
-      - ./www:/var/www/html
+      - ../../docs:/var/www/html
     depends_on:
-      - db
+      - libreriadb
     networks:
       - libreria-network
     restart: unless-stopped
 
-  libreriaDB:
+  libreriadb:
     image: mariadb:latest
     container_name: mariadb
-    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydb
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: mypassword
+      MYSQL_ROOT_PASSWORD: libreriaElLugar2026
+      MYSQL_DATABASE: ElLugarDB
+      MYSQL_USER: usuario
+      MYSQL_PASSWORD: 12345678
     ports:
       - "3306:3306"
     volumes:
