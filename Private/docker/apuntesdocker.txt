@@ -5,3 +5,6 @@ docker compose -f Private/docker/docker-compose.yaml up -d libreriaweb libreriad
 docker compose -f Private/docker/docker-compose.yaml up -d --build
 
 docker compose -f Private/docker/docker-compose.yaml down
+
+
+mariadb -u root -p ElLugarDB < /docker-entrypoint-initdb.d/database.sql ->RUN THIS TO MAKE DB WORK

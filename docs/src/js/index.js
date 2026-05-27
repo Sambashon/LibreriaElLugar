@@ -6,6 +6,11 @@ underConstructions.forEach(element => {
     })
 });
 
+const profileBtn = document.getElementById("profileBtn");
+profileBtn.addEventListener("click", function(){
+    window.location.href = "auth.html";
+})
+
 AOS.init({
     once: true,
     offset: 40,

@@ -1,5 +1,5 @@
 
-CREATE DATABASE ElLugarDB;
+CREATE DATABASE IF NOT EXISTS ElLugarDB;
 USE ElLugarDB;
 
 CREATE TABLE usuarios (
@@ -73,8 +73,8 @@ CREATE TABLE favorito_libros (
 
     FOREIGN KEY (id_favorito)
         REFERENCES favoritos(id_favorito)
-        ON DELETE CASCADE
-    
+        ON DELETE CASCADE,
+
     FOREIGN KEY (id_libro)
         REFERENCES libros(id_libro)
         ON DELETE CASCADE
