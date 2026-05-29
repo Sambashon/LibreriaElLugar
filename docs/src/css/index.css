@@ -367,6 +367,20 @@
     
 }
 
+.form-modal-bg{
+    background-image: url(../../Resources/fondos/flores.svg);
+}
+.modal-dialog {
+    max-width: 1000px;
+    width: 90%;
+}
+.modal-content {
+    min-height: 90vh;
+    background-color: #EBE9DA;
+}
+.modal-header{
+    color: #C8922B;
+}
 @media (min-width: 768px) {
     .two-parter{
         align-content: center;

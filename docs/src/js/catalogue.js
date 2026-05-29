@@ -1,6 +1,6 @@
 const inicioBtn = document.getElementById("inicioBtn");
 inicioBtn.addEventListener("click", () => {
-    window.location.href = "index.html";
+    window.location.href = "/";
 });
 
 const underConstructions =  document.querySelectorAll(".uC");
