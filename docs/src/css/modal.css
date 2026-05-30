@@ -144,8 +144,7 @@ label{
     margin-bottom: .5rem;
     font-family: "Fraunces", serif;
 }
-
-input{
+.form-input{
     width: 100%;
     padding: 14px;
 
@@ -157,8 +156,7 @@ input{
 
     font-family: "Plus Jakarta Sans", sans-serif;
 }
-
-input:focus{
+.form-input:focus{
     outline: none;
     box-shadow: 0 0 5px #23693e;
 }
