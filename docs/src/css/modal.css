@@ -1,0 +1,201 @@
+/* ---------- MODAL ---------- */
+.form-modal-bg{
+    background-image: url(../../Resources/fondos/flores.svg);
+}
+.modal-dialog {
+    max-width: 1000px;
+    width: 90%;
+}
+.modal-content {
+    background-color: #EBE9DA;
+    overflow: hidden;
+}
+.modal-header{
+    color: #C8922B;
+}
+
+.form-modal-bg .modal-header{
+    border-bottom: 1px solid #23693e;
+    padding: 1rem 2rem;
+}
+
+.form-modal-bg .modal-title{
+    color: #C8922B;
+    font-family: "Fraunces", serif;
+}
+
+.form-modal-bg .btn-close{
+    filter: invert(1);
+}
+
+/* ---------- modal-nav ---------- */
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    z-index: 10;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #000;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0.45;
+}
+
+.modal-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+
+.modal-nav{
+    width: 100%;
+    border-bottom: 1px solid #23693e;
+    padding: 0 2rem;
+}
+
+.modal-nav .button{
+    position: relative;
+    border: none;
+    background: transparent;
+    color: #000;
+    cursor: pointer;
+}
+
+.modal-nav .button:hover{
+    transform: none;
+    font-weight: bold;
+}
+
+.modal-nav .button::after{
+    content: "";
+    position: absolute;
+
+    left: 50%;
+    bottom: -1px;
+
+    width: 0;
+    height: 2px;
+
+    background-color: #C8922B;
+
+    transform: translateX(-50%);
+    transition: 0.3s;
+}
+
+.modal-nav .button.active::after{
+    width: 80%;
+}
+
+/* ---------- FORMULARIOS ---------- */
+
+.register,
+.login{
+    display: none;
+}
+
+.register.active,
+.login.active{
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+}
+.header{
+    margin-bottom: 2rem;
+}
+
+.header h1{
+    color: #C8922B;
+    font-family: "Fraunces", serif;
+}
+
+
+/* ---------- GRID ---------- */
+
+.row{
+    width: 100%;
+    margin-bottom: 1rem;
+
+    display: flex;
+    gap: 1rem;
+}
+
+.column{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.column-2{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---------- INPUTS ---------- */
+
+label{
+    color: #000;
+    margin-bottom: .5rem;
+    font-family: "Fraunces", serif;
+}
+
+input{
+    width: 100%;
+    padding: 14px;
+
+    border-radius: 10px;
+    border: 1px solid #23693e;
+
+    background-color: #133620;
+    color: #EBE9DA;
+
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+input:focus{
+    outline: none;
+    box-shadow: 0 0 5px #23693e;
+}
+
+/* ---------- BOTÓN ---------- */
+
+.button2{
+    background-color: #C8922B;
+    color: white;
+
+    border: none;
+    border-radius: 30px;
+
+    width: fit-content;
+    padding: 12px 24px;
+
+    transition: .3s;
+}
+
+.button2:hover{
+    transform: translateY(-3px);
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 768px){
+
+    .row{
+        flex-direction: column;
+    }
+
+    .register.active,
+    .login.active{
+        padding: 1rem;
+    }
+
+    .modal-nav{
+        padding: 0 1rem;
+    }
+}
