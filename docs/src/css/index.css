@@ -41,6 +41,8 @@
 .main-section .cifras{
     color: #C2A85A;
     font-weight: bold;
+    display: flex;
+    justify-content: center;
 }
 .main-section#destacados{
     background-color: #EBE9DA;

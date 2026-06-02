@@ -14,15 +14,22 @@ services:
     networks:
       - libreria-network
     restart: unless-stopped
+    
+    environment:
+      DB_HOST: libreriadb
+      DB_NAME: ${DB_NAME}
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
 
   libreriadb:
     image: mariadb:latest
     container_name: mariadb
     environment:
-      MYSQL_ROOT_PASSWORD: libreriaElLugar2026
-      MYSQL_DATABASE: ElLugarDB
-      MYSQL_USER: usuario
-      MYSQL_PASSWORD: 12345678
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
     volumes:

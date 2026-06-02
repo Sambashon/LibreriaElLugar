@@ -6,5 +6,25 @@ docker compose -f Private/docker/docker-compose.yaml up -d --build
 
 docker compose -f Private/docker/docker-compose.yaml down
 
+mariadb -u root -proot ElLugarDB < /docker-entrypoint-initdb.d/database.sql ->RUN THIS TO MAKE DB WORK
 
-mariadb -u root -p ElLugarDB < /docker-entrypoint-initdb.d/database.sql ->RUN THIS TO MAKE DB WORK
+docker compose -f Private/docker/docker-compose.yaml build --no-cache
+docker compose -f Private/docker/docker-compose.yaml up -d
+
+
+docker compose \
+  --env-file .env \
+  -f Private/docker/docker-compose.yaml \
+  config
+
+
+docker compose \
+  --env-file .env \
+  -f Private/docker/docker-compose.yaml \
+  down -v
+
+
+  docker compose \
+  --env-file .env \
+  -f Private/docker/docker-compose.yaml \
+  up -d --build

@@ -180,6 +180,258 @@ label{
     transform: translateY(-3px);
 }
 
+/* ---------- DASHBOARD ---------- */
+
+.dashboard-modal {
+    background-color: #EBE9DA;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.dashboard-header {
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(194, 168, 90, 0.08) 0%, rgba(200, 146, 42, 0.05) 100%);
+    position: relative;
+}
+
+.dashboard-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #C2A85A, transparent);
+}
+
+.dashboard-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dashboard-header.warning-header {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.08) 0%, rgba(255, 107, 107, 0.05) 100%);
+}
+
+.warning-icon svg {
+    animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dashboard-header h2 {
+    color: #C8922B;
+    font-family: "Fraunces", serif;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.dashboard-header p {
+    color: #23693e;
+    font-size: 15px;
+    margin: 0;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 500;
+}
+
+.dashboard-divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #C2A85A 20%, #C2A85A 80%, transparent);
+    margin: 0;
+}
+
+.dashboard-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 2.5rem 2rem;
+}
+
+.dashboard-btn {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 2px solid;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.dashboard-btn:hover::before {
+    opacity: 1;
+}
+
+.dashboard-btn svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s;
+}
+
+.dashboard-btn:hover svg {
+    transform: scale(1.15);
+}
+
+.logout-btn {
+    background: linear-gradient(135deg, #1B4D3E 0%, #23693e 100%);
+    color: #EBE9DA;
+    border-color: #1B4D3E;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, #0d2d23 0%, #1a4f33 100%);
+    border-color: #0d2d23;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(27, 77, 62, 0.35);
+}
+
+.delete-btn {
+    background-color: #EBE9DA;
+    color: #C8922B;
+    border-color: #C8922B;
+    font-weight: 600;
+}
+
+.delete-btn:hover {
+    background-color: #C8922B;
+    color: #EBE9DA;
+    border-color: #C8922B;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(200, 146, 42, 0.35);
+}
+
+.delete-confirm-content {
+    padding: 2.5rem 2rem;
+}
+
+.delete-confirm-content h2 {
+    color: #C8922B;
+    font-family: "Fraunces", serif;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+}
+
+.delete-confirm-content p {
+    color: #555;
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 15px;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.8rem;
+    color: #23693e;
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.form-group input.form-input {
+    background-color: #133620;
+    color: #EBE9DA;
+    border: 2px solid #23693e;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    transition: all 0.3s ease;
+}
+
+.form-group input.form-input:focus {
+    outline: none;
+    border-color: #C8922B;
+    box-shadow: 0 0 10px rgba(200, 146, 42, 0.2);
+}
+
+.delete-confirm-buttons {
+    display: flex;
+    justify-content: end;
+    gap: 12px;
+    margin-top: 2rem;
+}
+
+.delete-confirm-buttons button {
+    flex: 1;
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 2px solid;
+}
+
+.cancel-btn {
+    background-color: #EBE9DA;
+    color: #23693e;
+    border-color: #C2A85A;
+}
+
+.cancel-btn:hover {
+    background-color: #C2A85A;
+    color: #EBE9DA;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(194, 168, 90, 0.3);
+}
+
+.delete-btn {
+    background-color: #FF6B6B;
+    color: #fff;
+    border-color: #FF6B6B;
+}
+
+.delete-btn:hover {
+    background-color: #E55555;
+    border-color: #E55555;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+}
+
 /* ---------- RESPONSIVE ---------- */
 
 @media (max-width: 768px){
@@ -195,5 +447,70 @@ label{
 
     .modal-nav{
         padding: 0 1rem;
+    }
+
+    .dashboard-modal {
+        border-radius: 16px;
+    }
+
+    .dashboard-header {
+        padding: 2rem 1.5rem 1.5rem;
+    }
+
+    .dashboard-header h2 {
+        font-size: 1.6rem;
+    }
+
+    .dashboard-icon {
+        margin-bottom: 0.8rem;
+    }
+
+    .dashboard-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .dashboard-actions {
+        padding: 1.5rem 1.5rem;
+        gap: 12px;
+    }
+
+    .dashboard-btn {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+
+    .dashboard-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .delete-confirm-content {
+        padding: 2rem 1.5rem;
+    }
+
+    .delete-confirm-content h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .delete-confirm-content p {
+        font-size: 14px;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .delete-confirm-buttons {
+        flex-direction: column;
+    }
+
+    .delete-confirm-buttons .delete-btn,
+    .cancel-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 15px;
     }
 }
