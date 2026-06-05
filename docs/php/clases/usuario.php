@@ -189,6 +189,7 @@ class Usuario extends LibreriaDB
         $_SESSION["nombre"] = $usuarioDB["nombre"];
         $_SESSION["apellido"] = $usuarioDB["apellido"];
         $_SESSION["email"] = $usuarioDB["email"];
+        $_SESSION["admin"] = (bool) $usuarioDB["admin"];
 
         return [
             "state" => "success",
@@ -291,7 +292,8 @@ class Usuario extends LibreriaDB
                 "id_usuario" => $_SESSION["id_usuario"],
                 "nombre" => $_SESSION["nombre"],
                 "apellido" => $_SESSION["apellido"],
-                "email" => $_SESSION["email"]
+                "email" => $_SESSION["email"],
+                "admin" => $_SESSION["admin"] ?? false
             ]
         ];
     }

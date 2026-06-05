@@ -452,6 +452,76 @@
             </div>
         </div>
     </div>
+
+    <!--________________ADMIN PANEL MODAL____________-->
+    <div class="modal fade" id="adminPanelModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content dashboard-modal">
+                <button class="modal-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+                <div class="dashboard-header admin-header">
+                    <div class="dashboard-icon admin-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#C8922B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <path d="M12 1v6m0 6v4"></path>
+                            <path d="M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24"></path>
+                            <path d="M1 12h6m6 0h4"></path>
+                            <path d="M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path>
+                            <path d="M12 23v-6m0-6v-4"></path>
+                            <path d="M19.78 19.78l-4.24-4.24m-5.08-5.08l-4.24-4.24"></path>
+                            <path d="M23 12h-6m-6 0h-4"></path>
+                            <path d="M19.78 4.22l-4.24 4.24m-5.08 5.08l-4.24 4.24"></path>
+                        </svg>
+                    </div>
+                    <h2 id="adminGreeting">Panel de Administrador</h2>
+                    <p>Gestiona la librería</p>
+                </div>
+                <div class="dashboard-divider"></div>
+                <div class="admin-panel-content">
+                    <div class="admin-actions">
+                        <button class="dashboard-btn admin-btn" id="adminLibrosBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5h16M6 12.5h12M6 5.5h12"></path>
+                            </svg>
+                            Gestionar Libros
+                        </button>
+                        <button class="dashboard-btn admin-btn" id="adminUsuariosBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Gestionar Usuarios
+                        </button>
+                        <button class="dashboard-btn admin-btn" id="adminPedidosBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                            Ver Pedidos
+                        </button>
+                    </div>
+                </div>
+                <div class="dashboard-divider"></div>
+                <div class="dashboard-actions">
+                    <button class="dashboard-btn logout-btn" id="adminLogoutBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Cerrar sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="src/js/index.js"></script>
@@ -506,23 +576,40 @@ async function checkSession() {
 function updateProfileButton() {
     const profileBtn = document.getElementById("profileBtn");
 
-    profileBtn.removeAttribute("data-bs-toggle");
-    profileBtn.removeAttribute("data-bs-target");
+    const newBtn = profileBtn.cloneNode(true);
+    profileBtn.parentNode.replaceChild(newBtn, profileBtn);
 
-    profileBtn.addEventListener("click", function() {
-        if (currentUser) {
+    if (currentUser) {
+        newBtn.removeAttribute("data-bs-toggle");
+        newBtn.removeAttribute("data-bs-target");
+
+        newBtn.addEventListener("click", () => {
             showUserDashboard();
-        } else {
-            new bootstrap.Modal(document.getElementById("formModal")).show();
-        }
-    });
+        });
+    } else {
+        newBtn.setAttribute("data-bs-toggle", "modal");
+        newBtn.setAttribute("data-bs-target", "#formModal");
+    }
 }
 
 function showUserDashboard() {
     if (currentUser) {
-        document.getElementById("userGreeting").textContent = `Bienvenido, ${currentUser.nombre}`;
-        document.getElementById("userEmail").textContent = currentUser.email;
-        new bootstrap.Modal(document.getElementById("userDashboardModal")).show();
+        if (currentUser.admin) {
+            // Mostrar panel admin
+            showAdminPanel();
+        } else {
+            // Mostrar panel usuario normal
+            document.getElementById("userGreeting").textContent = `Bienvenido, ${currentUser.nombre}`;
+            document.getElementById("userEmail").textContent = currentUser.email;
+            new bootstrap.Modal(document.getElementById("userDashboardModal")).show();
+        }
+    }
+}
+
+function showAdminPanel() {
+    if (currentUser && currentUser.admin) {
+        document.getElementById("adminGreeting").textContent = `Panel de Administrador - ${currentUser.nombre}`;
+        new bootstrap.Modal(document.getElementById("adminPanelModal")).show();
     }
 }
 
@@ -549,12 +636,6 @@ if (registerForm) {
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 if (modal) {
                     modal.hide();
-                    // Remove backdrop
-                    const backdrops = document.querySelectorAll(".modal-backdrop");
-                    backdrops.forEach(backdrop => backdrop.remove());
-                    // Remove modal-open class from body
-                    document.body.classList.remove("modal-open");
-                    document.body.style.overflow = "";
                 }
 
                 this.reset();
@@ -592,12 +673,6 @@ if (loginForm) {
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 if (modal) {
                     modal.hide();
-                    // Remove backdrop
-                    const backdrops = document.querySelectorAll(".modal-backdrop");
-                    backdrops.forEach(backdrop => backdrop.remove());
-                    // Remove modal-open class from body
-                    document.body.classList.remove("modal-open");
-                    document.body.style.overflow = "";
                 }
 
                 this.reset();
@@ -648,12 +723,68 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
     }
 });
 
+// Admin Logout handler
+document.getElementById("adminLogoutBtn").addEventListener("click", async function() {
+    try {
+        const res = await fetch("php/scripts/logout.php", {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        if (data.state === "success") {
+            showSuccessNotification(data.message);
+            currentUser = null;
+
+            const adminModal = bootstrap.Modal.getInstance(document.getElementById("adminPanelModal"));
+            adminModal?.hide();
+
+            // Revert profile button to original behavior
+            const profileBtn = document.getElementById("profileBtn");
+            profileBtn.setAttribute("data-bs-toggle", "modal");
+            profileBtn.setAttribute("data-bs-target", "#formModal");
+
+            // Remove the custom click listener
+            profileBtn.removeEventListener("click", arguments.callee);
+            updateProfileButton();
+        } else {
+            showErrorNotification(data.message);
+        }
+    } catch (error) {
+        console.error(error);
+        showErrorNotification("Error al cerrar sesión");
+    }
+});
+
+// Admin panel action handlers
+document.getElementById("adminLibrosBtn").addEventListener("click", function() {
+    showSuccessNotification("Función 'Gestionar Libros' en construcción");
+});
+
+document.getElementById("adminUsuariosBtn").addEventListener("click", function() {
+    showSuccessNotification("Función 'Gestionar Usuarios' en construcción");
+});
+
+document.getElementById("adminPedidosBtn").addEventListener("click", function() {
+    showSuccessNotification("Función 'Ver Pedidos' en construcción");
+});
+
 // Delete account handlers
 document.getElementById("deleteBtn").addEventListener("click", function() {
     const dashboardModal = bootstrap.Modal.getInstance(document.getElementById("userDashboardModal"));
-    dashboardModal?.hide();
+    const dashboardModalEl = document.getElementById("userDashboardModal");
 
-    new bootstrap.Modal(document.getElementById("deleteConfirmModal")).show();
+    dashboardModalEl.addEventListener(
+        "hidden.bs.modal",
+        () => {
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById("deleteConfirmModal")
+            ).show();
+        },
+        { once: true }
+    );
+
+    bootstrap.Modal.getInstance(dashboardModalEl)?.hide();
 });
 
 document.getElementById("deleteConfirmForm").addEventListener("submit", async function(e) {
@@ -699,25 +830,10 @@ document.getElementById("deleteConfirmForm").addEventListener("submit", async fu
 });
 
 // Verificar sesión al cargar la página
+updateProfileButton();
 checkSession();
 
-// Cleanup backdrop when closing modals with X button
-function cleanupBackdrop() {
-    const backdrops = document.querySelectorAll(".modal-backdrop");
-    backdrops.forEach(backdrop => {
-        if (!document.querySelector(".modal.show")) {
-            backdrop.remove();
-        }
-    });
-    if (!document.querySelector(".modal.show")) {
-        document.body.classList.remove("modal-open");
-        document.body.style.overflow = "";
-    }
-}
 
-document.getElementById("formModal").addEventListener("hidden.bs.modal", cleanupBackdrop);
-document.getElementById("userDashboardModal").addEventListener("hidden.bs.modal", cleanupBackdrop);
-document.getElementById("deleteConfirmModal").addEventListener("hidden.bs.modal", cleanupBackdrop);
 </script>
 </body>
 </html>
