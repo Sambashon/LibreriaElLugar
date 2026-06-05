@@ -125,13 +125,7 @@
     gap: 1rem;
 }
 
-.column{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.column-2{
+.column {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -198,7 +192,9 @@ label{
 }
 
 
-.dashboard-icon {
+.dashboard-icon,
+.warning-icon svg,
+.admin-icon svg {
     display: flex;
     justify-content: center;
     margin-bottom: 1rem;
@@ -218,10 +214,6 @@ label{
 
 .dashboard-header.warning-header {
     background: linear-gradient(135deg, rgba(255, 107, 107, 0.08) 0%, rgba(255, 107, 107, 0.05) 100%);
-}
-
-.warning-icon svg {
-    animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .dashboard-header h2 {
@@ -322,6 +314,19 @@ label{
     box-shadow: 0 10px 25px rgba(200, 146, 42, 0.35);
 }
 
+.delete-btn-danger {
+    background-color: #FF6B6B;
+    color: #fff;
+    border-color: #FF6B6B;
+}
+
+.delete-btn-danger:hover {
+    background-color: #E55555;
+    border-color: #E55555;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+}
+
 .delete-confirm-content {
     padding: 2.5rem 2rem;
 }
@@ -409,19 +414,6 @@ label{
     box-shadow: 0 10px 25px rgba(194, 168, 90, 0.3);
 }
 
-.delete-btn {
-    background-color: #FF6B6B;
-    color: #fff;
-    border-color: #FF6B6B;
-}
-
-.delete-btn:hover {
-    background-color: #E55555;
-    border-color: #E55555;
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
-}
-
 /* ---------- ADMIN PANEL ---------- */
 
 .admin-header {
@@ -434,10 +426,6 @@ label{
 
 .admin-header p {
     color: #23693e;
-}
-
-.admin-icon svg {
-    animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .admin-panel-content {
@@ -454,8 +442,6 @@ label{
     background-color: #EBE9DA;
     color: #1B4D3E;
     border-color: #23693e;
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .admin-btn:hover {
@@ -464,11 +450,6 @@ label{
     border-color: #1B4D3E;
     transform: translateY(-4px);
     box-shadow: 0 10px 25px rgba(27, 77, 62, 0.35);
-}
-
-.admin-btn svg {
-    width: 20px;
-    height: 20px;
 }
 
 /* ---------- RESPONSIVE ---------- */
