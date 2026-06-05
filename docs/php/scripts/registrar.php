@@ -36,6 +36,7 @@ if (!$nombre || !$apellido || !$password || !$email) {
 
 $usuarioDB = new Usuario();
 
+// 1. Registrar usuario
 $resultado = $usuarioDB->registrarUsuario(
     trim($nombre),
     trim($apellido),
@@ -43,5 +44,27 @@ $resultado = $usuarioDB->registrarUsuario(
     trim($email)
 );
 
-echo json_encode($resultado);
+// 2. Si el registro fue exitoso, iniciar sesión automáticamente
+if ($resultado["state"] === "success") {
+    $loginResult = $usuarioDB->loguearUsuario(
+        trim($email),
+        $password
+    );
+    
+    // Retornar mensaje personalizado pero con datos de login
+    if ($loginResult["state"] === "success") {
+        echo json_encode([
+            "state" => "success",
+            "message" => "¡Cuenta creada! Sesión iniciada automáticamente",
+            "user" => $loginResult["user"]
+        ]);
+    } else {
+        // Registro exitoso pero error en login (raro pero posible)
+        echo json_encode($resultado);
+    }
+} else {
+    // Error en el registro
+    echo json_encode($resultado);
+}
+
 exit;
