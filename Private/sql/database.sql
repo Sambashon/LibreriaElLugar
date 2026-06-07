@@ -13,15 +13,23 @@ CREATE TABLE usuarios (
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE user_tokens (
+    token_id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    token_hash VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
 
 CREATE TABLE libros (
     id_libro INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(200) NOT NULL,
     autor VARCHAR(150),
+    editorial VARCHAR(150),
+    genero VARCHAR(150),
     precio DECIMAL(10,2) NOT NULL,
     stock INT DEFAULT 0,
-    portada VARCHAR(255),
-    disponible BOOLEAN DEFAULT FALSE
+    portada VARCHAR(255)
 );
 
 -- =========================
