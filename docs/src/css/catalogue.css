@@ -1,4 +1,4 @@
-body{
+      body{
     overflow: hidden;
 }
 .custom-row{
@@ -210,19 +210,34 @@ svg{
 /* ── PRECIO ── */
 .price-inputs {
     padding: 6px 12px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-.price-inputs input[type="range"] {
-    width: 100%;
-    accent-color: #1B4D2E;
 }
 .price-row {
     display: flex;
-    justify-content: space-between;
-    font-size: 11px;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
     color: #888;
+}
+.price-row input[type="number"] {
+    width: 0;
+    flex: 1 1 0;
+    padding: 5px 7px;
+    border: 0.5px solid #d0cfc3;
+    border-radius: 5px;
+    font-size: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #f5f3ea;
+    color: #333;
+    outline: none;
+    box-sizing: border-box;
+    -moz-appearance: textfield;
+}
+.price-row input[type="number"]:focus {
+    border-color: #1B4D2E;
+}
+.price-row input[type="number"]::-webkit-outer-spin-button,
+.price-row input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
 }
 
 /* ── DISPONIBILIDAD ── */
@@ -252,10 +267,10 @@ svg{
     height: fit-content;
     align-items: center;
     justify-content: start;
-
     flex-direction: column;
-    padding-right: 1rem;
-    
+    padding-right: 0.5rem;
+    flex-shrink: 0;
+    margin-bottom: 0.25rem;
 }
 .product-header h1{
     color: #F0C05F;
@@ -297,55 +312,55 @@ svg{
 
 .product-shell{
     box-sizing: border-box;
-    padding: 1rem;
-    padding-right: 0px;
-    background-image: none;
+    padding: 1.25rem 1.5rem 1rem 1.5rem;
     background-color: #1a4d2e;
-    min-height: 100vh;
+    height: 100vh;
     width: 100%;
-
-
-    margin: 0 auto;
-
+    overflow: hidden;
     display: flex;
-    align-items: center;
-
     flex-direction: column;
 }
 .main-wrapper{
-    height: 100%;
+    flex: 1 1 0;
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(240,192,95,0.35) transparent;
+    padding-right: 0.5rem;
+}
+.main-wrapper::-webkit-scrollbar { width: 5px; }
+.main-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(240,192,95,0.4);
+    border-radius: 3px;
+}
+.main-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(240,192,95,0.7);
 }
 /* ── PRODUCT BODY ── */
 .product-body {
-    height: 70vh;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    row-gap: 130px;
-    column-gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    grid-auto-rows: 340px;
+    row-gap: 1.5rem;
+    column-gap: 1.25rem;
     width: 100%;
-    padding: 1rem 1rem 2rem 0;
+    padding: 1.25rem 0.5rem 2rem 0;
     background-color: transparent;
     align-content: start;
-    overflow-y: auto;
-    
 }
 
 /* ── PRODUCT CARD ── */
 .product-card {
-    aspect-ratio: 2 / 3;
-    height: auto;
+    height: 340px;
     background-color: #FFFDF7;
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
     position: relative;
 }
 
@@ -354,10 +369,11 @@ svg{
     box-shadow: 0 8px 24px rgba(0,0,0,0.35);
 }
 
-/* Cover area — top 70% */
+/* Cover area — fixed height */
 .product-card .card-cover {
     width: 100%;
-    flex: 0 0 70%;
+    height: 240px;
+    flex-shrink: 0;
     background-color: #2a6644;
     position: relative;
     overflow: hidden;
@@ -382,22 +398,25 @@ svg{
     border-radius: 3px;
 }
 
-/* Info area — bottom 30% */
+/* Info area — fills remaining 100px */
 .product-card .card-info {
-    flex: 1;
-    padding: 10px 12px 12px;
+    flex: 1 1 0;
+    min-height: 0;
+    padding: 10px 12px 28px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     border-top: 1.5px solid #e8e4d4;
+    overflow: hidden;
+    position: relative;
 }
 
 .product-card .card-title {
     font-family: 'Fraunces', serif;
-    font-size: clamp(11px, 0.8vw, 14px);
+    font-size: clamp(12px, 0.85vw, 15px);
     font-weight: 600;
     color: #1a3a26;
-    line-height: 1.3;
+    line-height: 1.35;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -406,9 +425,9 @@ svg{
 
 .product-card .card-author {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: clamp(9px, 0.65vw, 12px);
+    font-size: clamp(10px, 0.65vw, 12px);
     color: #6b7c6e;
-    margin-top: 2px;
+    margin-top: 3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -416,10 +435,12 @@ svg{
 
 .product-card .card-price {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: clamp(11px, 0.75vw, 13px);
+    font-size: clamp(12px, 0.8vw, 14px);
     font-weight: 700;
     color: #1a4d2e;
-    margin-top: 6px;
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
 }
 
 /* Add to cart button — appears on hover */
@@ -449,14 +470,14 @@ svg{
 
 /* ── FOOTER PAGES ── */
 .footer-pages {
-    height: fit-content;
+    flex-shrink: 0;
     width: 100%;
     background-color: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 1rem 0 0.5rem;
+    padding: 0.75rem 0 0.5rem;
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
@@ -485,5 +506,30 @@ svg{
 @media (min-width: 768px){
     .nav-logo{
         height: 15vh;
+    }
+}
+@media (min-width: 1400px) {
+    .product-body {
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        grid-auto-rows: 360px;
+    }
+    .product-card {
+        height: 360px;
+    }
+    .product-card .card-cover {
+        height: 258px;
+    }
+}
+
+@media (min-width: 1800px) {
+    .product-body {
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        grid-auto-rows: 380px;
+    }
+    .product-card {
+        height: 380px;
+    }
+    .product-card .card-cover {
+        height: 272px;
     }
 }
