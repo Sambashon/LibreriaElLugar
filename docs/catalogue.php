@@ -194,7 +194,15 @@ $libros = $db->fetchAll(
 
             filteredLibros = list;
             currentPage    = 1;
-            renderPage();
+
+            const body = document.querySelector('.product-body');
+            body.style.transition = 'opacity 0.2s ease';
+            body.style.opacity = '0';
+            setTimeout(() => {
+                renderPage();
+                document.querySelector('.main-wrapper').scrollTo({ top: 0 });
+                body.style.opacity = '1';
+            }, 200);
         }
 
 
@@ -270,7 +278,17 @@ $libros = $db->fetchAll(
                 b.className  = 'page-btn' + (active ? ' active' : '');
                 b.textContent = label;
                 b.disabled   = disabled;
-                if (!disabled) b.onclick = () => { currentPage = page; renderPage(); };
+                if (!disabled) b.onclick = () => {
+                    const body = document.querySelector('.product-body');
+                    body.style.transition = 'opacity 0.2s ease';
+                    body.style.opacity = '0';
+                    setTimeout(() => {
+                        currentPage = page;
+                        renderPage();
+                        document.querySelector('.main-wrapper').scrollTo({ top: 0 });
+                        body.style.opacity = '1';
+                    }, 200);
+                };
                 return b;
             };
 

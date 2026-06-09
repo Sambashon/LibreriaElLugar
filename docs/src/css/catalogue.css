@@ -413,7 +413,7 @@ svg{
 
 .product-card .card-title {
     font-family: 'Fraunces', serif;
-    font-size: clamp(12px, 0.85vw, 15px);
+    font-size: clamp(15px, 0.85vw, 18px);
     font-weight: 600;
     color: #1a3a26;
     line-height: 1.35;
@@ -425,7 +425,7 @@ svg{
 
 .product-card .card-author {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: clamp(10px, 0.65vw, 12px);
+    font-size: clamp(14px, 0.65vw, 17px);
     color: #6b7c6e;
     margin-top: 3px;
     white-space: nowrap;

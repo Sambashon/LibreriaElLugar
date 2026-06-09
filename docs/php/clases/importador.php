@@ -78,7 +78,10 @@ class Importador extends LibreriaDB
         $genero    = trim($row[2] ?? '');
         $stock     = $row[3] ?? null;
         $editorial = trim($row[4] ?? '');
-        $precio = str_replace(['$', ' ', ','], '', $row[5] ?? '');
+        $precio = trim($row[5] ?? '');
+        $precio = str_replace(['$', ' '], '', $precio);  // sacar $ y espacios
+        $precio = str_replace('.', '', $precio);          // sacar puntos de miles
+        $precio = str_replace(',', '.', $precio);         // coma decimal → punto
 
         // validaciones básicas obligatorias
         if ($titulo === '' || $autor === '') {

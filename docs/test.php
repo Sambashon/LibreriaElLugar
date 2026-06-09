@@ -10,5 +10,11 @@
         <input type="file" name="archivo" accept=".xlsx,.xls,.csv">
         <input type="submit">
     </form>
+
+
+    <hr>
+    <form action="../php/scripts/eliminarTODOSlosLibros.php" method="POST">
+        <input type="submit">
+    </form>
 </body>
 </html>
