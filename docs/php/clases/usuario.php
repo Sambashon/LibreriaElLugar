@@ -1,101 +1,94 @@
 <?php
 
-require_once "libreriaDb.php";
+namespace App\Classes;
 
-class Usuario extends LibreriaDB
+require_once "libreriaDb.php";
+require_once __DIR__ . "/../bootstrap.php";
+
+use App\Managers\{SessionManager, TokenManager};
+use App\Helpers\Result;
+
+class Usuario extends \LibreriaDB
 {
+    private SessionManager $sessionManager;
+    private TokenManager $tokenManager;
+
+    public function __construct(
+        ?SessionManager $sessionManager = null,
+        ?TokenManager $tokenManager = null
+    ) {
+        parent::__construct();
+        $this->sessionManager = $sessionManager ?? new SessionManager();
+        $this->tokenManager = $tokenManager ?? new TokenManager();
+    }
+    /**
+     * Verifica si un nombre de usuario y email están disponibles
+     */
     public function verificarUsuario(
         string $nombre,
         string $email
     ): array {
-
-        $resultado = $this->fetch(
-            "SELECT
-                EXISTS(
-                    SELECT 1
-                    FROM usuarios
-                    WHERE nombre = :nombre
-                ) AS nombreExiste,
-
-                EXISTS(
-                    SELECT 1
-                    FROM usuarios
-                    WHERE email = :email
-                ) AS emailExiste",
-            [
-                "nombre" => $nombre,
-                "email" => $email
-            ]
-        );
-
-        if ($resultado["nombreExiste"]) {
-            return [
-                "state" => "error",
-                "message" => "El usuario ya existe"
-            ];
+        if ($this->nombreExiste($nombre)) {
+            return Result::error("El usuario ya existe")->toArray();
         }
 
-        if ($resultado["emailExiste"]) {
-            return [
-                "state" => "error",
-                "message" => "El email ya está registrado"
-            ];
+        if ($this->emailExiste($email)) {
+            return Result::error("El email ya está registrado")->toArray();
         }
 
-        return [
-            "state" => "success",
-            "message" => "Usuario y email disponibles"
-        ];
+        return Result::success("Usuario y email disponibles")->toArray();
     }
 
+    /**
+     * Verifica si un email ya existe en la BD
+     */
+    private function emailExiste(string $email): bool
+    {
+        $resultado = $this->fetch(
+            "SELECT 1 FROM usuarios WHERE email = :email",
+            ['email' => $email]
+        );
+        return (bool) $resultado;
+    }
+
+    /**
+     * Verifica si un nombre de usuario ya existe en la BD
+     */
+    private function nombreExiste(string $nombre): bool
+    {
+        $resultado = $this->fetch(
+            "SELECT 1 FROM usuarios WHERE nombre = :nombre",
+            ['nombre' => $nombre]
+        );
+        return (bool) $resultado;
+    }
+
+    /**
+     * Registra un nuevo usuario
+     */
     public function registrarUsuario(
         string $nombre,
         string $apellido,
         string $password,
         string $email
     ): array {
-
-        // 1. Verificar solo email
-        $verificacion = $this->fetch(
-            "SELECT id_usuario
-            FROM usuarios
-            WHERE email = :email",
-            [
-                "email" => $email
-            ]
-        );
-
-        if ($verificacion) {
-            return [
-                "state" => "error",
-                "message" => "El email ya está registrado"
-            ];
+        // Verificar si email ya existe
+        if ($this->emailExiste($email)) {
+            return Result::error("El email ya está registrado")->toArray();
         }
 
         try {
-
-            // 2. Iniciar transacción
+            // Iniciar transacción
             $this->beginTransaction();
 
-            // 3. Hash password
+            // Hash password
             $hash = password_hash($password, PASSWORD_DEFAULT);
 
-            // 4. Insertar usuario
+            // Insertar usuario
             $this->execute(
                 "INSERT INTO usuarios
-                (
-                    nombre,
-                    apellido,
-                    password,
-                    email
-                )
-                VALUES
-                (
-                    :nombre,
-                    :apellido,
-                    :password,
-                    :email
-                )",
+                (nombre, apellido, password, email)
+                VALUES (:nombre, :apellido, :password, :email)",
                 [
                     "nombre" => $nombre,
                     "apellido" => $apellido,
@@ -104,43 +97,30 @@ class Usuario extends LibreriaDB
                 ]
             );
 
-            // 5. ID del usuario creado
+            // ID del usuario creado
             $idUsuario = $this->lastInsertId();
 
-            // 6. Crear carrito
+            // Crear carrito
             $this->execute(
                 "INSERT INTO carritos(id_usuario)
                 VALUES(:id_usuario)",
-                [
-                    "id_usuario" => $idUsuario
-                ]
+                ["id_usuario" => $idUsuario]
             );
 
-            // 7. Crear favoritos
+            // Crear favoritos
             $this->execute(
                 "INSERT INTO favoritos(id_usuario)
                 VALUES(:id_usuario)",
-                [
-                    "id_usuario" => $idUsuario
-                ]
+                ["id_usuario" => $idUsuario]
             );
 
-            // 8. Commit
+            // Commit
             $this->commit();
 
-            return [
-                "state" => "success",
-                "message" => "Usuario registrado correctamente"
-            ];
-
-        } catch (Exception $e) {
-
+            return Result::success("Usuario registrado correctamente")->toArray();
+        } catch (\Exception $e) {
             $this->rollback();
-
-            return [
-                "state" => "error",
-                "message" => "Error al registrar usuario"
-            ];
+            return Result::error("Error al registrar usuario")->toArray();
         }
     }
 
@@ -159,10 +139,7 @@ class Usuario extends LibreriaDB
         );
 
         if (!$usuarioDB) {
-            return [
-                "state" => "error",
-                "message" => "Credenciales inválidas"
-            ];
+            return Result::error("Credenciales inválidas")->toArray();
         }
 
         if (
@@ -171,31 +148,23 @@ class Usuario extends LibreriaDB
                 $usuarioDB["password"]
             )
         ) {
-            return [
-                "state" => "error",
-                "message" => "Credenciales inválidas"
-            ];
+            return Result::error("Credenciales inválidas")->toArray();
         }
 
         unset($usuarioDB["password"]);
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Usar SessionManager para iniciar sesión
+        $this->sessionManager->regenerateId();
+        $this->sessionManager->establecer("id_usuario", $usuarioDB["id_usuario"]);
+        $this->sessionManager->establecer("nombre", $usuarioDB["nombre"]);
+        $this->sessionManager->establecer("apellido", $usuarioDB["apellido"]);
+        $this->sessionManager->establecer("email", $usuarioDB["email"]);
+        $this->sessionManager->establecer("admin", (bool) $usuarioDB["admin"]);
 
-        session_regenerate_id(true);
-
-        $_SESSION["id_usuario"] = $usuarioDB["id_usuario"];
-        $_SESSION["nombre"] = $usuarioDB["nombre"];
-        $_SESSION["apellido"] = $usuarioDB["apellido"];
-        $_SESSION["email"] = $usuarioDB["email"];
-        $_SESSION["admin"] = (bool) $usuarioDB["admin"];
-
-        return [
-            "state" => "success",
-            "message" => "Login exitoso",
-            "user" => $usuarioDB
-        ];
+        return Result::success(
+            "Login exitoso",
+            ["user" => $usuarioDB]
+        )->toArray();
     }
 
     public function eliminarUsuario(
@@ -212,20 +181,11 @@ class Usuario extends LibreriaDB
         );
 
         if (!$usuarioDB) {
-            return [
-                "state" => "error",
-                "message" => "Usuario no encontrado"
-            ];
+            return Result::error("Usuario no encontrado")->toArray();
         }
 
-        if (!password_verify(
-            $password,
-            $usuarioDB["password"]
-        )) {
-            return [
-                "state" => "error",
-                "message" => "Contraseña incorrecta"
-            ];
+        if (!password_verify($password, $usuarioDB["password"])) {
+            return Result::error("Contraseña incorrecta")->toArray();
         }
 
         $this->execute(
@@ -236,21 +196,16 @@ class Usuario extends LibreriaDB
             ]
         );
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+        // Eliminar token persistente si existe
+        $this->tokenManager->eliminarTodosTokens($idUsuario);
+        \App\Managers\TokenManager::borrarCookie();
+
+        // Cerrar sesión si es la del usuario actual
+        if ($this->sessionManager->obtener("id_usuario") === $idUsuario) {
+            $this->sessionManager->destruir();
         }
 
-        if (
-            isset($_SESSION["id_usuario"]) &&
-            (int) $_SESSION["id_usuario"] === $idUsuario
-        ) {
-            $this->cerrarSesion();
-        }
-
-        return [
-            "state" => "success",
-            "message" => "Usuario eliminado correctamente"
-        ];
+        return Result::success("Usuario eliminado correctamente")->toArray();
     }
 
     public function obtenerUsuario(
@@ -276,55 +231,16 @@ class Usuario extends LibreriaDB
 
     public function obtenerSesion(): array
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        if (!isset($_SESSION["id_usuario"])) {
-            return [
-                "logged" => false
-            ];
-        }
-
-        return [
-            "logged" => true,
-            "user" => [
-                "id_usuario" => $_SESSION["id_usuario"],
-                "nombre" => $_SESSION["nombre"],
-                "apellido" => $_SESSION["apellido"],
-                "email" => $_SESSION["email"],
-                "admin" => $_SESSION["admin"] ?? false
-            ]
-        ];
+        return $this->sessionManager->obtenerEstado();
     }
 
     public function cerrarSesion(): array
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Eliminar token persistente y su cookie
+        $this->tokenManager->limpiarTokensExpirados();
+        \App\Managers\TokenManager::borrarCookie();
 
-        $_SESSION = [];
-
-        if (ini_get("session.use_cookies")) {
-            $params = session_get_cookie_params();
-
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $params["path"],
-                $params["domain"],
-                $params["secure"],
-                $params["httponly"]
-            );
-        }
-
-        session_destroy();
-
-        return [
-            "state" => "success",
-            "message" => "Sesión cerrada correctamente"
-        ];
+        // Destruir sesión PHP
+        return $this->sessionManager->destruir();
     }
 }

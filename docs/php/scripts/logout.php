@@ -1,13 +1,16 @@
 <?php
 
-require_once "../clases/usuario.php";
+require_once "../bootstrap.php";
+
+use App\Helpers\Response;
+use App\Classes\Usuario;
 
 header('Content-Type: application/json');
 
-$usuario = new Usuario();
-
-echo json_encode(
-    $usuario->cerrarSesion()
-);
-
-exit;
+try {
+    $usuario = new Usuario();
+    $resultado = $usuario->cerrarSesion();
+    Response::json($resultado);
+} catch (Exception $e) {
+    Response::error($e->getMessage());
+}

@@ -1,70 +1,50 @@
 <?php
 
-require_once "../clases/usuario.php";
+require_once "../bootstrap.php";
+
+use App\Helpers\{Request, Response};
+use App\Classes\Usuario;
 
 header('Content-Type: application/json');
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    echo json_encode([
-        "state" => "error",
-        "message" => "Método no permitido"
-    ]);
-    exit;
-}
+try {
+    Request::requireMethod('POST');
 
-if (!isset($_POST["formtype"]) || $_POST["formtype"] !== "register") {
-    echo json_encode([
-        "state" => "error",
-        "message" => "Formulario inválido"
-    ]);
-    exit;
-}
-
-// Validación básica para evitar undefined array key
-$nombre   = $_POST["nombre"] ?? null;
-$apellido = $_POST["apellido"] ?? null;
-$password = $_POST["password"] ?? null;
-$email    = $_POST["email"] ?? null;
-
-if (!$nombre || !$apellido || !$password || !$email) {
-    echo json_encode([
-        "state" => "error",
-        "message" => "Faltan datos en el formulario"
-    ]);
-    exit;
-}
-
-$usuarioDB = new Usuario();
-
-// 1. Registrar usuario
-$resultado = $usuarioDB->registrarUsuario(
-    trim($nombre),
-    trim($apellido),
-    $password,
-    trim($email)
-);
-
-// 2. Si el registro fue exitoso, iniciar sesión automáticamente
-if ($resultado["state"] === "success") {
-    $loginResult = $usuarioDB->loguearUsuario(
-        trim($email),
-        $password
-    );
-    
-    // Retornar mensaje personalizado pero con datos de login
-    if ($loginResult["state"] === "success") {
-        echo json_encode([
-            "state" => "success",
-            "message" => "¡Cuenta creada! Sesión iniciada automáticamente",
-            "user" => $loginResult["user"]
-        ]);
-    } else {
-        // Registro exitoso pero error en login (raro pero posible)
-        echo json_encode($resultado);
+    $formtype = Request::getPost('formtype');
+    if ($formtype !== 'register') {
+        Response::error('Formulario inválido');
     }
-} else {
-    // Error en el registro
-    echo json_encode($resultado);
-}
 
-exit;
+    $fields = Request::requireFields(['nombre', 'apellido', 'password', 'email']);
+
+    $usuario = new Usuario();
+
+    // Registrar usuario
+    $resultado = $usuario->registrarUsuario(
+        trim($fields['nombre']),
+        trim($fields['apellido']),
+        $fields['password'],
+        trim($fields['email'])
+    );
+
+    // Si el registro fue exitoso, iniciar sesión automáticamente
+    if ($resultado['state'] === 'success') {
+        $loginResult = $usuario->loguearUsuario(
+            trim($fields['email']),
+            $fields['password']
+        );
+
+        if ($loginResult['state'] === 'success') {
+            Response::success(
+                '¡Cuenta creada! Sesión iniciada automáticamente',
+                ['user' => $loginResult['user']]
+            );
+        } else {
+            Response::json($resultado);
+        }
+    } else {
+        Response::json($resultado);
+    }
+} catch (Exception $e) {
+    Response::error($e->getMessage());
+}
