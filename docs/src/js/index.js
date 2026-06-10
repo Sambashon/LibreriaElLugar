@@ -71,7 +71,17 @@ let currentUser = null;
 async function checkSession() {
     try {
         const res = await fetch("php/scripts/sesion.php");
-        const data = await res.json();
+        
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const text = await res.text();
+        if (!text) {
+            throw new Error("Empty response from server");
+        }
+        
+        const data = JSON.parse(text);
 
         if (data.logged) {
             setCurrentUser(data.user);
@@ -175,7 +185,16 @@ async function handleAuthForm(form, endpoint) {
                 body: new FormData(this)
             });
 
-            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+
+            const text = await res.text();
+            if (!text) {
+                throw new Error("Empty response from server");
+            }
+
+            const data = JSON.parse(text);
 
             if (data.state === "success") {
 
