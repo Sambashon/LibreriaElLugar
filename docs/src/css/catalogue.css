@@ -309,6 +309,14 @@ svg{
     transition: border-color 0.15s;
 }
 
+/* Catalog searchbar overrides */
+.catalogue-searchbar {
+    margin-top: 1.5vh;
+    margin-right: 1rem;
+    --width-of-input: clamp(150px, 20vw, 350px);
+    --height-of-input: clamp(30px, 3vw, 50px);
+}
+
 
 .product-shell{
     box-sizing: border-box;

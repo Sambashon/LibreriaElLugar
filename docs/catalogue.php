@@ -7,6 +7,9 @@ $libros = $db->fetchAll(
      FROM libros
      ORDER BY titulo ASC"
 );
+
+// Get search parameter from URL
+$initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_QUOTES, 'UTF-8') : '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -116,6 +119,19 @@ $libros = $db->fetchAll(
                         <h1>Catálogo</h1>
                         <h3 id="resultCount"></h3>
                     </div>
+                    <form class="searchbar-form catalogue-searchbar">
+                        <button type="button">
+                            <svg width="17" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="search">
+                                <path d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9" stroke="currentColor" stroke-width="1.333" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Buscar libros..." value="<?= $initialSearch ?>" oninput="applyFilters()">
+                        <button class="reset" type="reset">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </form>
                     <select class="sort-select" id="sortSelect" onchange="applyFilters()">
                         <option value="alpha">Título A–Z</option>
                         <option value="price-asc">Precio: menor a mayor</option>
@@ -173,11 +189,12 @@ $libros = $db->fetchAll(
 
         // ── FILTROS ─────────────────────────────────────────────────
         function applyFilters() {
-            const sort      = document.getElementById('sortSelect').value;
-            const stockOn   = document.getElementById('filterStock').checked;
-            const agotadoOn = document.getElementById('filterAgotado').checked;
-            const minVal    = parseFloat(document.getElementById('priceMin').value) || 0;
-            const maxVal    = parseFloat(document.getElementById('priceMax').value) || Infinity;
+            const sort       = document.getElementById('sortSelect').value;
+            const stockOn    = document.getElementById('filterStock').checked;
+            const agotadoOn  = document.getElementById('filterAgotado').checked;
+            const minVal     = parseFloat(document.getElementById('priceMin').value) || 0;
+            const maxVal     = parseFloat(document.getElementById('priceMax').value) || Infinity;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
 
             let list = librosDB.filter(l => {
                 if (activeGenres.size && !activeGenres.has(l.genero)) return false;
@@ -185,6 +202,8 @@ $libros = $db->fetchAll(
                 if (l.precio > maxVal)                                 return false;
                 if (l.stock > 0  && !stockOn)                         return false;
                 if (l.stock === 0 && !agotadoOn)                      return false;
+                if (searchTerm && !l.titulo.toLowerCase().includes(searchTerm) && 
+                                  !l.autor.toLowerCase().includes(searchTerm)) return false;
                 return true;
             });
 
@@ -327,6 +346,12 @@ $libros = $db->fetchAll(
 
         // ── ARRANCAR ────────────────────────────────────────────────
         applyFilters();
+        
+        // Apply initial search if provided
+        if ('<?= $initialSearch ?>') {
+            document.getElementById('searchInput').value = '<?= $initialSearch ?>';
+            applyFilters();
+        }
     </script>
 
 </body>

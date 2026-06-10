@@ -449,6 +449,84 @@ if (deleteForm) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Book Search with Suggestions
+// ─────────────────────────────────────────────────────────────
+
+const indexSearchInput = document.getElementById('indexSearchInput');
+const suggestionsDropdown = document.getElementById('suggestionsDropdown');
+
+if (indexSearchInput) {
+    let searchTimeout;
+    
+    indexSearchInput.addEventListener('input', async (e) => {
+        const query = e.target.value.trim();
+        
+        clearTimeout(searchTimeout);
+        
+        if (query.length < 2) {
+            suggestionsDropdown.innerHTML = '';
+            suggestionsDropdown.classList.remove('open');
+            return;
+        }
+        
+        searchTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch(`php/scripts/buscarLibros.php?q=${encodeURIComponent(query)}`);
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                
+                const text = await res.text();
+                if (!text || text.trim() === '') {
+                    throw new Error("Empty response from server");
+                }
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error("Invalid JSON response:", text.substring(0, 300));
+                    throw parseError;
+                }
+                
+                if (data.state === 'success' && data.suggestions.length > 0) {
+                    renderSuggestions(data.suggestions, query);
+                } else {
+                    suggestionsDropdown.innerHTML = '<div class="suggestion-item no-results">No se encontraron libros</div>';
+                    suggestionsDropdown.classList.add('open');
+                }
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+                suggestionsDropdown.innerHTML = '<div class="suggestion-item error">Error al buscar</div>';
+                suggestionsDropdown.classList.add('open');
+            }
+        }, 300);
+    });
+    
+    function renderSuggestions(suggestions, query) {
+        suggestionsDropdown.innerHTML = suggestions.map(book => `
+            <div class="suggestion-item" onclick="goToCatalogue('${book.titulo.replace(/'/g, "\\'")}')">
+                <div class="suggestion-title">${book.titulo}</div>
+                <div class="suggestion-author">${book.autor}</div>
+                <div class="suggestion-price">$${book.precio.toLocaleString('es-AR')}</div>
+            </div>
+        `).join('');
+        suggestionsDropdown.classList.add('open');
+    }
+    
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#searchForm')) {
+            suggestionsDropdown.classList.remove('open');
+        }
+    });
+}
+
+function goToCatalogue(query) {
+    window.location.href = `/catalogue.php?search=${encodeURIComponent(query)}`;
+}
+
+// ─────────────────────────────────────────────────────────────
 // Init
 // ─────────────────────────────────────────────────────────────
 

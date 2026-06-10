@@ -17,7 +17,7 @@
     border-bottom: #b8b6ad 1px solid;
     padding-top: 5px;
 
-    overflow: hidden;
+    overflow-x: visible;
 }
 .sub-nav{
     display: flex;
@@ -48,6 +48,7 @@
 }
 .main-nav.hidden{
     height: 5vh;
+    overflow: hidden
 }
 #header{
     transition:all 0.3s ease;
@@ -102,9 +103,11 @@
     border-radius: var(--border-radius);
     transition: border-radius 0.5s ease;
     background: var(--input-bg,#fff);
+
+    z-index: 100;
 }
 
-.search-input {
+.searchbar-form .search-input {
     font-size: 0.9rem;
     background-color: transparent;
     width: 100%;
@@ -114,7 +117,7 @@
     border: none;
 }
 
-.search-input::placeholder{
+.searchbar-form .search-input::placeholder{
     color: #1A1A1A;
 }
 
@@ -143,19 +146,89 @@ input:focus {
 .searchbar-form:focus-within:before {
     transform: scale(1);
 }
-.reset {
+.searchbar-form .reset {
     border: none;
     background: none;
     opacity: 0;
     visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+    cursor: pointer;
 }
-input:not(:placeholder-shown) ~ .reset {
+
+.searchbar-form input:not(:placeholder-shown) ~ .reset {
     opacity: 1;
     visibility: visible;
 }
 .searchbar-form svg {
     width: 17px;
 }
+
+.search-suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #FFFDF7;
+    border: 0.5px solid #E8E4D4;
+    border-top: none;
+    border-radius: 0 0 7px 7px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+    z-index: 101;
+}
+
+.search-suggestions-dropdown.open {
+    max-height: 400px;
+    opacity: 1;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 12px 14px;
+    border-bottom: 0.5px solid #E8E4D4;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover {
+    background-color: #F5F3EA;
+}
+
+.suggestion-item.no-results,
+.suggestion-item.error {
+    text-align: center;
+    color: #999;
+    cursor: default;
+    padding: 20px;
+}
+
+.suggestion-title {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1A3A26;
+    margin-bottom: 2px;
+}
+
+.suggestion-author {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.suggestion-price {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1B4D2E;
+}
+
 .nav-item {
 position: relative;
 display: inline-block;
