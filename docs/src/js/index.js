@@ -77,13 +77,19 @@ async function checkSession() {
         }
         
         const text = await res.text();
-        if (!text) {
+        if (!text || text.trim() === '') {
             throw new Error("Empty response from server");
         }
         
-        const data = JSON.parse(text);
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.error("Invalid JSON response:", text.substring(0, 200));
+            throw parseError;
+        }
 
-        if (data.logged) {
+        if (data && data.logged) {
             setCurrentUser(data.user);
         }
 
@@ -190,13 +196,19 @@ async function handleAuthForm(form, endpoint) {
             }
 
             const text = await res.text();
-            if (!text) {
+            if (!text || text.trim() === '') {
                 throw new Error("Empty response from server");
             }
 
-            const data = JSON.parse(text);
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (parseError) {
+                console.error("Invalid JSON response:", text.substring(0, 200));
+                throw parseError;
+            }
 
-            if (data.state === "success") {
+            if (data && data.state === "success") {
 
                 showSuccessNotification(
                     data.message
@@ -208,10 +220,10 @@ async function handleAuthForm(form, endpoint) {
 
                 setCurrentUser(data.user);
 
-            } else {
+            } else if (data) {
 
                 showErrorNotification(
-                    data.message
+                    data.message || "Error desconocido"
                 );
             }
 

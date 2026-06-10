@@ -44,11 +44,26 @@ spl_autoload_register(function (string $class) {
         return;
     }
     
-    // Fallback: convertir a minúsculas para compatibilidad
+    // Fallback: convertir a minúsculas para compatibilidad con directorios en minúsculas
     $file_lower = strtolower($file);
     if ($file !== $file_lower && file_exists($file_lower)) {
         require_once $file_lower;
         return;
+    }
+    
+    // Fallback: buscar con namespace en minúsculas pero class name sin cambios
+    // App\Helpers\Response → helpers/Response.php
+    $parts = explode('\\', $relative_class);
+    if (count($parts) > 1) {
+        // Hacer minúsculas el directorio (namespace) pero mantener el nombre de clase
+        $dir_parts = array_slice($parts, 0, -1);
+        $dir_parts = array_map('strtolower', $dir_parts);
+        $class_name = $parts[count($parts) - 1];
+        $file_alt = $base_dir . implode('/', $dir_parts) . '/' . $class_name . '.php';
+        if (file_exists($file_alt)) {
+            require_once $file_alt;
+            return;
+        }
     }
 });
 
