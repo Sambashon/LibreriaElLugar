@@ -1,6 +1,6 @@
 <?php
-require_once "../clases/usuario.php";
-
+require_once __DIR__ . "/../clases/usuario.php";
+use App\Classes\Usuario;
 $nombre = "Admin";
 $apellido = "Usuario";
 $email = "admin@ejemplo.com";
