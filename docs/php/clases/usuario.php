@@ -2,7 +2,7 @@
 
 namespace App\Classes;
 
-require_once "libreriaDb.php";
+require_once __DIR__ . "/libreriaDb.php";
 require_once __DIR__ . "/../bootstrap.php";
 
 use App\Managers\{SessionManager, TokenManager};

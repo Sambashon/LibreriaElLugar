@@ -1,7 +1,7 @@
 <?php
 
-require_once "../clases/usuario.php";
-
+require_once __DIR__ . "/../clases/usuario.php";
+use App\Classes\Usuario;
 header("Content-Type: application/json");
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {

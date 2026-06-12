@@ -400,6 +400,13 @@ if (deleteForm) {
                 password ?? ""
             );
 
+            if (currentUser?.id_usuario) {
+                formData.append(
+                    "id_usuario",
+                    currentUser.id_usuario
+                );
+            }
+
             try {
 
                 const res = await fetch(
@@ -410,8 +417,29 @@ if (deleteForm) {
                     }
                 );
 
-                const data =
-                    await res.json();
+                if (!res.ok) {
+                    throw new Error(
+                        `HTTP error! status: ${res.status}`
+                    );
+                }
+
+                const text = await res.text();
+                if (!text || text.trim() === "") {
+                    throw new Error(
+                        "Empty response from server"
+                    );
+                }
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error(
+                        "Invalid JSON response:",
+                        text.substring(0, 200)
+                    );
+                    throw parseError;
+                }
 
                 if (
                     data.state === "success"
