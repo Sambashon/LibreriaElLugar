@@ -346,6 +346,11 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         }
 
         // ── ARRANCAR ────────────────────────────────────────────────
+        const catalogueSearch = sessionStorage.getItem('catalogueSearch');
+        if (catalogueSearch) {
+            document.getElementById('searchInput').value = catalogueSearch;
+            sessionStorage.removeItem('catalogueSearch');
+        }
         applyFilters();
         
         // Apply initial search if provided
@@ -353,6 +358,11 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             document.getElementById('searchInput').value = '<?= $initialSearch ?>';
             applyFilters();
         }
+
+        //para hacer funcionar mi reset
+        document.querySelector('.catalogue-searchbar').addEventListener('reset', () => {
+            setTimeout(() => applyFilters(), 0);
+        });
     </script>
 
 </body>
