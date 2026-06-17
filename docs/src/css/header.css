@@ -1,7 +1,6 @@
 .main-nav{
     font-family: "Plus Jakarta Sans", sans-serif;
-
-    transition: transform 0.3s ease;
+    
     height: 16vh;
     width: 100%;
     transition: height 0.3s ease;
@@ -195,8 +194,13 @@ input:focus {
     transition: background-color 0.2s ease;
 }
 
-.suggestion-item:hover {
+.suggestion-item:hover,
+.suggestion-item.selected {
     background-color: #F5F3EA;
+}
+
+.suggestion-item.selected {
+    background-color: #E8D4B0;
 }
 
 .suggestion-item.no-results,

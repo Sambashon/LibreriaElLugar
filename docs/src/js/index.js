@@ -400,13 +400,6 @@ if (deleteForm) {
                 password ?? ""
             );
 
-            if (currentUser?.id_usuario) {
-                formData.append(
-                    "id_usuario",
-                    currentUser.id_usuario
-                );
-            }
-
             try {
 
                 const res = await fetch(
@@ -417,29 +410,8 @@ if (deleteForm) {
                     }
                 );
 
-                if (!res.ok) {
-                    throw new Error(
-                        `HTTP error! status: ${res.status}`
-                    );
-                }
-
-                const text = await res.text();
-                if (!text || text.trim() === "") {
-                    throw new Error(
-                        "Empty response from server"
-                    );
-                }
-
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (parseError) {
-                    console.error(
-                        "Invalid JSON response:",
-                        text.substring(0, 200)
-                    );
-                    throw parseError;
-                }
+                const data =
+                    await res.json();
 
                 if (
                     data.state === "success"
@@ -485,9 +457,12 @@ const suggestionsDropdown = document.getElementById('suggestionsDropdown');
 
 if (indexSearchInput) {
     let searchTimeout;
+    let selectedIndex = -1;
+    let currentSuggestions = [];
     
     indexSearchInput.addEventListener('input', async (e) => {
         const query = e.target.value.trim();
+        selectedIndex = -1;
         
         clearTimeout(searchTimeout);
         
@@ -519,39 +494,87 @@ if (indexSearchInput) {
                 }
                 
                 if (data.state === 'success' && data.suggestions.length > 0) {
+                    currentSuggestions = data.suggestions;
                     renderSuggestions(data.suggestions, query);
                 } else {
                     suggestionsDropdown.innerHTML = '<div class="suggestion-item no-results">No se encontraron libros</div>';
                     suggestionsDropdown.classList.add('open');
+                    currentSuggestions = [];
                 }
             } catch (error) {
                 console.error('Error fetching suggestions:', error);
                 suggestionsDropdown.innerHTML = '<div class="suggestion-item error">Error al buscar</div>';
                 suggestionsDropdown.classList.add('open');
+                currentSuggestions = [];
             }
         }, 300);
     });
     
+    indexSearchInput.addEventListener('keydown', (e) => {
+        if (!suggestionsDropdown.classList.contains('open') || currentSuggestions.length === 0) {
+            return;
+        }
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, currentSuggestions.length - 1);
+            updateSelection();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, -1);
+            updateSelection();
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (selectedIndex >= 0 && currentSuggestions[selectedIndex]) {
+                goToCatalogue(currentSuggestions[selectedIndex].titulo);
+            }
+        }
+    });
+    
+    function updateSelection() {
+        const items = suggestionsDropdown.querySelectorAll('.suggestion-item');
+        items.forEach((item, idx) => {
+            if (idx === selectedIndex) {
+                item.classList.add('selected');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+    
     function renderSuggestions(suggestions, query) {
-        suggestionsDropdown.innerHTML = suggestions.map(book => `
-            <div class="suggestion-item" onclick="goToCatalogue('${book.titulo.replace(/'/g, "\\'")}')">
+        suggestionsDropdown.innerHTML = suggestions.map((book, idx) => `
+            <div class="suggestion-item" data-index="${idx}" onclick="goToCatalogue('${book.titulo.replace(/'/g, "\\'")}')">
                 <div class="suggestion-title">${book.titulo}</div>
                 <div class="suggestion-author">${book.autor}</div>
                 <div class="suggestion-price">$${book.precio.toLocaleString('es-AR')}</div>
             </div>
         `).join('');
+        
+        // Add hover event listeners
+        const items = suggestionsDropdown.querySelectorAll('.suggestion-item');
+        items.forEach((item, idx) => {
+            item.addEventListener('mouseenter', () => {
+                selectedIndex = idx;
+                updateSelection();
+            });
+        });
+        
         suggestionsDropdown.classList.add('open');
     }
     
     document.addEventListener('click', (e) => {
         if (!e.target.closest('#searchForm')) {
             suggestionsDropdown.classList.remove('open');
+            selectedIndex = -1;
         }
     });
 }
 
 function goToCatalogue(query) {
-    window.location.href = `/catalogue.php?search=${encodeURIComponent(query)}`;
+    sessionStorage.setItem('catalogueSearch', query);
+    window.location.href = '/catalogue.php';
 }
 
 // ─────────────────────────────────────────────────────────────
