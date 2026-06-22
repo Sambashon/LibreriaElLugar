@@ -6,7 +6,6 @@ services:
     container_name: apache_web
     ports:
       - "8080:80"
-      - "443:443"
     volumes:
       - ../../docs:/var/www/html
     depends_on:
@@ -14,7 +13,19 @@ services:
     networks:
       - libreria-network
     restart: unless-stopped
-    
+  
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+
     environment:
       DB_HOST: libreriadb
       DB_NAME: ${DB_NAME}
@@ -41,6 +52,8 @@ services:
     
 volumes:
   mariadb_data:
-
+  npm_data:
+  npm_letsencrypt:
+  
 networks:
   libreria-network:
