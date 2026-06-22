@@ -1,3 +1,9 @@
+const openCatalogueBtn = document.getElementById("btnCatalogue");
+openCatalogueBtn.addEventListener("click", function(){
+    window.location.href = "catalogue.php";
+})
+
+
 // ─────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────
