@@ -25,6 +25,8 @@ services:
     volumes:
       - npm_data:/data
       - npm_letsencrypt:/etc/letsencrypt
+    networks:
+      - libreria-network
 
     environment:
       DB_HOST: libreriadb
@@ -54,6 +56,6 @@ volumes:
   mariadb_data:
   npm_data:
   npm_letsencrypt:
-  
+
 networks:
   libreria-network:
