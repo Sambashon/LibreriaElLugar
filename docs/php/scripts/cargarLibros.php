@@ -1,6 +1,13 @@
 <?php
 require_once "../clases/importador.php";
+require_once "../clases/managers/SessionManager.php";
 
+
+$sessionManager = new SessionManager();
+if (!$sessionManager->obtener("admin", false)) {
+    Response::error("No autorizado", 403); // or similar
+    exit;
+}
 
 header('Content-Type: application/json');
 
