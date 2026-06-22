@@ -28,12 +28,43 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
     <link rel="stylesheet" href="src/css/catalogue.css">
 </head>
 <body>
+
+    <!-- ── MOBILE TOP BAR (visible only on mobile) ──────────────── -->
+    <div class="mobile-topbar">
+        <button class="mobile-hamburger" id="mobileMenuBtn" aria-label="Abrir menú">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <line x1="3" y1="6"  x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+        <div class="mobile-logo-wrap">
+            <a href="index.html">
+                <img src="Resources/logos/libreriaElLugar.png" alt="El Lugar">
+            </a>
+        </div>
+    </div>
+
+    <!-- ── OVERLAY (dims content behind open drawer) ─────────────── -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
     <div class="custom-row">
         <nav class="nav-menu">
 
+            <!-- Close button — only visible on mobile -->
+            <button class="nav-drawer-close" id="navDrawerClose" aria-label="Cerrar menú">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                    <line x1="18" y1="6"  x2="6"  y2="18"/>
+                    <line x1="6"  y1="6"  x2="18" y2="18"/>
+                </svg>
+            </button>
+
             <header class="nav-logo">
                 <div class="logo-container">
-                    <img src="Resources/logos/libreriaElLugar.png">
+                    <a href="index.html">
+                        <img src="Resources/logos/libreriaElLugar.png">
+                    </a>
+                    
                 </div>
                 <hr style="margin: 10px 0px; width: 100%;">
             </header>
@@ -363,6 +394,27 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         document.querySelector('.catalogue-searchbar').addEventListener('reset', () => {
             setTimeout(() => applyFilters(), 0);
         });
+
+        // ── MOBILE DRAWER ────────────────────────────────────────────
+        const mobileMenuBtn   = document.getElementById('mobileMenuBtn');
+        const navDrawerClose  = document.getElementById('navDrawerClose');
+        const mobileOverlay   = document.getElementById('mobileOverlay');
+        const navMenu         = document.querySelector('.nav-menu');
+
+        function openDrawer() {
+            navMenu.classList.add('open');
+            mobileOverlay.classList.add('visible');
+            document.body.classList.add('drawer-open');
+        }
+        function closeDrawer() {
+            navMenu.classList.remove('open');
+            mobileOverlay.classList.remove('visible');
+            document.body.classList.remove('drawer-open');
+        }
+
+        if (mobileMenuBtn)   mobileMenuBtn.addEventListener('click', openDrawer);
+        if (navDrawerClose)  navDrawerClose.addEventListener('click', closeDrawer);
+        if (mobileOverlay)   mobileOverlay.addEventListener('click', closeDrawer);
     </script>
 
 </body>
