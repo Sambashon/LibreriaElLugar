@@ -28,13 +28,6 @@ services:
     networks:
       - libreria-network
 
-    environment:
-      DB_HOST: libreriadb
-      DB_NAME: ${DB_NAME}
-      DB_PORT: 3306
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-
   libreriadb:
     image: mariadb:latest
     container_name: mariadb
