@@ -13,7 +13,7 @@ class Response
     public static function json(array $data, int $httpCode = 200): never
     {
         http_response_code($httpCode);
-        header('Content-Type: ' . RESPONSE_DEFAULT_CONTENT_TYPE . '; charset=' . RESPONSE_DEFAULT_CHARSET);
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
     }

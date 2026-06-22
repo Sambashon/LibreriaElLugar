@@ -63,7 +63,7 @@
     align-items: center;
     justify-content: space-between;
 }
-.modal-close{
+.modal-nav .modal-close{
     position: unset;
 }
 .modal-nav .button{

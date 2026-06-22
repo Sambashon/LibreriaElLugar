@@ -1,54 +1,73 @@
 services:
-  libreriaweb:
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile
-    container_name: apache_web
-    ports:
-      - "8080:80"
-    volumes:
-      - ../../docs:/var/www/html
-    depends_on:
-      - libreriadb
-    networks:
-      - libreria-network
-    restart: unless-stopped
-  
+
   npm:
     image: jc21/nginx-proxy-manager:latest
     container_name: npm
     restart: unless-stopped
     ports:
       - "80:80"
-      - "81:81"
       - "443:443"
+      - "81:81"
     volumes:
       - npm_data:/data
       - npm_letsencrypt:/etc/letsencrypt
     networks:
-      - libreria-network
+      - proxy-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ../../docs:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php_fpm
+    networks:
+      - proxy-network
+      - app-network
+
+  php_fpm:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: php_fpm
+    restart: unless-stopped
+    environment:
+      DB_HOST: libreriadb
+      DB_NAME: ${DB_NAME}
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ../../docs:/var/www/html
+    networks:
+      - app-network
 
   libreriadb:
     image: mariadb:latest
     container_name: mariadb
+    restart: unless-stopped
+    ports:
+      - 3306:3306
     environment:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
       - ../sql:/docker-entrypoint-initdb.d
-    restart: unless-stopped
     networks:
-      - libreria-network
-    
+      - app-network
+
 volumes:
   mariadb_data:
   npm_data:
   npm_letsencrypt:
 
 networks:
-  libreria-network:
+  proxy-network:
+  app-network:
