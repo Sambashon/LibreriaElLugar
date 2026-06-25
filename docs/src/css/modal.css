@@ -32,7 +32,7 @@
 
 /* ---------- modal-nav ---------- */
 .modal-close {
-    position: absolute;
+    position: absolute !important;
     top: 12px;
     right: 14px;
     z-index: 10;
