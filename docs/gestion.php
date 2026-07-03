@@ -11,7 +11,9 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Libros</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -43,8 +45,8 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
         }
 
         header h1 {
-            font-family: 'Fraunces', serif;
-            font-weight: 300;
+            font-family: "Fraunces", sans-serif;
+            font-weight: bold;
             font-size: 2rem;
             color: var(--cream);
             letter-spacing: -0.02em;
@@ -58,7 +60,7 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
         .header-count {
             font-size: 0.8rem;
             font-weight: 500;
-            color: var(--green-dark);
+            color: var(--amber);
             background: rgba(235,233,218,0.1);
             border: 1px solid rgba(235,233,218,0.15);
             padding: 0.25rem 0.7rem;

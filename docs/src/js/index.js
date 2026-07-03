@@ -3,6 +3,10 @@ openCatalogueBtn.addEventListener("click", function(){
     window.location.href = "catalogue.php";
 })
 
+const adminLibrosBtn = document.getElementById("adminLibrosBtn");
+adminLibrosBtn.addEventListener("click", function(){
+    window.location.href = "gestion.php";
+})
 
 // ─────────────────────────────────────────────────────────────
 // Helpers
@@ -323,9 +327,6 @@ bindClick(
 // ─────────────────────────────────────────────────────────────
 
 const adminActions = {
-    adminLibrosBtn:
-        "Función 'Gestionar Libros' en construcción",
-
     adminUsuariosBtn:
         "Función 'Gestionar Usuarios' en construcción",
 
