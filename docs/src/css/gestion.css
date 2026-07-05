@@ -1,0 +1,240 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --amber:      #C8922B;
+    --green-dark: #23693e;
+    --green-deep: #133620;
+    --cream:      #EBE9DA;
+    --cream-dark: #d9d7c6;
+    --text:       #1a1a18;
+    --text-muted: #6b6b5e;
+    --radius:     6px;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+    background: var(--green-deep);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.2rem;
+}
+header h1{
+    color: var(--cream);
+}
+header h1 em {
+    font-style: italic;
+    color: var(--amber);
+}
+
+.header-count {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--amber);
+    background: rgba(235,233,218,0.1);
+    border: 1px solid rgba(235,233,218,0.15);
+    padding: 0.25rem 0.7rem;
+    border-radius: 99px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.header-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    gap: 1rem;
+}
+.button{
+    background-color: var(--amber);
+    color: black;
+    font-weight: bold;
+}
+.button:hover{
+    color: var(--cream);
+}
+
+/* ── TOOLBAR ── */
+.toolbar {
+    background: var(--cream-dark);
+    border-bottom: 1px solid #c8c6b4;
+    padding: 0.85rem 2.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.toolbar input {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid #b8b6a4;
+    border-radius: var(--radius);
+    background: var(--cream);
+    color: var(--text);
+    width: 280px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.toolbar input:focus {
+    border-color: var(--amber);
+}
+
+.toolbar input::placeholder { color: var(--text-muted); }
+
+.toolbar label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ── TABLE WRAPPER ── */
+.wrapper {
+    padding: 2rem 2.5rem;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+thead th {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    background: var(--cream-dark);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid #c0bfae;
+    white-space: nowrap;
+}
+
+thead th:first-child { border-radius: var(--radius) 0 0 0; }
+thead th:last-child  { border-radius: 0 var(--radius) 0 0; }
+
+tbody tr {
+    border-bottom: 1px solid #d4d2c2;
+    transition: background 0.15s;
+    animation: fadeIn 0.3s ease both;
+}
+
+tbody tr:hover { background: #e2e0d0; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+    color: var(--text);
+}
+
+/* Título destacado */
+td.titulo {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 0.95rem;
+    max-width: 300px;
+}
+
+td.precio {
+    font-weight: 600;
+    color: var(--green-dark);
+    white-space: nowrap;
+}
+
+td.stock {
+    font-weight: 500;
+    text-align: center;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.badge-disponible {
+    background: #d4edda;
+    color: var(--green-dark);
+    border: 1px solid #b8dfc4;
+}
+
+.badge-agotado {
+    background: #fdecea;
+    color: #b03a2e;
+    border: 1px solid #f5c0bb;
+}
+.editBtn{
+    height: 30px;
+    width: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 5px;
+    margin: 0 auto;
+    transition: background-color 0.2s ease;
+}
+.editBtn img{
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+.editBtn:hover{
+    cursor: pointer;
+    background-color: #23693e;
+}
+
+/* Column that holds the edit button: keep it a fixed, non-squishable
+   width so the icon can't be stretched/compressed by the table's
+   auto layout on tablet / medium-width screens */
+td.acciones {
+    width: 46px;
+    text-align: center;
+}
+/* Empty state */
+.empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+}
+
+.empty p {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid #c8c6b4;
+}
