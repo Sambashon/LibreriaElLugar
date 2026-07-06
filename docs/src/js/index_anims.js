@@ -78,6 +78,11 @@ function countUp(cifra){
     const target = cifra.innerText;
     let current = 0;
 
+    // Reserve the final width up front (in ch units, based on digit count)
+    // so the span never resizes as the digit count changes mid-animation.
+    cifra.style.minWidth = original.length + "ch";
+    cifra.style.textAlign = "center";
+
     const interval = setInterval(() => {
 
         current += (target - current) * 0.05; 

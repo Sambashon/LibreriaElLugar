@@ -48,9 +48,9 @@ $generos = array_column(
         <span class="header-count" id="headerCount"><?= count($libros) ?> registros</span>
     </div>
     <div class="header-container">
-        <button class="button" id="backBtn">Volver a inicio</button>
-        
-        <button class="button">Cargar Libros</button>
+        <button class="button" onclick="location.href='index.html'">Volver a inicio</button>
+        <input type="file" id="importFile" accept=".xlsx,.xls,.csv" hidden>
+        <button class="button" id="importExcelBtn" type="button">Importar Excel</button>
     </div>
 </header>
 
@@ -186,6 +186,8 @@ $generos = array_column(
     const ENDPOINTS = {
         edit: 'php/scripts/actualizarLibro.php',
         add: 'php/scripts/crearLibro.php',
+        clearAll: 'php/scripts/eliminarTODOSlosLibros.php',
+        import: 'php/scripts/cargarLibros.php',
     };
 
     let popUpMode = 'edit';
@@ -437,6 +439,58 @@ $generos = array_column(
     });
 
     document.getElementById('addBookBtn').addEventListener('click', () => openPopUp('add'));
+
+    const importFileInput = document.getElementById('importFile');
+    const importExcelBtn = document.getElementById('importExcelBtn');
+
+    importExcelBtn.addEventListener('click', () => importFileInput.click());
+
+    importFileInput.addEventListener('change', async function () {
+        const file = this.files[0];
+        this.value = '';
+        if (!file) return;
+
+        const confirmed = confirm(
+            'Se eliminarán todos los libros actuales y se importará el archivo seleccionado.\n\n¿Desea continuar?'
+        );
+        if (!confirmed) return;
+
+        importExcelBtn.disabled = true;
+        importExcelBtn.textContent = 'Importando…';
+
+        try {
+            const clearRes = await fetch(ENDPOINTS.clearAll, { method: 'POST' });
+            const clearData = await clearRes.json();
+            if (clearData.state !== 'success') {
+                throw new Error(clearData.message || 'No se pudo vaciar la base de datos');
+            }
+
+            const formData = new FormData();
+            formData.append('archivo', file);
+
+            const importRes = await fetch(ENDPOINTS.import, {
+                method: 'POST',
+                body: formData,
+            });
+            const importData = await importRes.json();
+            if (importData.state !== 'success') {
+                throw new Error(importData.message || 'No se pudo importar el archivo');
+            }
+
+            const errores = importData.errores?.length ?? 0;
+            let message = `Importación completada: ${importData.insertados} libros cargados.`;
+            if (errores > 0) {
+                message += `\n${errores} fila(s) con errores fueron omitidas.`;
+            }
+            alert(message);
+            location.reload();
+        } catch (err) {
+            alert(err.message || 'Error al importar el archivo');
+        } finally {
+            importExcelBtn.disabled = false;
+            importExcelBtn.textContent = 'Importar Excel';
+        }
+    });
 
     if (tabla) {
         tabla.addEventListener('click', function (e) {

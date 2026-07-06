@@ -61,6 +61,13 @@ header h1 em {
 .button:hover{
     color: var(--cream);
 }
+.button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.button:disabled:hover {
+    color: black;
+}
 
 /* ── TOOLBAR ── */
 .toolbar {

@@ -44,6 +44,14 @@
     display: flex;
     justify-content: center;
 }
+.cifras-container{
+    width: fit-content;
+}
+.cifra{
+    font-variant-numeric: tabular-nums;
+    display: inline-block;
+    text-align: left;
+}
 .main-section#destacados{
     background-color: #EBE9DA;
     padding: 2.5rem;
