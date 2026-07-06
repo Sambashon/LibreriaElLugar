@@ -210,8 +210,16 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         let currentPage = 1;
 
         window.addEventListener('resize', () => {
-            PER_PAGE = calcPerPage();
-            currentPage = 1;
+            const newPerPage = calcPerPage();
+            if (newPerPage === PER_PAGE) return;
+
+            const firstItemIndex = (currentPage - 1) * PER_PAGE;
+            PER_PAGE = newPerPage;
+            const total = Math.max(1, Math.ceil(filteredLibros.length / PER_PAGE));
+            currentPage = Math.min(
+                Math.max(1, Math.floor(firstItemIndex / PER_PAGE) + 1),
+                total
+            );
             renderPage();
         });
         let   activeGenres   = new Set();
