@@ -99,6 +99,8 @@ header h1 em {
     letter-spacing: 0.05em;
 }
 
+    
+
 /* ── TABLE WRAPPER ── */
 .wrapper {
     padding: 2rem 2.5rem;
@@ -261,7 +263,7 @@ footer {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -48%);
-    width: min(480px, 92vw);
+    width: fit-content;
     max-height: 88vh;
     display: flex;
     flex-direction: column;
@@ -319,7 +321,7 @@ footer {
 
 .popUp-body {
     padding: 1.5rem;
-    overflow-y: auto;
+    overflow: visible;
 }
 
 .popUp-body form {
@@ -396,3 +398,48 @@ footer {
 .button-primary:hover {
     background: var(--green-deep);
 }
+
+.combobox {
+    position: relative;
+}
+
+.combobox-list {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    top: auto;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid var(--cream-dark);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(19, 54, 32, 0.12);
+    max-height: 180px;
+    overflow-y: auto;
+    z-index: 110;
+}
+
+.combobox-item {
+    padding: 0.55rem 0.75rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.12s ease;
+}
+
+.combobox-item:hover,
+.combobox-item.selected {
+    background: rgba(200, 146, 43, 0.15);
+}
+
+.combobox-empty {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    cursor: default;
+}
+
+.combobox-empty:hover {
+    background: transparent;
+}
+

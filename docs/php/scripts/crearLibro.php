@@ -1,0 +1,54 @@
+<?php
+
+require_once __DIR__ . "/../bootstrap.php";
+
+use App\Helpers\{Request, Response};
+
+header('Content-Type: application/json; charset=utf-8');
+
+try {
+    Request::requireMethod('POST');
+
+    $fields = Request::requireFields(['titulo', 'autor']);
+
+    $titulo = trim($fields['titulo']);
+    $autor = trim($fields['autor']);
+    $editorial = trim(Request::getPost('editorial', ''));
+    $genero = trim(Request::getPost('genero', ''));
+
+    $precioRaw = Request::getPost('precio');
+    if ($precioRaw === null || $precioRaw === '' || !is_numeric($precioRaw) || (float) $precioRaw < 0) {
+        Response::error('Precio inválido', 400);
+    }
+    $precio = (float) $precioRaw;
+
+    $stockRaw = Request::getPost('stock', '0');
+    if (!is_numeric($stockRaw) || (int) $stockRaw < 0) {
+        Response::error('Stock inválido', 400);
+    }
+    $stock = (int) $stockRaw;
+
+    $db = new LibreriaDB();
+
+    $db->query(
+        "INSERT INTO libros (titulo, autor, editorial, genero, precio, stock)
+         VALUES (?, ?, ?, ?, ?, ?)",
+        [$titulo, $autor, $editorial, $genero, $precio, $stock]
+    );
+
+    $idLibro = (int) $db->lastInsertId();
+
+    Response::success('Libro creado correctamente', [
+        'libro' => [
+            'id'        => $idLibro,
+            'titulo'    => $titulo,
+            'autor'     => $autor,
+            'editorial' => $editorial,
+            'genero'    => $genero,
+            'precio'    => $precio,
+            'stock'     => $stock,
+        ],
+    ]);
+} catch (Exception $e) {
+    Response::error($e->getMessage());
+}

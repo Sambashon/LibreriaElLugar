@@ -3,6 +3,30 @@ require_once __DIR__ . "/php/clases/libreriaDb.php";
 
 $db = new LibreriaDB();
 $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
+$editoriales = array_column(
+    $db->fetchAll(
+        "SELECT DISTINCT editorial FROM libros
+         WHERE editorial IS NOT NULL AND TRIM(editorial) != ''
+         ORDER BY editorial ASC"
+    ),
+    'editorial'
+);
+$autores = array_column(
+    $db->fetchAll(
+        "SELECT DISTINCT autor FROM libros
+         WHERE autor IS NOT NULL AND TRIM(autor) != ''
+         ORDER BY autor ASC"
+    ),
+    'autor'
+);
+$generos = array_column(
+    $db->fetchAll(
+        "SELECT DISTINCT genero FROM libros
+         WHERE genero IS NOT NULL AND TRIM(genero) != ''
+         ORDER BY genero ASC"
+    ),
+    'genero'
+);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,10 +45,11 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
 <header>
     <div class="header-container">
         <h1>Catálogo de <em>Libros</em></h1>
-        <span class="header-count"><?= count($libros) ?> registros</span>
+        <span class="header-count" id="headerCount"><?= count($libros) ?> registros</span>
     </div>
     <div class="header-container">
         <button class="button" id="backBtn">Volver a inicio</button>
+        
         <button class="button">Cargar Libros</button>
     </div>
 </header>
@@ -32,13 +57,14 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
 <div class="toolbar">
     <label for="buscar">Buscar</label>
     <input type="text" id="buscar" placeholder="Título, autor, editorial…">
+    <button class="button" id="addBookBtn">Agregar libro</button>
 </div>
 
 <div class="wrapper">
     <?php if (empty($libros)): ?>
-        <div class="empty"><p>No hay libros en la base de datos.</p></div>
-    <?php else: ?>
-    <table id="tabla">
+        <div class="empty" id="emptyState"><p>No hay libros en la base de datos.</p></div>
+    <?php endif; ?>
+    <table id="tabla" <?= empty($libros) ? 'hidden' : '' ?>>
         <thead>
             <tr>
                 <th>#</th>
@@ -50,7 +76,7 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
                 <th>Stock</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tablaBody">
             <?php foreach ($libros as $i => $libro): ?>
             <tr>
                 <td><?= htmlspecialchars($libro['id_libro'] ?? $i + 1) ?></td>
@@ -67,17 +93,16 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
             <?php endforeach; ?>
         </tbody>
     </table>
-    <?php endif; ?>
 </div>
 
-<footer>
+<footer id="footerCount">
     <?= count($libros) ?> libros · <?= date('d/m/Y H:i') ?>
 </footer>
-<!--___________EDIT BOOK POP UP___________-->
+<!--___________BOOK POP UP___________-->
 <div class="popUp-overlay" id="popUpOverlay"></div>
 <div class="popUp" id="popUp">
     <header class="popUp-header">
-        <div class="popUp-title">Editar libro</div>
+        <div class="popUp-title" id="popUpTitle">Editar libro</div>
         <button class="popUp-close" id="popUpClose">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -94,18 +119,27 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
             <div class="form-row">
                 <div class="form-group">
                     <label for="autor">Autor</label>
-                    <input type="text" id="autor" name="autor">
+                    <div class="combobox" id="autorCombobox">
+                        <input type="text" id="autor" name="autor" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="autorList" aria-autocomplete="list" required>
+                        <ul class="combobox-list" id="autorList" role="listbox" hidden></ul>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="editorial">Editorial</label>
-                    <input type="text" id="editorial" name="editorial">
+                    <div class="combobox" id="editorialCombobox">
+                        <input type="text" id="editorial" name="editorial" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="editorialList" aria-autocomplete="list">
+                        <ul class="combobox-list" id="editorialList" role="listbox" hidden></ul>
+                    </div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="genero">Género</label>
-                    <input type="text" id="genero" name="genero">
+                    <div class="combobox" id="generoCombobox">
+                        <input type="text" id="genero" name="genero" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="generoList" aria-autocomplete="list">
+                        <ul class="combobox-list" id="generoList" role="listbox" hidden></ul>
+                    </div>
                 </div>
                 <div class="form-group form-group-small">
                     <label for="precio">Precio</label>
@@ -120,7 +154,7 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
     </div>
     <footer class="popUp-footer">
         <button type="button" class="button button-ghost" id="popUpCancel">Cancelar</button>
-        <button type="submit" form="editForm" class="button button-primary">Guardar cambios</button>
+        <button type="submit" form="editForm" class="button button-primary" id="popUpSubmit">Guardar cambios</button>
     </footer>
 </div>
 <script>
@@ -134,8 +168,157 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
         'stock'     => (int)  ($l['stock']    ?? 0),
     ], $libros), JSON_UNESCAPED_UNICODE) ?>;
 
+    let editoriales = <?= json_encode(array_values($editoriales), JSON_UNESCAPED_UNICODE) ?>;
+    let autores    = <?= json_encode(array_values($autores),    JSON_UNESCAPED_UNICODE) ?>;
+    let generos    = <?= json_encode(array_values($generos),    JSON_UNESCAPED_UNICODE) ?>;
+
     const popUp = document.getElementById('popUp');
     const popUpOverlay = document.getElementById('popUpOverlay');
+    const editForm = document.getElementById('editForm');
+    const popUpTitle = document.getElementById('popUpTitle');
+    const popUpSubmit = document.getElementById('popUpSubmit');
+    const tabla = document.getElementById('tabla');
+    const tablaBody = document.getElementById('tablaBody');
+    const emptyState = document.getElementById('emptyState');
+    const headerCount = document.getElementById('headerCount');
+    const footerCount = document.getElementById('footerCount');
+
+    const ENDPOINTS = {
+        edit: 'php/scripts/actualizarLibro.php',
+        add: 'php/scripts/crearLibro.php',
+    };
+
+    let popUpMode = 'edit';
+
+    function createCombobox({ fieldId, listId, comboboxId, items, emptyLabelPlural }) {
+        const input = document.getElementById(fieldId);
+        const list = document.getElementById(listId);
+        const combobox = document.getElementById(comboboxId);
+        let activeIndex = -1;
+
+        function normalize(value) {
+            const trimmed = value.trim();
+            if (!trimmed) return '';
+            const match = items.find(e => e.toLowerCase() === trimmed.toLowerCase());
+            return match ?? trimmed;
+        }
+
+        function register(value) {
+            const normalized = normalize(value);
+            if (!normalized) return '';
+            if (!items.some(e => e.toLowerCase() === normalized.toLowerCase())) {
+                items.push(normalized);
+                items.sort((a, b) => a.localeCompare(b, 'es'));
+            }
+            return normalized;
+        }
+
+        function filterItems(query) {
+            const q = query.trim().toLowerCase();
+            if (!q) return items;
+            return items.filter(e => e.toLowerCase().includes(q));
+        }
+
+        function closeList() {
+            list.hidden = true;
+            input.setAttribute('aria-expanded', 'false');
+            activeIndex = -1;
+        }
+
+        function renderList(filtered) {
+            list.innerHTML = '';
+            if (!filtered.length) {
+                const empty = document.createElement('li');
+                empty.className = 'combobox-item combobox-empty';
+                empty.textContent = input.value.trim()
+                    ? 'Sin coincidencias — se usará el valor ingresado'
+                    : `No hay ${emptyLabelPlural} registrados`;
+                empty.setAttribute('role', 'option');
+                list.appendChild(empty);
+            } else {
+                filtered.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'combobox-item';
+                    li.textContent = item;
+                    li.setAttribute('role', 'option');
+                    li.dataset.index = index;
+                    li.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        input.value = item;
+                        closeList();
+                    });
+                    list.appendChild(li);
+                });
+            }
+            list.hidden = false;
+            input.setAttribute('aria-expanded', 'true');
+        }
+
+        function highlightItem(index) {
+            const nodes = list.querySelectorAll('.combobox-item:not(.combobox-empty)');
+            nodes.forEach((item, i) => item.classList.toggle('selected', i === index));
+            if (nodes[index]) {
+                nodes[index].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        function openList() {
+            renderList(filterItems(input.value));
+            activeIndex = -1;
+        }
+
+        input.addEventListener('focus', openList);
+        input.addEventListener('input', openList);
+        input.addEventListener('keydown', (e) => {
+            const nodes = list.querySelectorAll('.combobox-item:not(.combobox-empty)');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (list.hidden) openList();
+                activeIndex = Math.min(activeIndex + 1, nodes.length - 1);
+                highlightItem(activeIndex);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                activeIndex = Math.max(activeIndex - 1, 0);
+                highlightItem(activeIndex);
+            } else if (e.key === 'Enter' && activeIndex >= 0 && nodes[activeIndex]) {
+                e.preventDefault();
+                input.value = nodes[activeIndex].textContent;
+                closeList();
+            } else if (e.key === 'Escape') {
+                closeList();
+            }
+        });
+
+        input.addEventListener('blur', () => {
+            window.setTimeout(() => {
+                if (!combobox.contains(document.activeElement)) {
+                    input.value = normalize(input.value);
+                    closeList();
+                }
+            }, 120);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!combobox.contains(e.target)) {
+                closeList();
+            }
+        });
+
+        return { normalize, register };
+    }
+
+    const editorialBox = createCombobox({
+        fieldId: 'editorial', listId: 'editorialList', comboboxId: 'editorialCombobox',
+        items: editoriales, emptyLabelPlural: 'editoriales',
+    });
+    const autorBox = createCombobox({
+        fieldId: 'autor', listId: 'autorList', comboboxId: 'autorCombobox',
+        items: autores, emptyLabelPlural: 'autores',
+    });
+    const generoBox = createCombobox({
+        fieldId: 'genero', listId: 'generoList', comboboxId: 'generoCombobox',
+        items: generos, emptyLabelPlural: 'géneros',
+    });
 
     function formatPrecio(n) {
         return '$' + Number(n).toLocaleString('es-AR', {
@@ -146,6 +329,39 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
 
     function displayValue(value) {
         return value === '' || value == null ? '—' : value;
+    }
+
+    function buildTableRow(libro) {
+        const row = document.createElement('tr');
+        const values = [
+            String(libro.id),
+            displayValue(libro.titulo),
+            displayValue(libro.autor),
+            displayValue(libro.editorial),
+            displayValue(libro.genero),
+            formatPrecio(libro.precio),
+            String(libro.stock),
+        ];
+        const cellClasses = ['', 'titulo', '', '', '', 'precio', 'stock'];
+
+        values.forEach((text, i) => {
+            const td = document.createElement('td');
+            td.textContent = text;
+            if (cellClasses[i]) td.className = cellClasses[i];
+            row.appendChild(td);
+        });
+
+        const actions = document.createElement('td');
+        actions.className = 'acciones';
+        const btn = document.createElement('div');
+        btn.title = 'Editar libro...';
+        btn.className = 'editBtn';
+        btn.dataset.id = libro.id;
+        btn.innerHTML = '<img src="Resources/icons/edit.svg" alt="Editar">';
+        actions.appendChild(btn);
+        row.appendChild(actions);
+
+        return row;
     }
 
     function updateTableRow(libro) {
@@ -161,15 +377,51 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
         row.querySelector('.stock').textContent = libro.stock;
     }
 
-    function openPopUp(id) {
-        const libro = librosDB.find(l => l.id === Number(id));
-        document.getElementById('id_libro').value = id;
+    function appendTableRow(libro) {
+        if (emptyState) {
+            emptyState.remove();
+        }
+        tabla.hidden = false;
+        tablaBody.appendChild(buildTableRow(libro));
+    }
+
+    function updateCounts() {
+        const count = librosDB.length;
+        headerCount.textContent = `${count} registros`;
+        footerCount.textContent = `${count} libros · ${new Date().toLocaleString('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        })}`;
+    }
+
+    function fillForm(libro = null) {
+        document.getElementById('id_libro').value = libro?.id ?? '';
         document.getElementById('titulo').value = libro?.titulo ?? '';
         document.getElementById('autor').value = libro?.autor ?? '';
         document.getElementById('editorial').value = libro?.editorial ?? '';
         document.getElementById('genero').value = libro?.genero ?? '';
         document.getElementById('precio').value = libro?.precio ?? '';
         document.getElementById('stock').value = libro?.stock ?? '';
+    }
+
+    function openPopUp(mode, id = null) {
+        popUpMode = mode;
+        editForm.action = ENDPOINTS[mode];
+        popUpTitle.textContent = mode === 'add' ? 'Agregar libro' : 'Editar libro';
+        popUpSubmit.textContent = mode === 'add' ? 'Agregar libro' : 'Guardar cambios';
+
+        if (mode === 'add') {
+            editForm.reset();
+            document.getElementById('id_libro').value = '';
+        } else {
+            const libro = librosDB.find(l => l.id === Number(id));
+            fillForm(libro);
+            document.getElementById('id_libro').value = id;
+        }
+
         popUp.classList.add('active');
         popUpOverlay.classList.add('active');
     }
@@ -184,30 +436,37 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
         });
     });
 
-    // Delegated listener: works for every row regardless of how many
-    // are rendered or how the table is resized/reflowed at medium widths.
-    const tabla = document.getElementById('tabla');
+    document.getElementById('addBookBtn').addEventListener('click', () => openPopUp('add'));
+
     if (tabla) {
         tabla.addEventListener('click', function (e) {
             const btn = e.target.closest('.editBtn');
             if (!btn) return;
-            openPopUp(btn.dataset.id);
+            openPopUp('edit', btn.dataset.id);
         });
     }
     document.getElementById('popUpClose').addEventListener('click', closePopUp);
     document.getElementById('popUpCancel').addEventListener('click', closePopUp);
     popUpOverlay.addEventListener('click', closePopUp);
 
-    document.getElementById('editForm').addEventListener('submit', async function (e) {
+    editForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        const submitBtn = document.querySelector('button[form="editForm"]');
-        submitBtn.disabled = true;
+        popUpSubmit.disabled = true;
+
+        document.getElementById('editorial').value = editorialBox.normalize(document.getElementById('editorial').value);
+        document.getElementById('autor').value = autorBox.normalize(document.getElementById('autor').value);
+        document.getElementById('genero').value = generoBox.normalize(document.getElementById('genero').value);
+
+        const formData = new FormData(this);
+        if (popUpMode === 'add') {
+            formData.delete('id_libro');
+        }
 
         try {
             const res = await fetch(this.action, {
                 method: 'POST',
-                body: new FormData(this),
+                body: formData,
             });
 
             const data = await res.json();
@@ -217,17 +476,27 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
             }
 
             const libro = data.libro;
-            const idx = librosDB.findIndex(l => l.id === libro.id);
-            if (idx !== -1) {
-                librosDB[idx] = libro;
+            libro.editorial = editorialBox.register(libro.editorial);
+            libro.autor = autorBox.register(libro.autor);
+            libro.genero = generoBox.register(libro.genero);
+
+            if (popUpMode === 'add') {
+                librosDB.push(libro);
+                appendTableRow(libro);
+                updateCounts();
+            } else {
+                const idx = librosDB.findIndex(l => l.id === libro.id);
+                if (idx !== -1) {
+                    librosDB[idx] = libro;
+                }
+                updateTableRow(libro);
             }
 
-            updateTableRow(libro);
             closePopUp();
         } catch (err) {
             alert(err.message || 'Error al guardar los cambios');
         } finally {
-            submitBtn.disabled = false;
+            popUpSubmit.disabled = false;
         }
     });
 </script>
