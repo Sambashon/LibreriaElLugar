@@ -297,4 +297,17 @@ width: 100%;
     .searchbar-form{
         --width-of-input: 120px;
     }
+    #cartBtn{
+        display: none;
+    }
+    .sub-nav{
+        display: none;
+    }
+    .main-nav{
+        height: 11vh;
+        padding-bottom: 10px;
+    }
+    .header-container{
+        height: fit-content;
+    }
 }

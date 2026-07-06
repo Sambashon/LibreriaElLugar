@@ -421,7 +421,9 @@
         width: 100%;
         padding: 1rem 1rem;
     }
-    
+    .main-section{
+        height: 90vh;
+    }
 }
 
 @media (max-width: 768px){
