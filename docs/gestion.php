@@ -83,7 +83,7 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
         </button>
     </header>
     <div class="popUp-body">
-        <form id="editForm" action="" method="POST">
+        <form id="editForm" action="php/scripts/actualizarLibro.php" method="POST">
             <input type="hidden" id="id_libro" name="id_libro">
 
             <div class="form-group">
@@ -124,12 +124,52 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
     </footer>
 </div>
 <script>
+    const librosDB = <?= json_encode(array_map(fn($l) => [
+        'id'        => (int)  ($l['id_libro'] ?? 0),
+        'titulo'    =>        $l['titulo']    ?? '',
+        'autor'     =>        $l['autor']     ?? '',
+        'editorial' =>        $l['editorial'] ?? '',
+        'genero'    =>        $l['genero']    ?? '',
+        'precio'    => (float)($l['precio']   ?? 0),
+        'stock'     => (int)  ($l['stock']    ?? 0),
+    ], $libros), JSON_UNESCAPED_UNICODE) ?>;
+
     const popUp = document.getElementById('popUp');
     const popUpOverlay = document.getElementById('popUpOverlay');
-    
+
+    function formatPrecio(n) {
+        return '$' + Number(n).toLocaleString('es-AR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+    }
+
+    function displayValue(value) {
+        return value === '' || value == null ? '—' : value;
+    }
+
+    function updateTableRow(libro) {
+        const btn = document.querySelector(`.editBtn[data-id="${libro.id}"]`);
+        const row = btn?.closest('tr');
+        if (!row) return;
+
+        row.querySelector('.titulo').textContent = displayValue(libro.titulo);
+        row.cells[2].textContent = displayValue(libro.autor);
+        row.cells[3].textContent = displayValue(libro.editorial);
+        row.cells[4].textContent = displayValue(libro.genero);
+        row.querySelector('.precio').textContent = formatPrecio(libro.precio);
+        row.querySelector('.stock').textContent = libro.stock;
+    }
+
     function openPopUp(id) {
+        const libro = librosDB.find(l => l.id === Number(id));
         document.getElementById('id_libro').value = id;
-        // TODO: fetch book data by id and fill titulo/autor/editorial/genero/precio/stock
+        document.getElementById('titulo').value = libro?.titulo ?? '';
+        document.getElementById('autor').value = libro?.autor ?? '';
+        document.getElementById('editorial').value = libro?.editorial ?? '';
+        document.getElementById('genero').value = libro?.genero ?? '';
+        document.getElementById('precio').value = libro?.precio ?? '';
+        document.getElementById('stock').value = libro?.stock ?? '';
         popUp.classList.add('active');
         popUpOverlay.classList.add('active');
     }
@@ -157,6 +197,39 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
     document.getElementById('popUpClose').addEventListener('click', closePopUp);
     document.getElementById('popUpCancel').addEventListener('click', closePopUp);
     popUpOverlay.addEventListener('click', closePopUp);
+
+    document.getElementById('editForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const submitBtn = document.querySelector('button[form="editForm"]');
+        submitBtn.disabled = true;
+
+        try {
+            const res = await fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+            });
+
+            const data = await res.json();
+
+            if (data.state !== 'success') {
+                throw new Error(data.message || 'No se pudo guardar el libro');
+            }
+
+            const libro = data.libro;
+            const idx = librosDB.findIndex(l => l.id === libro.id);
+            if (idx !== -1) {
+                librosDB[idx] = libro;
+            }
+
+            updateTableRow(libro);
+            closePopUp();
+        } catch (err) {
+            alert(err.message || 'Error al guardar los cambios');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
 </script>
 
 </body>
