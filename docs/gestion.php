@@ -73,8 +73,70 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
 <footer>
     <?= count($libros) ?> libros · <?= date('d/m/Y H:i') ?>
 </footer>
+<!--___________EDIT BOOK POP UP___________-->
+<div class="popUp-overlay" id="popUpOverlay"></div>
+<div class="popUp" id="popUp">
+    <header class="popUp-header">
+        <div class="popUp-title">Editar libro</div>
+        <button class="popUp-close" id="popUpClose">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </header>
+    <div class="popUp-body">
+        <form id="editForm" action="" method="POST">
+            <input type="hidden" id="id_libro" name="id_libro">
 
+            <div class="form-group">
+                <label for="titulo">Título</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="autor">Autor</label>
+                    <input type="text" id="autor" name="autor">
+                </div>
+                <div class="form-group">
+                    <label for="editorial">Editorial</label>
+                    <input type="text" id="editorial" name="editorial">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="genero">Género</label>
+                    <input type="text" id="genero" name="genero">
+                </div>
+                <div class="form-group form-group-small">
+                    <label for="precio">Precio</label>
+                    <input type="number" id="precio" name="precio" step="0.01" min="0">
+                </div>
+                <div class="form-group form-group-small">
+                    <label for="stock">Stock</label>
+                    <input type="number" id="stock" name="stock" min="0">
+                </div>
+            </div>
+        </form>
+    </div>
+    <footer class="popUp-footer">
+        <button type="button" class="button button-ghost" id="popUpCancel">Cancelar</button>
+        <button type="submit" form="editForm" class="button button-primary">Guardar cambios</button>
+    </footer>
+</div>
 <script>
+    const popUp = document.getElementById('popUp');
+    const popUpOverlay = document.getElementById('popUpOverlay');
+    
+    function openPopUp(id) {
+        document.getElementById('id_libro').value = id;
+        // TODO: fetch book data by id and fill titulo/autor/editorial/genero/precio/stock
+        popUp.classList.add('active');
+        popUpOverlay.classList.add('active');
+    }
+    function closePopUp() {
+        popUp.classList.remove('active');
+        popUpOverlay.classList.remove('active');
+    }
     document.getElementById('buscar').addEventListener('input', function () {
         const q = this.value.toLowerCase();
         document.querySelectorAll('#tabla tbody tr').forEach(tr => {
@@ -89,11 +151,12 @@ $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");
         tabla.addEventListener('click', function (e) {
             const btn = e.target.closest('.editBtn');
             if (!btn) return;
-            const id = btn.dataset.id;
-            // TODO: hook this up to your actual edit flow (modal, redirect, etc.)
-            console.log('Editar libro', id);
+            openPopUp(btn.dataset.id);
         });
     }
+    document.getElementById('popUpClose').addEventListener('click', closePopUp);
+    document.getElementById('popUpCancel').addEventListener('click', closePopUp);
+    popUpOverlay.addEventListener('click', closePopUp);
 </script>
 
 </body>
