@@ -26,6 +26,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
     <link rel="stylesheet" href="src/css/components.css">
     <link rel="stylesheet" href="src/css/header.css">
     <link rel="stylesheet" href="src/css/catalogue.css">
+    <link rel="stylesheet" href="src/css/book-detail.css">
 </head>
 <body>
 
@@ -174,8 +175,98 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             </header>
 
             <div class="main-wrapper">
-                <div class="product-body"></div>
-                <aside class="bookMenu"></aside>
+                <div class="catalogue-view" id="catalogueView">
+                    <div class="product-body"></div>
+                </div>
+
+                <div class="book-detail-view" id="bookDetailView" aria-hidden="true">
+                    <nav class="breadcrumb">
+                        <button type="button" id="backToCatalogue">Volver al catálogo</button>
+                    </nav>
+
+                    <div class="product-layout">
+                        <div class="cover-col">
+                            <div class="book-cover" id="detailCover">
+                                <div class="cover-deco">
+                                    <svg class="cover-ornament" viewBox="0 0 60 12" fill="none" aria-hidden="true">
+                                        <line x1="0" y1="6" x2="22" y2="6" stroke="#F0C05F" stroke-width="0.8"/>
+                                        <circle cx="30" cy="6" r="4" stroke="#F0C05F" stroke-width="0.8"/>
+                                        <line x1="38" y1="6" x2="60" y2="6" stroke="#F0C05F" stroke-width="0.8"/>
+                                    </svg>
+                                    <p class="cover-title-text" id="detailCoverTitle"></p>
+                                    <div class="cover-line"></div>
+                                    <p class="cover-author-text" id="detailCoverAuthor"></p>
+                                    <svg class="cover-ornament" viewBox="0 0 60 12" fill="none" aria-hidden="true">
+                                        <line x1="0" y1="6" x2="22" y2="6" stroke="#F0C05F" stroke-width="0.8"/>
+                                        <circle cx="30" cy="6" r="4" stroke="#F0C05F" stroke-width="0.8"/>
+                                        <line x1="38" y1="6" x2="60" y2="6" stroke="#F0C05F" stroke-width="0.8"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-col">
+
+                            <div>
+                                <h2 class="book-title" id="detailTitle"></h2>
+                                <p class="book-author">por <span id="detailAuthor"></span></p>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div class="meta-grid">
+                                <div class="meta-item">
+                                    <span class="meta-label">Editorial</span>
+                                    <span class="meta-value" id="detailEditorial"></span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Género</span>
+                                    <span class="meta-value" id="detailGenero"></span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Disponibilidad</span>
+                                    <span class="meta-value" id="detailStockMeta"></span>
+                                </div>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div>
+                                <div class="price-block">
+                                    <span class="price-main" id="detailPrice"></span>
+                                </div>
+                                <div class="stock-badge in-stock" id="detailStockBadge">
+                                    <div class="stock-dot"></div>
+                                    <span id="detailStockLabel"></span>
+                                </div>
+                            </div>
+
+                            <div class="action-row">
+                                <div class="qty-control">
+                                    <button type="button" class="qty-btn" id="detailQtyMinus" aria-label="Disminuir cantidad">−</button>
+                                    <span class="qty-val" id="detailQty">1</span>
+                                    <button type="button" class="qty-btn" id="detailQtyPlus" aria-label="Aumentar cantidad">+</button>
+                                </div>
+                                <button type="button" class="btn-cart" id="detailAddCart">Agregar al carrito</button>
+                                <button type="button" class="btn-wishlist" id="detailWishlist" title="Agregar a favoritos" aria-label="Agregar a favoritos">
+                                    <svg width="18" height="18" viewBox="0 0 14 14" fill="none"><path d="M7 2l1.4 2.8 3.1.45-2.25 2.2.53 3.1L7 9.1l-2.78 1.45.53-3.1L2.5 5.25l3.1-.45L7 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                                </button>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div class="description-section">
+                                <p class="section-label">Sobre el libro</p>
+                                <div class="description-text" id="detailDescription"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="related-section" id="detailRelatedSection" hidden>
+                        <p class="section-label">También podría interesarte</p>
+                        <div class="related-grid" id="detailRelatedGrid"></div>
+                    </div>
+                </div>
             </div>
 
             <footer class="footer-pages" id="footerPages"></footer>
@@ -224,6 +315,167 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         });
         let   activeGenres   = new Set();
         let   filteredLibros = [...librosDB];
+        let   detailQty      = 1;
+
+        const catalogueView   = document.getElementById('catalogueView');
+        const bookDetailView  = document.getElementById('bookDetailView');
+        const productShell    = document.querySelector('.product-shell');
+        const mainWrapper     = document.querySelector('.main-wrapper');
+
+        const COVER_COLORS = ['#2a6644', '#2a5c40', '#1e4a35', '#2f5e45', '#234d38', '#335c43', '#244d38', '#355f48'];
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function coverColor(id) {
+            return COVER_COLORS[Math.abs(Number(id) || 0) % COVER_COLORS.length];
+        }
+
+        function formatCoverTitle(title) {
+            const words = String(title ?? '').trim().split(/\s+/);
+            if (words.length <= 3) return escapeHtml(title);
+            const mid = Math.ceil(words.length / 2);
+            return escapeHtml(words.slice(0, mid).join(' ')) + '<br>' + escapeHtml(words.slice(mid).join(' '));
+        }
+
+        function formatPrice(value) {
+            return '$' + Number(value).toLocaleString('es-AR');
+        }
+
+        function findBook(id) {
+            return librosDB.find(l => l.id === Number(id));
+        }
+
+        function getRelatedBooks(book) {
+            const sameGenre = book.genero
+                ? librosDB.filter(l => l.id !== book.id && l.genero === book.genero)
+                : [];
+            const sameAuthor = librosDB.filter(l =>
+                l.id !== book.id &&
+                l.autor === book.autor &&
+                !sameGenre.some(g => g.id === l.id)
+            );
+            return [...sameGenre, ...sameAuthor].slice(0, 6);
+        }
+
+        function buildDescription(book) {
+            const parts = [];
+            if (book.titulo && book.autor) {
+                parts.push(`<p><em>${escapeHtml(book.titulo)}</em> es una obra de <strong>${escapeHtml(book.autor)}</strong>.</p>`);
+            }
+            if (book.editorial) {
+                parts.push(`<p>Publicado por ${escapeHtml(book.editorial)}.</p>`);
+            }
+            if (book.genero) {
+                parts.push(`<p>Género: ${escapeHtml(book.genero)}.</p>`);
+            }
+            if (!parts.length) {
+                parts.push('<p>Información disponible en el catálogo de El Lugar.</p>');
+            }
+            return parts.join('');
+        }
+
+        function renderRelatedBooks(book) {
+            const related = getRelatedBooks(book);
+            const section = document.getElementById('detailRelatedSection');
+            const grid    = document.getElementById('detailRelatedGrid');
+
+            if (!related.length) {
+                section.hidden = true;
+                grid.innerHTML = '';
+                return;
+            }
+
+            section.hidden = false;
+            grid.innerHTML = related.map(item => `
+                <div class="related-card" data-id="${item.id}" role="button" tabindex="0" aria-label="${escapeHtml(item.titulo)}">
+                    <div class="related-cover" style="background:${coverColor(item.id)};"></div>
+                    <p class="related-title">${escapeHtml(item.titulo)}</p>
+                    <p class="related-price">${formatPrice(item.precio)}</p>
+                </div>
+            `).join('');
+
+            grid.querySelectorAll('.related-card').forEach(card => {
+                const open = () => openBookDetail(card.dataset.id);
+                card.addEventListener('click', open);
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        open();
+                    }
+                });
+            });
+        }
+
+        function setDetailQty(value) {
+            detailQty = Math.max(1, Math.min(Number(value) || 1, 99));
+            document.getElementById('detailQty').textContent = detailQty;
+        }
+
+        function openBookDetail(id) {
+            const book = findBook(id);
+            if (!book) return;
+
+            detailQty = 1;
+            setDetailQty(1);
+
+            document.title = `${book.titulo} — El lugar`;
+            document.getElementById('detailCover').style.backgroundColor = coverColor(book.id);
+            document.getElementById('detailCoverTitle').innerHTML = formatCoverTitle(book.titulo);
+            document.getElementById('detailCoverAuthor').textContent = book.autor || '—';
+            document.getElementById('detailTitle').textContent = book.titulo || '—';
+            document.getElementById('detailAuthor').textContent = book.autor || '—';
+            document.getElementById('detailEditorial').textContent = book.editorial || '—';
+            document.getElementById('detailGenero').textContent = book.genero || '—';
+
+            document.getElementById('detailPrice').textContent = formatPrice(book.precio);
+
+
+            const inStock = book.stock > 0;
+            const stockBadge = document.getElementById('detailStockBadge');
+            stockBadge.classList.toggle('in-stock', inStock);
+            stockBadge.classList.toggle('out-of-stock', !inStock);
+            document.getElementById('detailStockLabel').textContent = inStock
+                ? `En stock (${book.stock} disponible${book.stock !== 1 ? 's' : ''})`
+                : 'Agotado';
+            document.getElementById('detailStockMeta').textContent = inStock
+                ? `${book.stock} unidad${book.stock !== 1 ? 'es' : ''}`
+                : 'Sin stock';
+            document.getElementById('detailDescription').innerHTML = buildDescription(book) + "(Esto es un ejemplo)";
+
+            const addCartBtn = document.getElementById('detailAddCart');
+            addCartBtn.disabled = !inStock;
+            addCartBtn.textContent = inStock ? 'Agregar al carrito' : 'Sin stock';
+
+            renderRelatedBooks(book);
+
+            catalogueView.classList.add('hidden');
+            bookDetailView.classList.add('active');
+            bookDetailView.setAttribute('aria-hidden', 'false');
+            productShell.classList.add('detail-open');
+            mainWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeBookDetail() {
+            document.title = 'Catálogo | El lugar';
+            catalogueView.classList.remove('hidden');
+            bookDetailView.classList.remove('active');
+            bookDetailView.setAttribute('aria-hidden', 'true');
+            productShell.classList.remove('detail-open');
+        }
+
+        document.getElementById('backToCatalogue').addEventListener('click', closeBookDetail);
+        document.getElementById('detailQtyMinus').addEventListener('click', () => setDetailQty(detailQty - 1));
+        document.getElementById('detailQtyPlus').addEventListener('click', () => setDetailQty(detailQty + 1));
+        document.getElementById('detailAddCart').addEventListener('click', () => alert('Función en construcción'));
+        document.getElementById('detailWishlist').addEventListener('click', () => alert('Función en construcción'));
 
         // ── PRECIO — sin inicialización necesaria
 
@@ -253,6 +505,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
 
             filteredLibros = list;
             currentPage    = 1;
+            closeBookDetail();
 
             const body = document.querySelector('.product-body');
             body.style.transition = 'opacity 0.2s ease';
@@ -307,17 +560,26 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             page.forEach(book => {
                 const card = document.createElement('div');
                 card.classList.add('product-card');
+                card.dataset.id = book.id;
                 card.innerHTML = `
                     <div class="card-cover"></div>
                     <div class="card-info">
                         <div>
-                            <p class="card-title">${book.titulo}</p>
-                            <p class="card-author">${book.autor}</p>
+                            <p class="card-title">${escapeHtml(book.titulo)}</p>
+                            <p class="card-author">${escapeHtml(book.autor)}</p>
                         </div>
-                        <p class="card-price">$${book.precio.toLocaleString('es-AR')}</p>
+                        <p class="card-price">${formatPrice(book.precio)}</p>
                     </div>
                     <div class="card-btn">Agregar al carrito</div>
                 `;
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.card-btn')) {
+                        e.stopPropagation();
+                        alert('Función en construcción');
+                        return;
+                    }
+                    openBookDetail(book.id);
+                });
                 body.appendChild(card);
             });
 
