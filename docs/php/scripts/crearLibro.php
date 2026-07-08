@@ -15,6 +15,7 @@ try {
     $autor = trim($fields['autor']);
     $editorial = trim(Request::getPost('editorial', ''));
     $genero = trim(Request::getPost('genero', ''));
+    $descripcion = trim(Request::getPost('descripcion', ''));
 
     $precioRaw = Request::getPost('precio');
     if ($precioRaw === null || $precioRaw === '' || !is_numeric($precioRaw) || (float) $precioRaw < 0) {
@@ -31,9 +32,9 @@ try {
     $db = new LibreriaDB();
 
     $db->query(
-        "INSERT INTO libros (titulo, autor, editorial, genero, precio, stock)
-         VALUES (?, ?, ?, ?, ?, ?)",
-        [$titulo, $autor, $editorial, $genero, $precio, $stock]
+        "INSERT INTO libros (titulo, autor, editorial, genero, precio, stock, descripcion)
+         VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [$titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion]
     );
 
     $idLibro = (int) $db->lastInsertId();
@@ -45,8 +46,9 @@ try {
             'autor'     => $autor,
             'editorial' => $editorial,
             'genero'    => $genero,
-            'precio'    => $precio,
-            'stock'     => $stock,
+            'precio'      => $precio,
+            'stock'       => $stock,
+            'descripcion' => $descripcion,
         ],
     ]);
 } catch (Exception $e) {

@@ -270,7 +270,7 @@ footer {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -48%);
-    width: fit-content;
+    width: min(540px, 92vw);
     max-height: 88vh;
     display: flex;
     flex-direction: column;
@@ -328,7 +328,7 @@ footer {
 
 .popUp-body {
     padding: 1.5rem;
-    overflow: visible;
+    overflow-y: auto;
 }
 
 .popUp-body form {
@@ -376,6 +376,32 @@ footer {
     outline: none;
     border-color: var(--amber);
     box-shadow: 0 0 0 3px rgba(200, 146, 43, 0.2);
+}
+
+.form-group textarea {
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--cream-dark);
+    border-radius: var(--radius);
+    background: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 6.5rem;
+    max-height: 12rem;
+    width: 100%;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(200, 146, 43, 0.2);
+}
+
+.form-group textarea::placeholder {
+    color: var(--text-muted);
 }
 
 .popUp-footer {

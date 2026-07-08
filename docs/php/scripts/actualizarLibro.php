@@ -20,6 +20,7 @@ try {
     $autor = trim(Request::getPost('autor', ''));
     $editorial = trim(Request::getPost('editorial', ''));
     $genero = trim(Request::getPost('genero', ''));
+    $descripcion = trim(Request::getPost('descripcion', ''));
 
     $precioRaw = Request::getPost('precio');
     if ($precioRaw === null || $precioRaw === '' || !is_numeric($precioRaw) || (float) $precioRaw < 0) {
@@ -45,9 +46,9 @@ try {
 
     $db->query(
         "UPDATE libros
-         SET titulo = ?, autor = ?, editorial = ?, genero = ?, precio = ?, stock = ?
+         SET titulo = ?, autor = ?, editorial = ?, genero = ?, precio = ?, stock = ?, descripcion = ?
          WHERE id_libro = ?",
-        [$titulo, $autor, $editorial, $genero, $precio, $stock, $idLibro]
+        [$titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $idLibro]
     );
 
     Response::success('Libro actualizado correctamente', [
@@ -57,8 +58,9 @@ try {
             'autor'     => $autor,
             'editorial' => $editorial,
             'genero'    => $genero,
-            'precio'    => $precio,
-            'stock'     => $stock,
+            'precio'      => $precio,
+            'stock'       => $stock,
+            'descripcion' => $descripcion,
         ],
     ]);
 } catch (Exception $e) {

@@ -150,6 +150,11 @@ $generos = array_column(
                     <input type="number" id="stock" name="stock" min="0">
                 </div>
             </div>
+
+            <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" rows="4" placeholder="Sinopsis, notas o información sobre el libro…"></textarea>
+            </div>
         </form>
     </div>
     <footer class="popUp-footer">
@@ -164,8 +169,9 @@ $generos = array_column(
         'autor'     =>        $l['autor']     ?? '',
         'editorial' =>        $l['editorial'] ?? '',
         'genero'    =>        $l['genero']    ?? '',
-        'precio'    => (float)($l['precio']   ?? 0),
-        'stock'     => (int)  ($l['stock']    ?? 0),
+        'precio'      => (float)($l['precio']     ?? 0),
+        'stock'       => (int)  ($l['stock']      ?? 0),
+        'descripcion' =>        $l['descripcion'] ?? '',
     ], $libros), JSON_UNESCAPED_UNICODE) ?>;
 
     let editoriales = <?= json_encode(array_values($editoriales), JSON_UNESCAPED_UNICODE) ?>;
@@ -407,6 +413,7 @@ $generos = array_column(
         document.getElementById('genero').value = libro?.genero ?? '';
         document.getElementById('precio').value = libro?.precio ?? '';
         document.getElementById('stock').value = libro?.stock ?? '';
+        document.getElementById('descripcion').value = libro?.descripcion ?? '';
     }
 
     function openPopUp(mode, id = null) {

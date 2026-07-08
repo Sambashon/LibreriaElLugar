@@ -29,7 +29,8 @@ CREATE TABLE libros (
     genero VARCHAR(150),
     precio DECIMAL(10,2) NOT NULL,
     stock INT DEFAULT 0,
-    portada VARCHAR(255)
+    portada VARCHAR(255),
+    descripcion TEXT
 );
 
 -- =========================

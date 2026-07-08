@@ -3,7 +3,7 @@ require_once __DIR__ . "/php/clases/libreriaDb.php";
 
 $db     = new LibreriaDB();
 $libros = $db->fetchAll(
-    "SELECT id_libro, titulo, autor, editorial, genero, precio, stock
+    "SELECT id_libro, titulo, autor, editorial, genero, precio, stock, descripcion
      FROM libros
      ORDER BY titulo ASC"
 );
@@ -282,8 +282,9 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             'autor'     =>        $l['autor'],
             'editorial' =>        $l['editorial'] ?? '',
             'genero'    =>        $l['genero']    ?? '',
-            'precio'    => (float)$l['precio'],
-            'stock'     => (int)  $l['stock'],
+            'precio'      => (float)$l['precio'],
+            'stock'       => (int)  $l['stock'],
+            'descripcion' =>        $l['descripcion'] ?? '',
         ], $libros), JSON_UNESCAPED_UNICODE) ?>;
 
         // Géneros únicos extraídos de la DB
@@ -365,6 +366,14 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         }
 
         function buildDescription(book) {
+            const descripcion = String(book.descripcion ?? '').trim();
+            if (descripcion) {
+                return descripcion
+                    .split(/\n{2,}/)
+                    .map(paragraph => `<p>${escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`)
+                    .join('');
+            }
+
             const parts = [];
             if (book.titulo && book.autor) {
                 parts.push(`<p><em>${escapeHtml(book.titulo)}</em> es una obra de <strong>${escapeHtml(book.autor)}</strong>.</p>`);
@@ -447,7 +456,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             document.getElementById('detailStockMeta').textContent = inStock
                 ? `${book.stock} unidad${book.stock !== 1 ? 'es' : ''}`
                 : 'Sin stock';
-            document.getElementById('detailDescription').innerHTML = buildDescription(book) + "(Esto es un ejemplo)";
+            document.getElementById('detailDescription').innerHTML = buildDescription(book);
 
             const addCartBtn = document.getElementById('detailAddCart');
             addCartBtn.disabled = !inStock;
