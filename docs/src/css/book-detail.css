@@ -521,7 +521,7 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .book-detail-view {
         padding: 0.5rem 0 1.5rem;
         gap: 1.75rem;

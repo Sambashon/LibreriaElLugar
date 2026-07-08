@@ -52,6 +52,9 @@
     display: inline-block;
     text-align: left;
 }
+.cifras-container br{
+    display: none;
+}
 .main-section#destacados{
     background-color: #EBE9DA;
     padding: 2.5rem;
@@ -465,5 +468,12 @@
     .map-container iframe{
         height: 100%;
         width: 100%;
+    }
+    
+}
+
+@media (max-width: 1200px){
+    .cifras-container br{
+        display: block;
     }
 }
