@@ -274,6 +274,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         </main>
     </div>
 
+    <script src="src/js/search-utils.js"></script>
     <script>
         // ── DATOS DESDE PHP ──────────────────────────────────────────
         const librosDB = <?= json_encode(array_map(fn($l) => [
@@ -495,7 +496,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             const agotadoOn  = document.getElementById('filterAgotado').checked;
             const minVal     = parseFloat(document.getElementById('priceMin').value) || 0;
             const maxVal     = parseFloat(document.getElementById('priceMax').value) || Infinity;
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const searchTerm = document.getElementById('searchInput').value.trim();
 
             let list = librosDB.filter(l => {
                 if (activeGenres.size && !activeGenres.has(l.genero)) return false;
@@ -503,8 +504,8 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                 if (l.precio > maxVal)                                 return false;
                 if (l.stock > 0  && !stockOn)                         return false;
                 if (l.stock === 0 && !agotadoOn)                      return false;
-                if (searchTerm && !l.titulo.toLowerCase().includes(searchTerm) && 
-                                  !l.autor.toLowerCase().includes(searchTerm)) return false;
+                if (searchTerm && !textIncludesSearch(l.titulo, searchTerm) &&
+                                  !textIncludesSearch(l.autor, searchTerm)) return false;
                 return true;
             });
 
@@ -539,7 +540,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         }
 
         function filterGenres(q) {
-            renderGenres(genres.filter(g => g.toLowerCase().includes(q.toLowerCase())));
+            renderGenres(genres.filter(g => textIncludesSearch(g, q)));
         }
 
         function toggleGenre(g, checked) {

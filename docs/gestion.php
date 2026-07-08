@@ -162,6 +162,7 @@ $generos = array_column(
         <button type="submit" form="editForm" class="button button-primary" id="popUpSubmit">Guardar cambios</button>
     </footer>
 </div>
+<script src="src/js/search-utils.js"></script>
 <script>
     const librosDB = <?= json_encode(array_map(fn($l) => [
         'id'        => (int)  ($l['id_libro'] ?? 0),
@@ -439,9 +440,9 @@ $generos = array_column(
         popUpOverlay.classList.remove('active');
     }
     document.getElementById('buscar').addEventListener('input', function () {
-        const q = this.value.toLowerCase();
+        const q = this.value;
         document.querySelectorAll('#tabla tbody tr').forEach(tr => {
-            tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+            tr.style.display = textIncludesSearch(tr.textContent, q) ? '' : 'none';
         });
     });
 
