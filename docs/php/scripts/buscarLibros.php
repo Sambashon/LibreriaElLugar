@@ -1,13 +1,15 @@
 <?php
 
-require_once __DIR__ . "/../clases/libreriaDb.php";
+require_once __DIR__ . "/../bootstrap.php";
+
+use App\Helpers\Search;
 
 header('Content-Type: application/json; charset=utf-8');
 
 try {
     $query = isset($_GET['q']) ? trim($_GET['q']) : '';
     
-    if (!$query || strlen($query) < 2) {
+    if (!$query || mb_strlen($query) < 2) {
         echo json_encode([
             'state' => 'success',
             'suggestions' => []
@@ -15,17 +17,19 @@ try {
         exit;
     }
     
-    // Search in database
-    $searchTerm = '%' . $query . '%';
     $db = new LibreriaDB();
     
     $libros = $db->fetchAll(
-        "SELECT id_libro, titulo, autor, precio, stock
-         FROM libros
-         WHERE titulo LIKE ? OR autor LIKE ?
-         LIMIT 8",
-        [$searchTerm, $searchTerm]
+        "SELECT id_libro, titulo, autor, precio, stock FROM libros"
     );
+
+    $matches = array_values(array_filter(
+        $libros,
+        fn($l) => Search::includes($l['titulo'] ?? '', $query)
+               || Search::includes($l['autor'] ?? '', $query)
+    ));
+
+    $libros = array_slice($matches, 0, 8);
     
     echo json_encode([
         'state' => 'success',

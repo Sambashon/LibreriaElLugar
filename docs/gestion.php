@@ -145,12 +145,14 @@ $generos = array_column(
                     <label for="precio">Precio</label>
                     <input type="number" id="precio" name="precio" step="0.01" min="0">
                 </div>
+                
+            </div>
+            <div class="form-row">
                 <div class="form-group form-group-small">
                     <label for="stock">Stock</label>
                     <input type="number" id="stock" name="stock" min="0">
                 </div>
             </div>
-
             <div class="form-group">
                 <label for="descripcion">Descripción</label>
                 <textarea id="descripcion" name="descripcion" rows="4" placeholder="Sinopsis, notas o información sobre el libro…"></textarea>
