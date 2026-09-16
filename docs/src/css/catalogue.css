@@ -399,11 +399,18 @@ svg{
 }
 
 /* Placeholder book title on cover */
-.product-card .card-cover::after {
-    content: '';
+.product-card .card-cover .book-cover-img {
     position: absolute;
-    inset: 16px 20px;
-    border-radius: 3px;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.product-card .card-cover.has-cover::before,
+.product-card .card-cover.has-cover::after {
+    display: none;
 }
 
 /* Info area — fills remaining 100px */
@@ -790,4 +797,203 @@ svg{
     .product-card { height: 245px; }
     .product-card .card-cover { height: 165px; }
     .product-card .card-price { bottom: 28px; }
+}
+
+/* ── CART VIEW ── */
+.cart-view {
+    display: none;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 1rem 0.5rem 2.5rem;
+    color: #FFFDF7;
+}
+
+.cart-view.active {
+    display: flex;
+}
+
+.cart-view .breadcrumb {
+    display: flex;
+    align-items: center;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 10.5px;
+    font-weight: bold;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding-bottom: 0.75rem;
+    border-bottom: 0.5px solid rgba(240, 192, 95, 0.18);
+}
+
+#backFromCart {
+    color: #C8922B;
+    background: none;
+    border: none;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    padding: 0;
+    cursor: pointer;
+}
+
+.cart-header h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    color: #F0C05F;
+    margin: 0;
+}
+
+.cart-header p {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #EBE9DA;
+    margin: 0.35rem 0 0;
+}
+
+.cart-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cart-empty {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: #EBE9DA;
+    padding: 2rem 0;
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    background: #FFFDF7;
+    color: #1a3a26;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.cart-item-cover {
+    width: 72px;
+    height: 96px;
+    border-radius: 6px;
+    background: #2a6644;
+    overflow: hidden;
+    position: relative;
+}
+
+.cart-item-cover .book-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cart-item-info {
+    min-width: 0;
+}
+
+.cart-item-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    margin: 0;
+}
+
+.cart-item-author,
+.cart-item-qty {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    color: #6b7c6e;
+    margin: 4px 0 0;
+}
+
+.cart-item-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.cart-item-price {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+}
+
+.cart-remove {
+    background: none;
+    border: 1px solid #c9c4b0;
+    border-radius: 6px;
+    color: #1a3a26;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 6px 8px;
+    cursor: pointer;
+}
+
+.cart-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 0.5px solid rgba(240, 192, 95, 0.18);
+}
+
+.cart-footer[hidden] {
+    display: none;
+}
+
+.cart-total-label,
+.cart-total-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #F0C05F;
+    margin: 0;
+}
+
+.cart-total-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.catalogue-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1200;
+    background: #FFFDF7;
+    color: #1a3a26;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.catalogue-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (max-width: 767px) {
+    .cart-item {
+        grid-template-columns: 56px 1fr;
+    }
+    .cart-item-cover {
+        width: 56px;
+        height: 76px;
+    }
+    .cart-item-side {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
 }

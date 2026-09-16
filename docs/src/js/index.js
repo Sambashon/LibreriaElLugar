@@ -3,6 +3,13 @@ openCatalogueBtn.addEventListener("click", function(){
     window.location.href = "catalogue.php";
 })
 
+const cartBtn = document.getElementById("cartBtn");
+if (cartBtn) {
+    cartBtn.addEventListener("click", function(){
+        window.location.href = "catalogue.php?view=cart";
+    });
+}
+
 const adminLibrosBtn = document.getElementById("adminLibrosBtn");
 adminLibrosBtn.addEventListener("click", function(){
     window.location.href = "gestion.php";

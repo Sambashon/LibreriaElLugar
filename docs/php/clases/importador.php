@@ -38,16 +38,17 @@ class Importador extends LibreriaDB
 
                 $this->execute(
                     "INSERT INTO libros 
-                    (titulo, autor, editorial, genero, precio, stock)
+                    (titulo, autor, editorial, genero, precio, stock, info_adicional)
                     VALUES 
-                    (:titulo, :autor, :editorial, :genero, :precio, :stock)",
+                    (:titulo, :autor, :editorial, :genero, :precio, :stock, :info_adicional)",
                     [
                         "titulo"     => $data['titulo'],
                         "autor"      => $data['autor'],
                         "editorial"  => $data['editorial'],
                         "genero"     => $data['genero'],
                         "precio"     => $data['precio'],
-                        "stock"      => $data['stock']
+                        "stock"      => $data['stock'],
+                        "info_adicional" => $data['info_adicional']
                     ]
                 );
 
@@ -82,6 +83,7 @@ class Importador extends LibreriaDB
         $precio = str_replace(['$', ' '], '', $precio);  // sacar $ y espacios
         $precio = str_replace('.', '', $precio);          // sacar puntos de miles
         $precio = str_replace(',', '.', $precio);         // coma decimal → punto
+        $info_adicional = trim($row[6] ?? '');
 
         // validaciones básicas obligatorias
         if ($titulo === '' || $autor === '') {
@@ -102,7 +104,8 @@ class Importador extends LibreriaDB
             "genero"     => $genero,
             "stock"      => (int)$stock,
             "editorial"  => $editorial,
-            "precio"     => (float)$precio
+            "precio"     => (float)$precio,
+            "info_adicional" => $info_adicional
         ];
     }
 

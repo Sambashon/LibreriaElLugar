@@ -23,6 +23,9 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
 
+    <link rel="preconnect" href="https://openlibrary.org">
+    <link rel="preconnect" href="https://covers.openlibrary.org">
+
     <link rel="stylesheet" href="src/css/components.css">
     <link rel="stylesheet" href="src/css/header.css">
     <link rel="stylesheet" href="src/css/catalogue.css">
@@ -74,7 +77,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                 <svg class="icon" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor"/></svg>
                 <p>Inicio</p>
             </div>
-            <div class="menu-item uC">
+            <div class="menu-item" id="carritoBtn">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.29977 5H21L19 12H7.37671M20 16H8L6 3H3M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20ZM20 20C20 20.5523 19.5523 21 19 21C18.4477 21 18 20.5523 18 20C18 19.4477 18.4477 19 19 19C19.5523 19 20 19.4477 20 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <p>Carrito</p>
             </div>
@@ -267,7 +270,24 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                         <div class="related-grid" id="detailRelatedGrid"></div>
                     </div>
                 </div>
+
+                <div class="cart-view" id="cartView" aria-hidden="true">
+                    <nav class="breadcrumb">
+                        <button type="button" id="backFromCart">Volver al catálogo</button>
+                    </nav>
+                    <header class="cart-header">
+                        <h2>Tu carrito</h2>
+                        <p id="cartCount"></p>
+                    </header>
+                    <div class="cart-list" id="cartList"></div>
+                    <div class="cart-footer" id="cartFooter" hidden>
+                        <p class="cart-total-label">Total</p>
+                        <p class="cart-total-value" id="cartTotal"></p>
+                    </div>
+                </div>
             </div>
+
+    <div class="catalogue-toast" id="catalogueToast" role="status" aria-live="polite"></div>
 
             <footer class="footer-pages" id="footerPages"></footer>
 
@@ -275,6 +295,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
     </div>
 
     <script src="src/js/search-utils.js"></script>
+    <script src="src/js/portadas.js"></script>
     <script>
         // ── DATOS DESDE PHP ──────────────────────────────────────────
         const librosDB = <?= json_encode(array_map(fn($l) => [
@@ -318,11 +339,16 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         let   activeGenres   = new Set();
         let   filteredLibros = [...librosDB];
         let   detailQty      = 1;
+        let   detailQtyReady = false;
+        let   qtySyncSeq     = 0;
 
         const catalogueView   = document.getElementById('catalogueView');
         const bookDetailView  = document.getElementById('bookDetailView');
+        const cartView        = document.getElementById('cartView');
+        const carritoBtn      = document.getElementById('carritoBtn');
         const productShell    = document.querySelector('.product-shell');
         const mainWrapper     = document.querySelector('.main-wrapper');
+        let toastTimer = null;
 
         const COVER_COLORS = ['#2a6644', '#2a5c40', '#1e4a35', '#2f5e45', '#234d38', '#335c43', '#244d38', '#355f48'];
 
@@ -412,6 +438,10 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             `).join('');
 
             grid.querySelectorAll('.related-card').forEach(card => {
+                const relatedBook = findBook(card.dataset.id);
+                if (relatedBook) {
+                    PortadasOL.aplicarPortada(card.querySelector('.related-cover'), relatedBook.titulo, relatedBook.autor);
+                }
                 const open = () => openBookDetail(card.dataset.id);
                 card.addEventListener('click', open);
                 card.addEventListener('keydown', (e) => {
@@ -423,20 +453,233 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             });
         }
 
-        function setDetailQty(value) {
-            detailQty = Math.max(1, Math.min(Number(value) || 1, 99));
-            document.getElementById('detailQty').textContent = detailQty;
+        function maxDetailQty(book) {
+            if (!book) return 99;
+            const stock = Number(book.stock) || 0;
+            if (stock < 1) return 1;
+            return Math.min(stock, 99);
         }
 
-        function openBookDetail(id) {
+        function setDetailQty(value, persist = false) {
+            const book = currentBookId ? findBook(currentBookId) : null;
+            detailQty = Math.max(1, Math.min(Number(value) || 1, maxDetailQty(book)));
+            document.getElementById('detailQty').textContent = detailQty;
+            if (persist) persistDetailQty();
+        }
+
+        async function persistDetailQty() {
+            if (!currentBookId || !detailQtyReady) return false;
+
+            const seq = ++qtySyncSeq;
+            const idLibro = currentBookId;
+            const cantidad = detailQty;
+            const body = new FormData();
+            body.append('id_libro', String(idLibro));
+            body.append('cantidad', String(cantidad));
+
+            try {
+                const res = await fetch('php/scripts/actualizarCantidadCarrito.php', {
+                    method: 'POST',
+                    body,
+                    credentials: 'same-origin'
+                });
+                const data = await res.json();
+                if (seq !== qtySyncSeq || currentBookId !== idLibro) return false;
+                if (data.state !== 'success') {
+                    if (res.status !== 401) {
+                        showToast(data.message || 'No se pudo actualizar la cantidad');
+                    }
+                    return false;
+                }
+                if (typeof data.cantidad === 'number') {
+                    setDetailQty(data.cantidad, false);
+                }
+                if (cartView.classList.contains('active')) {
+                    await loadCart();
+                }
+                return true;
+            } catch (err) {
+                if (seq !== qtySyncSeq) return false;
+                showToast('Error al actualizar la cantidad');
+                return false;
+            }
+        }
+
+        async function syncDetailQtyFromCart(book) {
+            try {
+                const res = await fetch('php/scripts/obtenerCarrito.php', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (data.state !== 'success' || currentBookId !== book.id) return;
+                const item = (data.items || []).find(i => i.id_libro === book.id);
+                if (item) setDetailQty(item.cantidad, false);
+            } catch (err) {
+                // Sin sesión o carrito vacío: se mantiene la cantidad local
+            }
+        }
+
+        let currentBookId = null;
+
+        function showToast(message) {
+            const toast = document.getElementById('catalogueToast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        async function getSession() {
+            const res = await fetch('php/scripts/sesion.php', { credentials: 'same-origin' });
+            return res.json();
+        }
+
+        async function requireLogin(message) {
+            const session = await getSession();
+            if (session && session.logged) return true;
+            showToast(message || 'Iniciá sesión para usar el carrito');
+            return false;
+        }
+
+        async function addToCart(idLibro, cantidad = 1) {
+            if (!(await requireLogin('Iniciá sesión para agregar libros al carrito'))) return;
+
+            const body = new FormData();
+            body.append('id_libro', String(idLibro));
+            body.append('cantidad', String(cantidad));
+
+            try {
+                const res = await fetch('php/scripts/agregarAlCarrito.php', {
+                    method: 'POST',
+                    body,
+                    credentials: 'same-origin'
+                });
+                const data = await res.json();
+                if (data.state !== 'success') {
+                    showToast(data.message || 'No se pudo agregar al carrito');
+                    return;
+                }
+                showToast('Libro agregado al carrito');
+            } catch (err) {
+                showToast('Error al agregar al carrito');
+            }
+        }
+
+        function renderCart(items, total) {
+            const list = document.getElementById('cartList');
+            const count = document.getElementById('cartCount');
+            const footer = document.getElementById('cartFooter');
+            const totalEl = document.getElementById('cartTotal');
+
+            if (!items.length) {
+                count.textContent = 'No tenés libros en el carrito';
+                footer.hidden = false;
+                totalEl.textContent = formatPrice(total);
+                list.innerHTML = '<p class="cart-empty">Agregá libros desde el catálogo para verlos acá.</p>';
+                return;
+            }
+
+            count.textContent = items.length + ' libro' + (items.length !== 1 ? 's' : '');
+            footer.hidden = false;
+            totalEl.textContent = formatPrice(total);
+            list.innerHTML = items.map(item => `
+                <article class="cart-item" data-id="${item.id_libro}">
+                    <div class="cart-item-cover" style="background:${coverColor(item.id_libro)};"></div>
+                    <div class="cart-item-info">
+                        <p class="cart-item-title">${escapeHtml(item.titulo)}</p>
+                        <p class="cart-item-author">${escapeHtml(item.autor || '')}</p>
+                        <p class="cart-item-qty">Cantidad: ${item.cantidad}</p>
+                    </div>
+                    <div class="cart-item-side">
+                        <span class="cart-item-price">${formatPrice(item.subtotal)}</span>
+                        <button type="button" class="cart-remove">Quitar</button>
+                    </div>
+                </article>
+            `).join('');
+
+            list.querySelectorAll('.cart-item').forEach(row => {
+                const id = Number(row.dataset.id);
+                const book = findBook(id);
+                if (book) {
+                    PortadasOL.aplicarPortada(row.querySelector('.cart-item-cover'), book.titulo, book.autor);
+                }
+            });
+
+            list.querySelectorAll('.cart-remove').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.closest('.cart-item').dataset.id;
+                    const form = new FormData();
+                    form.append('id_libro', id);
+                    try {
+                        const res = await fetch('php/scripts/quitarDelCarrito.php', {
+                            method: 'POST',
+                            body: form,
+                            credentials: 'same-origin'
+                        });
+                        const data = await res.json();
+                        if (data.state !== 'success') {
+                            showToast(data.message || 'No se pudo quitar el libro');
+                            return;
+                        }
+                        await loadCart();
+                    } catch (err) {
+                        showToast('Error al quitar el libro');
+                    }
+                });
+            });
+        }
+
+        async function loadCart() {
+            const res = await fetch('php/scripts/obtenerCarrito.php', { credentials: 'same-origin' });
+            const data = await res.json();
+            if (data.state !== 'success') {
+                throw new Error(data.message || 'No se pudo cargar el carrito');
+            }
+            renderCart(data.items || [], data.total ?? 0);
+        }
+
+        function closeCartView() {
+            cartView.classList.remove('active');
+            cartView.setAttribute('aria-hidden', 'true');
+            productShell.classList.remove('cart-open');
+            carritoBtn.classList.remove('active');
+            if (!bookDetailView.classList.contains('active')) {
+                catalogueView.classList.remove('hidden');
+                document.title = 'Catálogo | El lugar';
+            }
+        }
+
+        async function openCartView() {
+            if (!(await requireLogin('Iniciá sesión para ver tu carrito'))) return;
+
+            try {
+                await loadCart();
+            } catch (err) {
+                showToast(err.message || 'No se pudo cargar el carrito');
+                return;
+            }
+
+            closeBookDetail(true);
+            catalogueView.classList.add('hidden');
+            cartView.classList.add('active');
+            cartView.setAttribute('aria-hidden', 'false');
+            productShell.classList.add('cart-open');
+            carritoBtn.classList.add('active');
+            document.title = 'Carrito | El lugar';
+            mainWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function openBookDetail(id) {
             const book = findBook(id);
             if (!book) return;
 
-            detailQty = 1;
-            setDetailQty(1);
+            closeCartView();
+            currentBookId = book.id;
+            detailQtyReady = false;
+            qtySyncSeq += 1;
+            setDetailQty(1, false);
 
             document.title = `${book.titulo} — El lugar`;
             document.getElementById('detailCover').style.backgroundColor = coverColor(book.id);
+            PortadasOL.aplicarPortada(document.getElementById('detailCover'), book.titulo, book.autor);
             document.getElementById('detailCoverTitle').innerHTML = formatCoverTitle(book.titulo);
             document.getElementById('detailCoverAuthor').textContent = book.autor || '—';
             document.getElementById('detailTitle').textContent = book.titulo || '—';
@@ -471,20 +714,35 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             productShell.classList.add('detail-open');
             mainWrapper.scrollTo({ top: 0, behavior: 'smooth' });
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            await syncDetailQtyFromCart(book);
+            if (currentBookId === book.id) {
+                detailQtyReady = true;
+            }
         }
 
-        function closeBookDetail() {
-            document.title = 'Catálogo | El lugar';
-            catalogueView.classList.remove('hidden');
+        function closeBookDetail(keepHidden = false) {
             bookDetailView.classList.remove('active');
             bookDetailView.setAttribute('aria-hidden', 'true');
             productShell.classList.remove('detail-open');
+            currentBookId = null;
+            if (!keepHidden && !cartView.classList.contains('active')) {
+                catalogueView.classList.remove('hidden');
+                document.title = 'Catálogo | El lugar';
+            }
         }
 
-        document.getElementById('backToCatalogue').addEventListener('click', closeBookDetail);
-        document.getElementById('detailQtyMinus').addEventListener('click', () => setDetailQty(detailQty - 1));
-        document.getElementById('detailQtyPlus').addEventListener('click', () => setDetailQty(detailQty + 1));
-        document.getElementById('detailAddCart').addEventListener('click', () => alert('Función en construcción'));
+        document.getElementById('backToCatalogue').addEventListener('click', () => closeBookDetail());
+        document.getElementById('backFromCart').addEventListener('click', closeCartView);
+        document.getElementById('detailQtyMinus').addEventListener('click', () => setDetailQty(detailQty - 1, true));
+        document.getElementById('detailQtyPlus').addEventListener('click', () => setDetailQty(detailQty + 1, true));
+        document.getElementById('detailAddCart').addEventListener('click', async () => {
+            if (!currentBookId) return;
+            if (!(await requireLogin('Iniciá sesión para agregar libros al carrito'))) return;
+            detailQtyReady = true;
+            const ok = await persistDetailQty();
+            if (ok) showToast('Libro agregado al carrito');
+        });
         document.getElementById('detailWishlist').addEventListener('click', () => alert('Función en construcción'));
 
         // ── PRECIO — sin inicialización necesaria
@@ -515,6 +773,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
 
             filteredLibros = list;
             currentPage    = 1;
+            closeCartView();
             closeBookDetail();
 
             const body = document.querySelector('.product-body');
@@ -585,12 +844,13 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                 card.addEventListener('click', (e) => {
                     if (e.target.closest('.card-btn')) {
                         e.stopPropagation();
-                        alert('Función en construcción');
+                        addToCart(book.id, 1);
                         return;
                     }
                     openBookDetail(book.id);
                 });
                 body.appendChild(card);
+                PortadasOL.aplicarPortada(card.querySelector('.card-cover'), book.titulo, book.autor);
             });
 
             renderPagination();
@@ -642,6 +902,11 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             window.location.href = '/';
         });
 
+        carritoBtn.addEventListener('click', () => {
+            if (typeof closeDrawer === 'function') closeDrawer();
+            openCartView();
+        });
+
         document.querySelectorAll('.uC').forEach(el => {
             el.addEventListener('click', () => alert('Función en construcción'));
         });
@@ -674,6 +939,11 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         document.querySelector('.catalogue-searchbar').addEventListener('reset', () => {
             setTimeout(() => applyFilters(), 0);
         });
+
+        const viewParam = new URLSearchParams(window.location.search).get('view');
+        if (viewParam === 'cart') {
+            openCartView();
+        }
 
         // ── MOBILE DRAWER ────────────────────────────────────────────
         const mobileMenuBtn   = document.getElementById('mobileMenuBtn');

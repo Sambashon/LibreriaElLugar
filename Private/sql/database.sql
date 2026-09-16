@@ -39,7 +39,7 @@ CREATE TABLE libros (
 -- =========================
 CREATE TABLE carritos (
     id_carrito INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NOT NULL,
+    id_usuario INT NOT NULL UNIQUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (id_usuario)
