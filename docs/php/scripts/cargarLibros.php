@@ -1,39 +1,26 @@
 <?php
-require_once "../clases/importador.php";
-require_once "../clases/managers/SessionManager.php";
+require_once __DIR__ . "/../bootstrap.php";
+require_once __DIR__ . "/../clases/importador.php";
 
-header('Content-Type: application/json');
-
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    echo json_encode([
-        "state" => "error",
-        "message" => "Método no permitido"
-    ]);
-    exit;
-}
-
+use App\Helpers\{AdminAccess, Request, Response};
 
 try {
+    Request::requireMethod('POST');
+    AdminAccess::requireAdmin();
+
+    if (!isset($_FILES['archivo']) || $_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
+        Response::error('No se pudo recibir el archivo', 400);
+    }
+
     $importador = new Importador();
-
     $importador->verificarArchivos($_FILES['archivo']);
-
     $resultado = $importador->importarLibros($_FILES['archivo']['tmp_name']);
-        echo json_encode([
-            "state"      => "success",
-            "insertados" => $resultado["insertados"],
-            "errores"    => $resultado["errores"]
-        ]);
 
-    /*
-    echo json_encode([
-        "state" => "ok",
-        "message" => "Importación completada"
+    Response::json([
+        'state' => 'success',
+        'insertados' => $resultado['insertados'],
+        'errores' => $resultado['errores']
     ]);
-    */
 } catch (RuntimeException $e) {
-    echo json_encode([
-        "state" => "error",
-        "message" => $e->getMessage()
-    ]);
+    Response::error($e->getMessage());
 }

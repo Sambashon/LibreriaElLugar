@@ -189,6 +189,25 @@ label{
 
 /* ---------- DASHBOARD ---------- */
 
+.admin-dashboard-page {
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    background-color: #EBE9DA;
+}
+
+.admin-dashboard-card {
+    width: min(90vw, 800px);
+}
+
+.admin-dashboard-back {
+    align-self: center;
+}
+
 .dashboard-modal {
     background-color: #EBE9DA;
     border-radius: 20px;

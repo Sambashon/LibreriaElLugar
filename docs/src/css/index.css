@@ -386,7 +386,9 @@
     gap: 12px;
     
 }
-
+.admin-dashboard-back{
+    background-color: #C2A85A;
+}
 @media (min-width: 768px) {
     .two-parter{
         align-content: center;

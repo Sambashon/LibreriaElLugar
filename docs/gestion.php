@@ -1,5 +1,9 @@
 <?php
-require_once __DIR__ . "/php/clases/libreriaDb.php";
+require_once __DIR__ . "/php/bootstrap.php";
+
+use App\Helpers\AdminAccess;
+
+AdminAccess::requireAdminPage();
 
 $db = new LibreriaDB();
 $libros = $db->fetchAll("SELECT * FROM libros ORDER BY titulo ASC");

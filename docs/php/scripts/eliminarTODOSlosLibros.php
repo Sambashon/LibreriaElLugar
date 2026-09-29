@@ -2,12 +2,13 @@
 
 require_once __DIR__ . "/../bootstrap.php";
 
-use App\Helpers\{Request, Response};
+use App\Helpers\{AdminAccess, Request, Response};
 
 header('Content-Type: application/json; charset=utf-8');
 
 try {
     Request::requireMethod('POST');
+    AdminAccess::requireAdmin();
 
     $db = new LibreriaDB();
 

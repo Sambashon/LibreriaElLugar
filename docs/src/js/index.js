@@ -10,11 +10,6 @@ if (cartBtn) {
     });
 }
 
-const adminLibrosBtn = document.getElementById("adminLibrosBtn");
-adminLibrosBtn.addEventListener("click", function(){
-    window.location.href = "gestion.php";
-})
-
 // ─────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────
@@ -180,15 +175,7 @@ function showUserDashboard() {
 function showAdminPanel() {
     if (!currentUser?.admin) return;
 
-    const greeting =
-        document.getElementById("adminGreeting");
-
-    if (greeting) {
-        greeting.textContent =
-            `Panel de Administrador - ${currentUser.nombre}`;
-    }
-
-    showModal("adminPanelModal");
+    window.location.href = "admindash.php";
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -324,32 +311,9 @@ bindClick(
     () => logout("userDashboardModal")
 );
 
-bindClick(
-    "adminLogoutBtn",
-    () => logout("adminPanelModal")
-);
-
 // ─────────────────────────────────────────────────────────────
 // Admin Panel
 // ─────────────────────────────────────────────────────────────
-
-const adminActions = {
-    adminUsuariosBtn:
-        "Función 'Gestionar Usuarios' en construcción",
-
-    adminPedidosBtn:
-        "Función 'Ver Pedidos' en construcción"
-};
-
-Object.entries(adminActions).forEach(
-    ([id, message]) => {
-
-        bindClick(id, () => {
-            showSuccessNotification(message);
-        });
-
-    }
-);
 
 // ─────────────────────────────────────────────────────────────
 // Delete Account
