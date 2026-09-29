@@ -434,9 +434,15 @@ const indexSearchInput = document.getElementById('indexSearchInput');
 const suggestionsDropdown = document.getElementById('suggestionsDropdown');
 
 if (indexSearchInput) {
+    const searchForm = document.getElementById('searchForm');
     let searchTimeout;
     let selectedIndex = -1;
     let currentSuggestions = [];
+
+    searchForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        goToCatalogue(indexSearchInput.value);
+    });
     
     indexSearchInput.addEventListener('input', async (e) => {
         const query = e.target.value.trim();
@@ -489,6 +495,14 @@ if (indexSearchInput) {
     });
     
     indexSearchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            if (suggestionsDropdown.classList.contains('open') && currentSuggestions[selectedIndex]) {
+                e.preventDefault();
+                goToCatalogue(currentSuggestions[selectedIndex].titulo);
+            }
+            return;
+        }
+
         if (!suggestionsDropdown.classList.contains('open') || currentSuggestions.length === 0) {
             return;
         }
@@ -501,11 +515,6 @@ if (indexSearchInput) {
             e.preventDefault();
             selectedIndex = Math.max(selectedIndex - 1, -1);
             updateSelection();
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (selectedIndex >= 0 && currentSuggestions[selectedIndex]) {
-                goToCatalogue(currentSuggestions[selectedIndex].titulo);
-            }
         }
     });
     
@@ -551,7 +560,10 @@ if (indexSearchInput) {
 }
 
 function goToCatalogue(query) {
-    sessionStorage.setItem('catalogueSearch', query);
+    const searchTerm = query.trim();
+    if (!searchTerm) return;
+
+    sessionStorage.setItem('catalogueSearch', searchTerm);
     window.location.href = '/catalogue.php';
 }
 

@@ -20,16 +20,16 @@ try {
     $db = new LibreriaDB();
     
     $libros = $db->fetchAll(
-        "SELECT id_libro, titulo, autor, precio, stock FROM libros"
+        "SELECT id_libro, titulo, autor, precio, stock
+         FROM libros
+         ORDER BY titulo ASC"
     );
 
-    $matches = array_values(array_filter(
+    $libros = array_values(array_filter(
         $libros,
         fn($l) => Search::includes($l['titulo'] ?? '', $query)
                || Search::includes($l['autor'] ?? '', $query)
     ));
-
-    $libros = array_slice($matches, 0, 8);
     
     echo json_encode([
         'state' => 'success',
