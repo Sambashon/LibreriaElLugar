@@ -171,6 +171,7 @@ class Carrito extends \LibreriaDB
         $items = $this->fetchAll(
             "SELECT
                 l.id_libro,
+                l.uid,
                 l.titulo,
                 l.autor,
                 l.editorial,

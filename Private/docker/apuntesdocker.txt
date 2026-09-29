@@ -28,3 +28,6 @@ docker compose \
   --env-file .env \
   -f Private/docker/docker-compose.yaml \
   up -d --build
+
+  # Reconstruir PHP conserva las portadas en el volumen persistente portadas_data.
+  # No usar "down -v" si se quieren conservar las portadas: también elimina ese volumen.

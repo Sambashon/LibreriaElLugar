@@ -115,6 +115,17 @@ $generos = array_column(
         <form id="editForm" action="php/scripts/actualizarLibro.php" method="POST">
             <input type="hidden" id="id_libro" name="id_libro">
 
+            <section class="cover-upload" id="coverUpload" hidden>
+                <label for="coverFile">Portada del libro</label>
+                <div class="cover-upload-controls">
+                    <input type="file" id="coverFile" accept="image/jpeg,image/png,image/webp">
+                    <button type="button" class="button" id="uploadCoverBtn">Subir portada</button>
+                </div>
+                <small>JPG, PNG o WebP (máximo 8 MB). Esta portada tiene prioridad sobre Open Library.</small>
+                <p id="coverUploadStatus" role="status"></p>
+                <img id="coverPreview" alt="Portada actual del libro" hidden>
+            </section>
+
             <div class="form-group">
                 <label for="titulo">Título</label>
                 <input type="text" id="titulo" name="titulo" required>
@@ -172,6 +183,7 @@ $generos = array_column(
 <script>
     const librosDB = <?= json_encode(array_map(fn($l) => [
         'id'        => (int)  ($l['id_libro'] ?? 0),
+        'uid'       =>        $l['uid']       ?? '',
         'titulo'    =>        $l['titulo']    ?? '',
         'autor'     =>        $l['autor']     ?? '',
         'editorial' =>        $l['editorial'] ?? '',
@@ -195,6 +207,11 @@ $generos = array_column(
     const emptyState = document.getElementById('emptyState');
     const headerCount = document.getElementById('headerCount');
     const footerCount = document.getElementById('footerCount');
+    const coverUpload = document.getElementById('coverUpload');
+    const coverFile = document.getElementById('coverFile');
+    const uploadCoverBtn = document.getElementById('uploadCoverBtn');
+    const coverUploadStatus = document.getElementById('coverUploadStatus');
+    const coverPreview = document.getElementById('coverPreview');
 
     const ENDPOINTS = {
         edit: 'php/scripts/actualizarLibro.php',
@@ -432,10 +449,21 @@ $generos = array_column(
         if (mode === 'add') {
             editForm.reset();
             document.getElementById('id_libro').value = '';
+            coverUpload.hidden = true;
         } else {
             const libro = librosDB.find(l => l.id === Number(id));
             fillForm(libro);
             document.getElementById('id_libro').value = id;
+            coverUpload.hidden = false;
+            coverFile.value = '';
+            coverUploadStatus.textContent = '';
+            coverPreview.hidden = !libro?.uid;
+            coverPreview.src = libro?.uid
+                ? `php/scripts/portadaLibro.php?uid=${encodeURIComponent(libro.uid)}&t=${Date.now()}`
+                : '';
+            coverPreview.onerror = () => {
+                coverPreview.hidden = true;
+            };
         }
 
         popUp.classList.add('active');
@@ -516,6 +544,54 @@ $generos = array_column(
     document.getElementById('popUpClose').addEventListener('click', closePopUp);
     document.getElementById('popUpCancel').addEventListener('click', closePopUp);
     popUpOverlay.addEventListener('click', closePopUp);
+
+    uploadCoverBtn.addEventListener('click', async () => {
+        const idLibro = document.getElementById('id_libro').value;
+        const file = coverFile.files[0];
+
+        if (!idLibro || !file) {
+            coverUploadStatus.textContent = 'Seleccioná una imagen para subir.';
+            return;
+        }
+
+        uploadCoverBtn.disabled = true;
+        coverUploadStatus.textContent = 'Subiendo portada…';
+        const formData = new FormData();
+        formData.append('id_libro', idLibro);
+        formData.append('portada', file);
+
+        try {
+            const response = await fetch('php/scripts/subirPortada.php', {
+                method: 'POST',
+                body: formData,
+            });
+            const responseText = await response.text();
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch {
+                const detail = responseText.replace(/<[^>]*>/g, ' ').trim().slice(0, 200);
+                throw new Error(
+                    `El servidor no devolvió una respuesta JSON (HTTP ${response.status}).`
+                    + (detail ? ` ${detail}` : '')
+                );
+            }
+            if (!response.ok || result.state !== 'success') {
+                throw new Error(result.message || 'No se pudo subir la portada.');
+            }
+
+            const libro = librosDB.find(item => item.id === Number(idLibro));
+            if (libro) libro.uid = result.uid;
+            coverPreview.src = `${result.url}&t=${Date.now()}`;
+            coverPreview.hidden = false;
+            coverUploadStatus.textContent = 'Portada subida correctamente.';
+            coverFile.value = '';
+        } catch (error) {
+            coverUploadStatus.textContent = error.message || 'Error al subir la portada.';
+        } finally {
+            uploadCoverBtn.disabled = false;
+        }
+    });
 
     editForm.addEventListener('submit', async function (e) {
         e.preventDefault();

@@ -41,8 +41,10 @@ services:
       DB_PORT: 3306
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      COVER_UPLOAD_DIR: /var/lib/el-lugar/portadas
     volumes:
       - ../../docs:/var/www/html
+      - portadas_data:/var/lib/el-lugar/portadas
     networks:
       - app-network
 
@@ -65,6 +67,7 @@ services:
 
 volumes:
   mariadb_data:
+  portadas_data:
   npm_data:
   npm_letsencrypt:
 

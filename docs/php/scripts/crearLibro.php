@@ -1,8 +1,9 @@
 <?php
 
 require_once __DIR__ . "/../bootstrap.php";
+require_once __DIR__ . "/../clases/helpers/BookUid.php";
 
-use App\Helpers\{AdminAccess, Request, Response};
+use App\Helpers\{AdminAccess, BookUid, Request, Response};
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -32,11 +33,17 @@ try {
     $stock = (int) $stockRaw;
 
     $db = new LibreriaDB();
+    $uid = BookUid::ensureExists($db, [
+        'titulo' => $titulo,
+        'autor' => $autor,
+        'editorial' => $editorial,
+        'genero' => $genero,
+    ]);
 
     $db->query(
-        "INSERT INTO libros (titulo, autor, editorial, genero, precio, stock, descripcion, info_adicional)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [$titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $info_adicional]
+        "INSERT INTO libros (uid, titulo, autor, editorial, genero, precio, stock, descripcion, info_adicional)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $info_adicional]
     );
 
     $idLibro = (int) $db->lastInsertId();
@@ -44,6 +51,7 @@ try {
     Response::success('Libro creado correctamente', [
         'libro' => [
             'id'        => $idLibro,
+            'uid'       => $uid,
             'titulo'    => $titulo,
             'autor'     => $autor,
             'editorial' => $editorial,

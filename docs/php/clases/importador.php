@@ -4,6 +4,10 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 require_once __DIR__ . "/libreriaDb.php";
 require_once '/php/vendor/autoload.php';
+require_once __DIR__ . "/helpers/BookUid.php";
+
+use App\Helpers\BookUid;
+
 class Importador extends LibreriaDB
 {
     /**
@@ -36,12 +40,15 @@ class Importador extends LibreriaDB
                     continue;
                 }
 
+                $uid = BookUid::ensureExists($this, $data);
+
                 $this->execute(
                     "INSERT INTO libros 
-                    (titulo, autor, editorial, genero, precio, stock, info_adicional)
+                    (uid, titulo, autor, editorial, genero, precio, stock, info_adicional)
                     VALUES 
-                    (:titulo, :autor, :editorial, :genero, :precio, :stock, :info_adicional)",
+                    (:uid, :titulo, :autor, :editorial, :genero, :precio, :stock, :info_adicional)",
                     [
+                        "uid"         => $uid,
                         "titulo"     => $data['titulo'],
                         "autor"      => $data['autor'],
                         "editorial"  => $data['editorial'],

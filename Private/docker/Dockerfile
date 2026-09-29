@@ -36,6 +36,13 @@ RUN composer install \
     --prefer-dist \
     --optimize-autoloader
 
+RUN mkdir -p /var/lib/el-lugar/portadas \
+ && chown www-data:www-data /var/lib/el-lugar/portadas \
+ && chmod 0755 /var/lib/el-lugar/portadas
+
+RUN printf "upload_max_filesize=9M\npost_max_size=10M\n" \
+    > /usr/local/etc/php/conf.d/uploads.ini
+
 # Application code will be mounted here
 WORKDIR /var/www/html
 

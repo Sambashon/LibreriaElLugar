@@ -21,16 +21,26 @@ CREATE TABLE user_tokens (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
+CREATE TABLE libros_uid (
+    uid CHAR(64) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+    titulo TEXT NOT NULL,
+    autor TEXT NOT NULL,
+    editorial TEXT NOT NULL,
+    genero TEXT NOT NULL
+);
+
 CREATE TABLE libros (
     id_libro INT AUTO_INCREMENT PRIMARY KEY,
+    uid CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
     titulo VARCHAR(200) NOT NULL,
     autor VARCHAR(150),
     editorial VARCHAR(150),
     genero VARCHAR(150),
     precio DECIMAL(10,2) NOT NULL,
     stock INT DEFAULT 0,
-    portada VARCHAR(255),
-    descripcion TEXT
+    descripcion TEXT,
+    info_adicional TEXT,
+    CONSTRAINT fk_libros_uid FOREIGN KEY (uid) REFERENCES libros_uid(uid)
 );
 
 -- =========================

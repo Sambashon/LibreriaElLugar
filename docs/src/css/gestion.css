@@ -404,6 +404,55 @@ footer {
     color: var(--text-muted);
 }
 
+.cover-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1rem;
+    border: 1px solid var(--cream-dark);
+    border-radius: var(--radius);
+    background: #f4f2e7;
+}
+
+.cover-upload[hidden] {
+    display: none;
+}
+
+.cover-upload > label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.cover-upload-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.cover-upload-controls input {
+    flex: 1;
+    min-width: 180px;
+}
+
+.cover-upload-controls .button {
+    padding: 0.6rem 0.8rem;
+}
+
+#coverUploadStatus {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+#coverPreview {
+    max-width: 120px;
+    max-height: 180px;
+    object-fit: contain;
+}
+
 .popUp-footer {
     display: flex;
     justify-content: flex-end;
@@ -475,4 +524,3 @@ footer {
 .combobox-empty:hover {
     background: transparent;
 }
-

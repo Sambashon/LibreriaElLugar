@@ -1,8 +1,9 @@
 <?php
 
 require_once __DIR__ . "/../bootstrap.php";
+require_once __DIR__ . "/../clases/helpers/BookUid.php";
 
-use App\Helpers\{AdminAccess, Request, Response};
+use App\Helpers\{AdminAccess, BookUid, Request, Response};
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -45,16 +46,24 @@ try {
         Response::error('Libro no encontrado', 404);
     }
 
+    $uid = BookUid::ensureExists($db, [
+        'titulo' => $titulo,
+        'autor' => $autor,
+        'editorial' => $editorial,
+        'genero' => $genero,
+    ]);
+
     $db->query(
         "UPDATE libros
-         SET titulo = ?, autor = ?, editorial = ?, genero = ?, precio = ?, stock = ?, descripcion = ?
+         SET uid = ?, titulo = ?, autor = ?, editorial = ?, genero = ?, precio = ?, stock = ?, descripcion = ?
          WHERE id_libro = ?",
-        [$titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $idLibro]
+        [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $idLibro]
     );
 
     Response::success('Libro actualizado correctamente', [
         'libro' => [
             'id'        => $idLibro,
+            'uid'       => $uid,
             'titulo'    => $titulo,
             'autor'     => $autor,
             'editorial' => $editorial,

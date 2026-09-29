@@ -3,7 +3,7 @@ require_once __DIR__ . "/php/clases/libreriaDb.php";
 
 $db     = new LibreriaDB();
 $libros = $db->fetchAll(
-    "SELECT id_libro, titulo, autor, editorial, genero, precio, stock, descripcion
+    "SELECT id_libro, uid, titulo, autor, editorial, genero, precio, stock, descripcion
      FROM libros
      ORDER BY titulo ASC"
 );
@@ -306,11 +306,12 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
     </div>
 
     <script src="src/js/search-utils.js"></script>
-    <script src="src/js/portadas.js"></script>
+    <script src="src/js/portadas.js?v=2"></script>
     <script>
         // ── DATOS DESDE PHP ──────────────────────────────────────────
         const librosDB = <?= json_encode(array_map(fn($l) => [
             'id'        => (int)  $l['id_libro'],
+            'uid'       =>        $l['uid'],
             'titulo'    =>        $l['titulo'],
             'autor'     =>        $l['autor'],
             'editorial' =>        $l['editorial'] ?? '',
@@ -454,7 +455,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             grid.querySelectorAll('.related-card').forEach(card => {
                 const relatedBook = findBook(card.dataset.id);
                 if (relatedBook) {
-                    PortadasOL.aplicarPortada(card.querySelector('.related-cover'), relatedBook.titulo, relatedBook.autor);
+                    PortadasOL.aplicarPortada(card.querySelector('.related-cover'), relatedBook.titulo, relatedBook.autor, relatedBook.uid);
                 }
                 const open = () => openBookDetail(card.dataset.id);
                 card.addEventListener('click', open);
@@ -602,7 +603,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             footer.hidden = false;
             totalEl.textContent = formatPrice(total);
             list.innerHTML = items.map(item => `
-                <article class="cart-item" data-id="${item.id_libro}">
+                <article class="cart-item" data-id="${item.id_libro}" data-uid="${escapeHtml(item.uid || '')}">
                     <div class="cart-item-cover" style="background:${coverColor(item.id_libro)};"></div>
                     <div class="cart-item-info">
                         <p class="cart-item-title">${escapeHtml(item.titulo)}</p>
@@ -623,8 +624,15 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         function bindCartItemCovers(list) {
             list.querySelectorAll('.cart-item').forEach(row => {
                 const book = findBook(row.dataset.id);
-                if (book) {
-                    PortadasOL.aplicarPortada(row.querySelector('.cart-item-cover'), book.titulo, book.autor);
+                if (row.dataset.uid || book) {
+                    const title = row.querySelector('.cart-item-title')?.textContent || book?.titulo || '';
+                    const author = row.querySelector('.cart-item-author')?.textContent || book?.autor || '';
+                    PortadasOL.aplicarPortada(
+                        row.querySelector('.cart-item-cover'),
+                        title,
+                        author,
+                        row.dataset.uid || book?.uid || ''
+                    );
                 }
             });
         }
@@ -658,7 +666,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
 
             count.textContent = items.length + ' libro' + (items.length !== 1 ? 's' : '');
             list.innerHTML = items.map(item => `
-                <article class="cart-item" data-id="${item.id_libro}">
+                <article class="cart-item" data-id="${item.id_libro}" data-uid="${escapeHtml(item.uid || '')}">
                     <div class="cart-item-cover" style="background:${coverColor(item.id_libro)};"></div>
                     <div class="cart-item-info">
                         <p class="cart-item-title">${escapeHtml(item.titulo)}</p>
@@ -782,7 +790,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
 
             document.title = `${book.titulo} — El lugar`;
             document.getElementById('detailCover').style.backgroundColor = coverColor(book.id);
-            PortadasOL.aplicarPortada(document.getElementById('detailCover'), book.titulo, book.autor);
+            PortadasOL.aplicarPortada(document.getElementById('detailCover'), book.titulo, book.autor, book.uid);
             document.getElementById('detailCoverTitle').innerHTML = formatCoverTitle(book.titulo);
             document.getElementById('detailCoverAuthor').textContent = book.autor || '—';
             document.getElementById('detailTitle').textContent = book.titulo || '—';
@@ -975,7 +983,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                     openBookDetail(book.id);
                 });
                 body.appendChild(card);
-                PortadasOL.aplicarPortada(card.querySelector('.card-cover'), book.titulo, book.autor);
+                PortadasOL.aplicarPortada(card.querySelector('.card-cover'), book.titulo, book.autor, book.uid);
             });
 
             renderPagination();

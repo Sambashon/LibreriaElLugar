@@ -136,7 +136,31 @@
         return job;
     }
 
-    function aplicarPortada(el, titulo, autor) {
+    function cargarImagen(el, titulo, url, deco, token, onError) {
+        const img = document.createElement('img');
+        img.className = 'book-cover-img';
+        img.alt = titulo || '';
+        img.loading = 'lazy';
+        img.onload = () => {
+            if (token !== el._coverToken) {
+                img.remove();
+                return;
+            }
+            el.classList.add('has-cover');
+            if (deco) deco.hidden = true;
+        };
+        img.onerror = () => {
+            img.remove();
+            if (token !== el._coverToken) return;
+            el.classList.remove('has-cover');
+            if (deco) deco.hidden = false;
+            onError();
+        };
+        img.src = url;
+        el.appendChild(img);
+    }
+
+    function aplicarPortada(el, titulo, autor, uid = '') {
         if (!el) return;
 
         el.querySelectorAll(':scope > img.book-cover-img').forEach(img => img.remove());
@@ -146,28 +170,25 @@
 
         const token = (el._coverToken = (el._coverToken || 0) + 1);
 
+        if (uid) {
+            cargarImagen(
+                el,
+                titulo,
+                `php/scripts/portadaLibro.php?uid=${encodeURIComponent(uid)}`,
+                deco,
+                token,
+                () => cargarPortadaOpenLibrary(el, titulo, autor, deco, token)
+            );
+            return;
+        }
+
+        cargarPortadaOpenLibrary(el, titulo, autor, deco, token);
+    }
+
+    function cargarPortadaOpenLibrary(el, titulo, autor, deco, token) {
         obtenerPortada(titulo, autor).then(url => {
             if (token !== el._coverToken || !url || !el.isConnected) return;
-
-            const img = document.createElement('img');
-            img.className = 'book-cover-img';
-            img.alt = titulo || '';
-            img.loading = 'lazy';
-            img.src = url;
-            img.onload = () => {
-                if (token !== el._coverToken) {
-                    img.remove();
-                    return;
-                }
-                el.classList.add('has-cover');
-                if (deco) deco.hidden = true;
-            };
-            img.onerror = () => {
-                img.remove();
-                el.classList.remove('has-cover');
-                if (deco) deco.hidden = false;
-            };
-            el.appendChild(img);
+            cargarImagen(el, titulo, url, deco, token, () => {});
         });
     }
 
