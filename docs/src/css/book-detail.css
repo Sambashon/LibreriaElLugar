@@ -17,17 +17,11 @@
     display: flex;
 }
 
-.catalogue-view.hidden {
-    display: none !important;
-}
-
-.product-shell.detail-open .footer-pages,
-.product-shell.cart-open .footer-pages {
+.product-shell.detail-open .footer-pages {
     display: none;
 }
 
-.product-shell.detail-open .product-header,
-.product-shell.cart-open .product-header {
+.product-shell.detail-open .product-header {
     display: none;
 }
 

@@ -328,6 +328,16 @@ svg{
     display: flex;
     flex-direction: column;
 }
+
+.catalogue-view.hidden {
+    display: none !important;
+}
+
+.product-shell.cart-open .footer-pages,
+.product-shell.cart-open .product-header {
+    display: none;
+}
+
 .main-wrapper{
     flex: 1 1 0;
     width: 100%;

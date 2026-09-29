@@ -343,7 +343,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
 
             if (!items.length) {
                 count.textContent = 'No tenés libros en el carrito';
-                footer.hidden = false;
+                footer.hidden = true;
                 totalEl.textContent = formatPrice(total);
                 list.innerHTML = '<p class="cart-empty">Agregá libros desde el catálogo para verlos acá.</p>';
                 return;
