@@ -23,7 +23,8 @@ spl_autoload_register(function (string $class) {
     // Mapeos especiales para clases existentes
     $special_map = [
         'Classes\Usuario' => 'usuario.php',
-        'Classes\Carrito' => 'carrito.php'
+        'Classes\Carrito' => 'carrito.php',
+        'Classes\Favoritos' => 'favoritos.php'
     ];
     
     if (isset($special_map[$relative_class])) {

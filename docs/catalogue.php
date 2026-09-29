@@ -81,7 +81,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                 <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.29977 5H21L19 12H7.37671M20 16H8L6 3H3M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20ZM20 20C20 20.5523 19.5523 21 19 21C18.4477 21 18 20.5523 18 20C18 19.4477 18.4477 19 19 19C19.5523 19 20 19.4477 20 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <p>Carrito</p>
             </div>
-            <div class="menu-item uC">
+            <div class="menu-item" id="favoritosBtn">
                 <svg class="icon" viewBox="0 0 14 14" fill="none"><path d="M7 2l1.4 2.8 3.1.45-2.25 2.2.53 3.1L7 9.1l-2.78 1.45.53-3.1L2.5 5.25l3.1-.45L7 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
                 <p>Favoritos</p>
             </div>
@@ -285,6 +285,17 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                         <p class="cart-total-value" id="cartTotal"></p>
                     </div>
                 </div>
+
+                <div class="cart-view" id="favView" aria-hidden="true">
+                    <nav class="breadcrumb">
+                        <button type="button" id="backFromFav">Volver al catálogo</button>
+                    </nav>
+                    <header class="cart-header">
+                        <h2>Tus favoritos</h2>
+                        <p id="favCount"></p>
+                    </header>
+                    <div class="cart-list" id="favList"></div>
+                </div>
             </div>
 
     <div class="catalogue-toast" id="catalogueToast" role="status" aria-live="polite"></div>
@@ -345,7 +356,10 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         const catalogueView   = document.getElementById('catalogueView');
         const bookDetailView  = document.getElementById('bookDetailView');
         const cartView        = document.getElementById('cartView');
+        const favView         = document.getElementById('favView');
         const carritoBtn      = document.getElementById('carritoBtn');
+        const favoritosBtn    = document.getElementById('favoritosBtn');
+        const favoriteIds     = new Set();
         const productShell    = document.querySelector('.product-shell');
         const mainWrapper     = document.querySelector('.main-wrapper');
         let toastTimer = null;
@@ -539,27 +553,34 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             return false;
         }
 
-        async function addToCart(idLibro, cantidad = 1) {
-            if (!(await requireLogin('Iniciá sesión para agregar libros al carrito'))) return;
-
+        async function postLibro(url, idLibro, extra = {}) {
             const body = new FormData();
             body.append('id_libro', String(idLibro));
-            body.append('cantidad', String(cantidad));
+            Object.entries(extra).forEach(([k, v]) => body.append(k, String(v)));
+            const res = await fetch(url, { method: 'POST', body, credentials: 'same-origin' });
+            const data = await res.json();
+            if (data.state !== 'success') throw new Error(data.message || 'No se pudo completar la acción');
+            return data;
+        }
 
+        function updateWishlistButton() {
+            const btn = document.getElementById('detailWishlist');
+            const on = !!(currentBookId && favoriteIds.has(currentBookId));
+            btn.classList.toggle('active', on);
+            btn.title = on ? 'Quitar de favoritos' : 'Agregar a favoritos';
+            btn.setAttribute('aria-label', btn.title);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        }
+
+        async function addToCart(idLibro, cantidad = 1) {
+            if (!(await requireLogin('Iniciá sesión para agregar libros al carrito'))) return false;
             try {
-                const res = await fetch('php/scripts/agregarAlCarrito.php', {
-                    method: 'POST',
-                    body,
-                    credentials: 'same-origin'
-                });
-                const data = await res.json();
-                if (data.state !== 'success') {
-                    showToast(data.message || 'No se pudo agregar al carrito');
-                    return;
-                }
+                await postLibro('php/scripts/agregarAlCarrito.php', idLibro, { cantidad });
                 showToast('Libro agregado al carrito');
+                return true;
             } catch (err) {
-                showToast('Error al agregar al carrito');
+                showToast(err.message || 'Error al agregar al carrito');
+                return false;
             }
         }
 
@@ -595,35 +616,65 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                 </article>
             `).join('');
 
+            bindCartItemCovers(list);
+            bindRemoveButtons(list, 'php/scripts/quitarDelCarrito.php', loadCart);
+        }
+
+        function bindCartItemCovers(list) {
             list.querySelectorAll('.cart-item').forEach(row => {
-                const id = Number(row.dataset.id);
-                const book = findBook(id);
+                const book = findBook(row.dataset.id);
                 if (book) {
                     PortadasOL.aplicarPortada(row.querySelector('.cart-item-cover'), book.titulo, book.autor);
                 }
             });
+        }
 
+        function bindRemoveButtons(list, url, reload) {
             list.querySelectorAll('.cart-remove').forEach(btn => {
                 btn.addEventListener('click', async () => {
-                    const id = btn.closest('.cart-item').dataset.id;
-                    const form = new FormData();
-                    form.append('id_libro', id);
+                    const id = Number(btn.closest('.cart-item').dataset.id);
                     try {
-                        const res = await fetch('php/scripts/quitarDelCarrito.php', {
-                            method: 'POST',
-                            body: form,
-                            credentials: 'same-origin'
-                        });
-                        const data = await res.json();
-                        if (data.state !== 'success') {
-                            showToast(data.message || 'No se pudo quitar el libro');
-                            return;
-                        }
-                        await loadCart();
+                        await postLibro(url, id);
+                        await reload();
                     } catch (err) {
-                        showToast('Error al quitar el libro');
+                        showToast(err.message || 'Error al quitar el libro');
                     }
                 });
+            });
+        }
+
+        function renderFavorites(items) {
+            const list = document.getElementById('favList');
+            const count = document.getElementById('favCount');
+            favoriteIds.clear();
+            items.forEach(item => favoriteIds.add(Number(item.id_libro)));
+            updateWishlistButton();
+
+            if (!items.length) {
+                count.textContent = 'No tenés libros en favoritos';
+                list.innerHTML = '<p class="cart-empty">Marcá libros desde el detalle para verlos acá.</p>';
+                return;
+            }
+
+            count.textContent = items.length + ' libro' + (items.length !== 1 ? 's' : '');
+            list.innerHTML = items.map(item => `
+                <article class="cart-item" data-id="${item.id_libro}">
+                    <div class="cart-item-cover" style="background:${coverColor(item.id_libro)};"></div>
+                    <div class="cart-item-info">
+                        <p class="cart-item-title">${escapeHtml(item.titulo)}</p>
+                        <p class="cart-item-author">${escapeHtml(item.autor || '')}</p>
+                    </div>
+                    <div class="cart-item-side">
+                        <span class="cart-item-price">${formatPrice(item.precio)}</span>
+                        <button type="button" class="cart-remove">Quitar</button>
+                    </div>
+                </article>
+            `).join('');
+
+            bindCartItemCovers(list);
+            bindRemoveButtons(list, 'php/scripts/quitarDeFavoritos.php', async () => {
+                await loadFavorites();
+                updateWishlistButton();
             });
         }
 
@@ -636,43 +687,95 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             renderCart(data.items || [], data.total ?? 0);
         }
 
-        function closeCartView() {
-            cartView.classList.remove('active');
-            cartView.setAttribute('aria-hidden', 'true');
-            productShell.classList.remove('cart-open');
-            carritoBtn.classList.remove('active');
-            if (!bookDetailView.classList.contains('active')) {
+        async function loadFavorites() {
+            const res = await fetch('php/scripts/obtenerFavoritos.php', { credentials: 'same-origin' });
+            const data = await res.json();
+            if (data.state !== 'success') {
+                throw new Error(data.message || 'No se pudo cargar favoritos');
+            }
+            renderFavorites(data.items || []);
+        }
+
+        async function refreshFavoriteIds() {
+            try {
+                const res = await fetch('php/scripts/obtenerFavoritos.php', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (data.state !== 'success') return;
+                favoriteIds.clear();
+                (data.items || []).forEach(i => favoriteIds.add(Number(i.id_libro)));
+                updateWishlistButton();
+            } catch (err) {}
+        }
+
+        function closeListView(view, btn, keepHidden = false) {
+            view.classList.remove('active');
+            view.setAttribute('aria-hidden', 'true');
+            btn.classList.remove('active');
+            const otherOpen = cartView.classList.contains('active') || favView.classList.contains('active');
+            if (!otherOpen) productShell.classList.remove('cart-open');
+            if (!keepHidden && !otherOpen && !bookDetailView.classList.contains('active')) {
                 catalogueView.classList.remove('hidden');
                 document.title = 'Catálogo | El lugar';
             }
         }
 
-        async function openCartView() {
-            if (!(await requireLogin('Iniciá sesión para ver tu carrito'))) return;
+        function closeCartView(keepHidden = false) {
+            closeListView(cartView, carritoBtn, keepHidden);
+        }
 
+        function closeFavView(keepHidden = false) {
+            closeListView(favView, favoritosBtn, keepHidden);
+        }
+
+        async function openListView({ requireMsg, load, otherClose, view, btn, title }) {
+            if (!(await requireLogin(requireMsg))) return;
             try {
-                await loadCart();
+                await load();
             } catch (err) {
-                showToast(err.message || 'No se pudo cargar el carrito');
+                showToast(err.message);
                 return;
             }
-
+            otherClose();
             closeBookDetail(true);
             catalogueView.classList.add('hidden');
-            cartView.classList.add('active');
-            cartView.setAttribute('aria-hidden', 'false');
+            view.classList.add('active');
+            view.setAttribute('aria-hidden', 'false');
             productShell.classList.add('cart-open');
-            carritoBtn.classList.add('active');
-            document.title = 'Carrito | El lugar';
+            btn.classList.add('active');
+            document.title = title;
             mainWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function openCartView() {
+            await openListView({
+                requireMsg: 'Iniciá sesión para ver tu carrito',
+                load: loadCart,
+                otherClose: () => closeFavView(true),
+                view: cartView,
+                btn: carritoBtn,
+                title: 'Carrito | El lugar'
+            });
+        }
+
+        async function openFavView() {
+            await openListView({
+                requireMsg: 'Iniciá sesión para ver tus favoritos',
+                load: loadFavorites,
+                otherClose: () => closeCartView(true),
+                view: favView,
+                btn: favoritosBtn,
+                title: 'Favoritos | El lugar'
+            });
         }
 
         async function openBookDetail(id) {
             const book = findBook(id);
             if (!book) return;
 
-            closeCartView();
+            closeCartView(true);
+            closeFavView(true);
             currentBookId = book.id;
+            updateWishlistButton();
             detailQtyReady = false;
             qtySyncSeq += 1;
             setDetailQty(1, false);
@@ -715,7 +818,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             mainWrapper.scrollTo({ top: 0, behavior: 'smooth' });
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            await syncDetailQtyFromCart(book);
+            await Promise.all([syncDetailQtyFromCart(book), refreshFavoriteIds()]);
             if (currentBookId === book.id) {
                 detailQtyReady = true;
             }
@@ -726,14 +829,15 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             bookDetailView.setAttribute('aria-hidden', 'true');
             productShell.classList.remove('detail-open');
             currentBookId = null;
-            if (!keepHidden && !cartView.classList.contains('active')) {
+            if (!keepHidden && !cartView.classList.contains('active') && !favView.classList.contains('active')) {
                 catalogueView.classList.remove('hidden');
                 document.title = 'Catálogo | El lugar';
             }
         }
 
         document.getElementById('backToCatalogue').addEventListener('click', () => closeBookDetail());
-        document.getElementById('backFromCart').addEventListener('click', closeCartView);
+        document.getElementById('backFromCart').addEventListener('click', () => closeCartView());
+        document.getElementById('backFromFav').addEventListener('click', () => closeFavView());
         document.getElementById('detailQtyMinus').addEventListener('click', () => setDetailQty(detailQty - 1, true));
         document.getElementById('detailQtyPlus').addEventListener('click', () => setDetailQty(detailQty + 1, true));
         document.getElementById('detailAddCart').addEventListener('click', async () => {
@@ -743,7 +847,27 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             const ok = await persistDetailQty();
             if (ok) showToast('Libro agregado al carrito');
         });
-        document.getElementById('detailWishlist').addEventListener('click', () => alert('Función en construcción'));
+        document.getElementById('detailWishlist').addEventListener('click', async () => {
+            if (!currentBookId) return;
+            if (!(await requireLogin('Iniciá sesión para usar favoritos'))) return;
+            const id = currentBookId;
+            const on = favoriteIds.has(id);
+            try {
+                if (on) {
+                    await postLibro('php/scripts/quitarDeFavoritos.php', id);
+                    favoriteIds.delete(id);
+                    showToast('Libro quitado de favoritos');
+                } else {
+                    await postLibro('php/scripts/agregarAFavoritos.php', id);
+                    favoriteIds.add(id);
+                    showToast('Libro agregado a favoritos');
+                }
+                updateWishlistButton();
+                if (favView.classList.contains('active')) await loadFavorites();
+            } catch (err) {
+                showToast(err.message || 'No se pudo actualizar favoritos');
+            }
+        });
 
         // ── PRECIO — sin inicialización necesaria
 
@@ -774,6 +898,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             filteredLibros = list;
             currentPage    = 1;
             closeCartView();
+            closeFavView();
             closeBookDetail();
 
             const body = document.querySelector('.product-body');
@@ -907,6 +1032,11 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             openCartView();
         });
 
+        favoritosBtn.addEventListener('click', () => {
+            if (typeof closeDrawer === 'function') closeDrawer();
+            openFavView();
+        });
+
         document.querySelectorAll('.uC').forEach(el => {
             el.addEventListener('click', () => alert('Función en construcción'));
         });
@@ -943,6 +1073,8 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         const viewParam = new URLSearchParams(window.location.search).get('view');
         if (viewParam === 'cart') {
             openCartView();
+        } else if (viewParam === 'favorites') {
+            openFavView();
         }
 
         // ── MOBILE DRAWER ────────────────────────────────────────────

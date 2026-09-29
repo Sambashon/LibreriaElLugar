@@ -410,9 +410,14 @@
     flex-shrink: 0;
 }
 
-.book-detail-view .btn-wishlist:hover {
+.book-detail-view .btn-wishlist:hover,
+.book-detail-view .btn-wishlist.active {
     border-color: #F0C05F;
     color: #F0C05F;
+}
+
+.book-detail-view .btn-wishlist.active svg path {
+    fill: currentColor;
 }
 
 .book-detail-view .description-section {
