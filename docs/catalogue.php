@@ -660,7 +660,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
 
             if (!items.length) {
                 count.textContent = 'No tenés libros en favoritos';
-                list.innerHTML = '<p class="cart-empty">Marcá libros desde el detalle para verlos acá.</p>';
+                list.innerHTML = '<p class="cart-empty">Marcá libros desde la ficha de producto para verlos acá.</p>';
                 return;
             }
 

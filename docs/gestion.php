@@ -175,6 +175,7 @@ $generos = array_column(
         </form>
     </div>
     <footer class="popUp-footer">
+        <button type="button" class="button button-danger" id="deleteBookBtn" hidden>Eliminar libro</button>
         <button type="button" class="button button-ghost" id="popUpCancel">Cancelar</button>
         <button type="submit" form="editForm" class="button button-primary" id="popUpSubmit">Guardar cambios</button>
     </footer>
@@ -204,9 +205,10 @@ $generos = array_column(
     const popUpSubmit = document.getElementById('popUpSubmit');
     const tabla = document.getElementById('tabla');
     const tablaBody = document.getElementById('tablaBody');
-    const emptyState = document.getElementById('emptyState');
+    let emptyState = document.getElementById('emptyState');
     const headerCount = document.getElementById('headerCount');
     const footerCount = document.getElementById('footerCount');
+    const deleteBookBtn = document.getElementById('deleteBookBtn');
     const coverUpload = document.getElementById('coverUpload');
     const coverFile = document.getElementById('coverFile');
     const uploadCoverBtn = document.getElementById('uploadCoverBtn');
@@ -216,6 +218,7 @@ $generos = array_column(
     const ENDPOINTS = {
         edit: 'php/scripts/actualizarLibro.php',
         add: 'php/scripts/crearLibro.php',
+        delete: 'php/scripts/eliminarLibro.php',
         clearAll: 'php/scripts/eliminarTODOSlosLibros.php',
         import: 'php/scripts/cargarLibros.php',
     };
@@ -412,9 +415,31 @@ $generos = array_column(
     function appendTableRow(libro) {
         if (emptyState) {
             emptyState.remove();
+            emptyState = null;
         }
         tabla.hidden = false;
         tablaBody.appendChild(buildTableRow(libro));
+    }
+
+    function removeTableRow(id) {
+        const index = librosDB.findIndex(libro => libro.id === id);
+        if (index === -1) return;
+
+        librosDB.splice(index, 1);
+        document.querySelector(`.editBtn[data-id="${id}"]`)?.closest('tr')?.remove();
+
+        if (librosDB.length === 0) {
+            emptyState = document.createElement('div');
+            emptyState.className = 'empty';
+            emptyState.id = 'emptyState';
+            const message = document.createElement('p');
+            message.textContent = 'No hay libros en la base de datos.';
+            emptyState.appendChild(message);
+            tabla.before(emptyState);
+            tabla.hidden = true;
+        }
+
+        updateCounts();
     }
 
     function updateCounts() {
@@ -445,6 +470,7 @@ $generos = array_column(
         editForm.action = ENDPOINTS[mode];
         popUpTitle.textContent = mode === 'add' ? 'Agregar libro' : 'Editar libro';
         popUpSubmit.textContent = mode === 'add' ? 'Agregar libro' : 'Guardar cambios';
+        deleteBookBtn.hidden = mode === 'add';
 
         if (mode === 'add') {
             editForm.reset();
@@ -544,6 +570,37 @@ $generos = array_column(
     document.getElementById('popUpClose').addEventListener('click', closePopUp);
     document.getElementById('popUpCancel').addEventListener('click', closePopUp);
     popUpOverlay.addEventListener('click', closePopUp);
+
+    deleteBookBtn.addEventListener('click', async () => {
+        const idLibro = document.getElementById('id_libro').value;
+        const libro = librosDB.find(item => item.id === Number(idLibro));
+        if (!libro) return;
+
+        if (!confirm(`¿Eliminar "${libro.titulo}"? Esta acción no se puede deshacer.`)) {
+            return;
+        }
+
+        deleteBookBtn.disabled = true;
+        try {
+            const formData = new FormData();
+            formData.append('id_libro', idLibro);
+            const response = await fetch(ENDPOINTS.delete, {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+            if (!response.ok || data.state !== 'success') {
+                throw new Error(data.message || 'No se pudo eliminar el libro');
+            }
+
+            removeTableRow(Number(idLibro));
+            closePopUp();
+        } catch (error) {
+            alert(error.message || 'Error al eliminar el libro');
+        } finally {
+            deleteBookBtn.disabled = false;
+        }
+    });
 
     uploadCoverBtn.addEventListener('click', async () => {
         const idLibro = document.getElementById('id_libro').value;

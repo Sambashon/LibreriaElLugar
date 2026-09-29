@@ -461,6 +461,21 @@ footer {
     border-top: 1px solid var(--cream-dark);
 }
 
+.button-danger {
+    margin-right: auto;
+    background: #b42318;
+    border: 1px solid #b42318;
+    color: var(--cream);
+}
+
+.button-danger:hover {
+    background: #8f1d15;
+}
+
+.button[hidden] {
+    display: none;
+}
+
 .button-ghost {
     background: transparent;
     border: 1px solid var(--cream-dark);
