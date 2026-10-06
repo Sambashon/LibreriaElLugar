@@ -270,7 +270,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
                                 </div>
                             </div>
                             <div class="checkout-modal-actions">
-                                <button class="button2 checkout-submit" id="checkoutSubmit" type="submit" disabled>Confirmar pedido</button>
+                                <button class="button2 checkout-submit" id="checkoutSubmit" type="submit">Confirmar pedido</button>
                             </div>
                         </form>
                     </section>
@@ -518,16 +518,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
         const checkoutModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('checkoutModal'));
         const checkoutSubmit = document.getElementById('checkoutSubmit');
 
-        function updateCheckoutValidity() {
-            checkoutSubmit.disabled = !checkoutForm.checkValidity();
-        }
-
-        checkoutForm.querySelectorAll('[required]').forEach((input) => {
-            input.addEventListener('input', updateCheckoutValidity);
-            input.addEventListener('change', updateCheckoutValidity);
-        });
         document.getElementById('openCheckoutModal').addEventListener('click', () => {
-            updateCheckoutValidity();
             checkoutModal.show();
         });
 
@@ -535,7 +526,6 @@ $checkoutEmail = (string) $session->obtener('email', '');
             event.preventDefault();
             if (!checkoutForm.checkValidity()) {
                 checkoutForm.reportValidity();
-                updateCheckoutValidity();
                 return;
             }
             checkoutSubmit.disabled = true;
@@ -561,7 +551,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
             } catch (error) {
                 showToast(error.message || 'No se pudo confirmar el pedido');
             } finally {
-                updateCheckoutValidity();
+                checkoutSubmit.disabled = false;
             }
         });
 
