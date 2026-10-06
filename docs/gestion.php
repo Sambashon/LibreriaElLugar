@@ -121,7 +121,7 @@ $generos = array_column(
                     <input type="file" id="coverFile" accept="image/jpeg,image/png,image/webp">
                     <button type="button" class="button" id="uploadCoverBtn">Subir portada</button>
                 </div>
-                <small>JPG, PNG o WebP (máximo 8 MB). Esta portada tiene prioridad sobre Open Library.</small>
+                <small>JPG, PNG o WebP (máximo 8 MB). Se convierte y comprime a WebP al subirla. Esta portada tiene prioridad sobre Open Library.</small>
                 <p id="coverUploadStatus" role="status"></p>
                 <img id="coverPreview" alt="Portada actual del libro" hidden>
             </section>

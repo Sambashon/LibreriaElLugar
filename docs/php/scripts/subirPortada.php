@@ -42,6 +42,12 @@ try {
     ) {
         Response::error('Formato de imagen inválido. Usá JPG, PNG o WebP.', 400);
     }
+    if (($imageInfo[0] * $imageInfo[1]) > 20000000) {
+        Response::error('La portada supera el tamaño máximo de imagen permitido.', 400);
+    }
+    if (!function_exists('imagewebp')) {
+        Response::error('El servidor no tiene habilitada la conversión de imágenes WebP.', 500);
+    }
 
     $db = new LibreriaDB();
     $book = $db->fetch(
@@ -61,18 +67,40 @@ try {
     }
 
     $uid = $book['uid'];
-    $extension = $extensions[$mime];
-    $destination = $directory . '/' . $uid . '.' . $extension;
-    if (!move_uploaded_file($upload['tmp_name'], $destination)) {
-        throw new RuntimeException('No se pudo guardar la portada en el volumen persistente');
+    $source = match ($mime) {
+        'image/jpeg' => imagecreatefromjpeg($upload['tmp_name']),
+        'image/png' => imagecreatefrompng($upload['tmp_name']),
+        'image/webp' => imagecreatefromwebp($upload['tmp_name']),
+    };
+    if ($source === false) {
+        Response::error('No se pudo procesar la imagen subida.', 400);
     }
 
-    foreach (['jpg', 'png', 'webp'] as $otherExtension) {
-        if ($otherExtension === $extension) {
-            continue;
-        }
+    imagepalettetotruecolor($source);
+    imagealphablending($source, false);
+    imagesavealpha($source, true);
 
-        $oldCover = $directory . '/' . $uid . '.' . $otherExtension;
+    $temporaryPath = tempnam($directory, $uid . '.');
+    if ($temporaryPath === false) {
+        imagedestroy($source);
+        throw new RuntimeException('No se pudo preparar el archivo WebP');
+    }
+
+    $converted = imagewebp($source, $temporaryPath, 82);
+    imagedestroy($source);
+    if (!$converted) {
+        unlink($temporaryPath);
+        throw new RuntimeException('No se pudo convertir la portada a WebP');
+    }
+
+    $destination = $directory . '/' . $uid . '.webp';
+    if (!rename($temporaryPath, $destination)) {
+        unlink($temporaryPath);
+        throw new RuntimeException('No se pudo guardar la portada WebP en el volumen persistente');
+    }
+
+    foreach (['jpg', 'png'] as $oldExtension) {
+        $oldCover = $directory . '/' . $uid . '.' . $oldExtension;
         if (is_file($oldCover) && !unlink($oldCover)) {
             error_log('No se pudo eliminar una versión anterior de la portada: ' . $oldCover);
         }
