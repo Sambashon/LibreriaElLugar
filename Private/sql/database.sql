@@ -78,6 +78,44 @@ CREATE TABLE carrito_libros (
         ON DELETE CASCADE
 );
 
+CREATE TABLE pedidos (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NULL,
+    nombre_cliente VARCHAR(200) NOT NULL,
+    telefono VARCHAR(40) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    comentarios TEXT NULL,
+    tipo_entrega ENUM('retiro_en_libreria') NOT NULL DEFAULT 'retiro_en_libreria',
+    metodo_pago ENUM('en_libreria', 'transferencia_bancaria') NOT NULL,
+    estado ENUM(
+        'pendiente',
+        'confirmado',
+        'preparando',
+        'listo_para_retirar',
+        'entregado',
+        'cancelado'
+    ) NOT NULL DEFAULT 'pendiente',
+    total DECIMAL(12,2) NOT NULL,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_pedidos_estado_fecha (estado, fecha_creacion),
+    CONSTRAINT fk_pedidos_usuario FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id_usuario) ON DELETE SET NULL
+);
+
+CREATE TABLE detalle_pedido (
+    id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+    id_pedido INT NOT NULL,
+    id_libro INT NULL,
+    titulo_libro VARCHAR(200) NOT NULL,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_detalle_pedido FOREIGN KEY (id_pedido)
+        REFERENCES pedidos(id_pedido) ON DELETE CASCADE,
+    CONSTRAINT fk_detalle_libro FOREIGN KEY (id_libro)
+        REFERENCES libros(id_libro) ON DELETE SET NULL
+);
+
 CREATE TABLE favoritos (
     id_favorito INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,

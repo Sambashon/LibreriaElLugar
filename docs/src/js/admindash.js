@@ -19,7 +19,3 @@ document.getElementById("adminLogoutBtn")?.addEventListener("click", async () =>
 document.getElementById("adminUsuariosBtn")?.addEventListener("click", () => {
     window.alert("Función 'Gestionar Usuarios' en construcción");
 });
-
-document.getElementById("adminPedidosBtn")?.addEventListener("click", () => {
-    window.alert("Función 'Ver Pedidos' en construcción");
-});

@@ -62,6 +62,10 @@ body{
     box-sizing: border-box;
     flex-shrink: 0;
 }
+.menu-item p{
+    margin: 0;
+    padding: 0;
+}
 
 .menu-item:hover{
     background-color: #eef7f1;
@@ -98,7 +102,14 @@ svg{
     box-sizing: border-box;
     flex-shrink: 0;
 }
-
+.nav-header h3{
+    margin: 0;
+    padding: 0;
+}
+h3{
+    font-size: 1.2rem;
+    font-weight: bold;
+}
 /* ── ZONA DE FILTROS SCROLLEABLE ── */
 .filters-wrapper {
     width: 100%;
@@ -135,6 +146,8 @@ svg{
 .filter-header p {
     font-size: clamp(14px, 0.8vw, 18px);
     font-weight: 500;
+    margin: 0;
+    padding: 0;
 }
 
 .arrow-container {
@@ -282,6 +295,8 @@ svg{
 
 .product-header hr{
     margin: 0.5rem 0px;
+    border: 1px solid #C8922B;
+    opacity: 1;
 }
 .product-header .row{
     width: 100%;
@@ -290,12 +305,14 @@ svg{
     justify-content: space-between;
     align-items: center;
 }
-.product-header .column{
+.product-header .columnb{
     display: flex;
     flex-direction: column;
+    width: fit-content !important;
 }
 .sort-select {
     margin-top: 1.5vh;
+    width: fit-content;
     height: fit-content;
     font-size: 16px;
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -464,7 +481,7 @@ svg{
     font-weight: 700;
     color: #1a4d2e;
     position: absolute;
-    bottom: 10px;
+    bottom: -10px;
     left: 12px;
 }
 
@@ -968,6 +985,75 @@ svg{
 .cart-total-value {
     font-size: 1.4rem;
     font-weight: 700;
+}
+
+.checkout-pickup {
+    margin: -1.25rem 0 1.25rem;
+    color: #526457;
+    font-size: 0.9rem;
+}
+
+.checkout-open {
+    align-self: flex-end;
+    padding: 0.75rem 1.1rem;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: #C8922B;
+}
+
+.checkout-open[hidden] {
+    display: none;
+}
+
+.checkout-modal .modal-content {
+    border: 1px solid #23693e;
+    border-radius: 12px;
+}
+
+.checkout-modal-content {
+    color: #1a1a18;
+}
+
+.checkout-modal-content .header {
+    margin-bottom: 1.25rem;
+}
+
+.checkout-modal-content .header p {
+    color: #526457;
+}
+
+.checkout-modal-content form .row {
+    align-items: flex-start;
+}
+
+.checkout-modal-content .form-input {
+    min-height: 52px;
+}
+
+.checkout-modal-content textarea.form-input {
+    min-height: 96px;
+}
+
+.checkout-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.checkout-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@media (max-width: 768px) {
+    .checkout-modal-content .row {
+        flex-direction: column;
+    }
+
+    .checkout-modal-content .column {
+        width: 100%;
+    }
 }
 
 .catalogue-toast {

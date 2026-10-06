@@ -1,6 +1,11 @@
 <?php
+require_once __DIR__ . '/php/bootstrap.php';
+
+use App\Managers\SessionManager;
+
 require_once __DIR__ . "/php/clases/libreriaDb.php";
 
+$session = new SessionManager();
 $db     = new LibreriaDB();
 $libros = $db->fetchAll(
     "SELECT id_libro, uid, titulo, autor, editorial, genero, precio, stock, descripcion
@@ -10,6 +15,8 @@ $libros = $db->fetchAll(
 
 // Get search parameter from URL
 $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_QUOTES, 'UTF-8') : '';
+$checkoutName = trim((string) $session->obtener('nombre', '') . ' ' . (string) $session->obtener('apellido', ''));
+$checkoutEmail = (string) $session->obtener('email', '');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,7 +33,10 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
     <link rel="preconnect" href="https://openlibrary.org">
     <link rel="preconnect" href="https://covers.openlibrary.org">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="src/css/modal.css">
     <link rel="stylesheet" href="src/css/components.css">
+    
     <link rel="stylesheet" href="src/css/header.css">
     <link rel="stylesheet" href="src/css/catalogue.css">
 </head>
@@ -150,7 +160,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
         <main class="product-shell">
             <header class="product-header">
                 <div class="row">
-                    <div class="column">
+                    <div class="columnb">
                         <h1>Catálogo</h1>
                         <h3 id="resultCount"></h3>
                     </div>
@@ -173,7 +183,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                         <option value="price-desc">Precio: mayor a menor</option>
                     </select>
                 </div>
-                <hr style="color: #F0C05F;">
+                <hr>
             </header>
 
             <div class="main-wrapper">
@@ -194,6 +204,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
                         <p class="cart-total-label">Total</p>
                         <p class="cart-total-value" id="cartTotal"></p>
                     </div>
+                    <button class="button checkout-open" id="openCheckoutModal" type="button" hidden>Confirmar pedido</button>
                 </div>
 
                 <div class="cart-view" id="favView" aria-hidden="true">
@@ -210,11 +221,70 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
 
     <div class="catalogue-toast" id="catalogueToast" role="status" aria-live="polite"></div>
 
+    <div class="modal fade form-modal-bg checkout-modal" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalTitle" aria-hidden="true">
+        <div class="modal-dialog form-modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-body p-0">
+                    <nav class="modal-nav">
+                        <button class="modal-close unsetter" type="button" data-bs-dismiss="modal" aria-label="Cerrar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </nav>
+                    <section class="register active checkout-modal-content">
+                        <header class="header">
+                            <h1 id="checkoutModalTitle">Confirmar pedido</h1>
+                            <p>Completá tus datos para reservar los libros y coordinar el retiro.</p>
+                        </header>
+                        <p class="checkout-pickup">Entrega: retiro en la librería. No realizamos envíos.</p>
+                        <form id="checkoutForm" novalidate>
+                            <div class="row">
+                                <div class="column">
+                                    <label for="checkoutName">Nombre completo</label>
+                                    <input class="form-input" type="text" id="checkoutName" name="nombre" placeholder="Tu nombre..." maxlength="200" pattern=".*\S.*" required value="<?= htmlspecialchars($checkoutName, ENT_QUOTES, 'UTF-8') ?>">
+                                </div>
+                                <div class="column">
+                                    <label for="checkoutPhone">Teléfono</label>
+                                    <input class="form-input" type="tel" id="checkoutPhone" name="telefono" placeholder="Tu teléfono..." maxlength="40" pattern="[\d\+\(\)\.\s\-]{6,40}" autocomplete="tel" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column">
+                                    <label for="checkoutEmail">Correo electrónico</label>
+                                    <input class="form-input" type="email" id="checkoutEmail" name="email" placeholder="Tu email..." maxlength="150" autocomplete="email" required value="<?= htmlspecialchars($checkoutEmail, ENT_QUOTES, 'UTF-8') ?>">
+                                </div>
+                                <div class="column">
+                                    <label for="checkoutPayment">Forma de pago</label>
+                                    <select class="form-input" id="checkoutPayment" name="metodo_pago" required>
+                                        <option value="" selected disabled>Seleccioná una forma de pago</option>
+                                        <option value="en_libreria">Pago en librería</option>
+                                        <option value="transferencia_bancaria">Transferencia bancaria</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="column">
+                                    <label for="checkoutComments">Comentarios (opcional)</label>
+                                    <textarea class="form-input" id="checkoutComments" name="comentarios" maxlength="2000" rows="3" placeholder="Dejanos cualquier comentario..."></textarea>
+                                </div>
+                            </div>
+                            <div class="checkout-modal-actions">
+                                <button class="button2 checkout-submit" id="checkoutSubmit" type="submit" disabled>Confirmar pedido</button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
             <footer class="footer-pages" id="footerPages"></footer>
 
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="src/js/search-utils.js"></script>
     <script src="src/js/portadas.js?v=2"></script>
     <script>
@@ -339,11 +409,13 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             const list = document.getElementById('cartList');
             const count = document.getElementById('cartCount');
             const footer = document.getElementById('cartFooter');
+            const checkoutButton = document.getElementById('openCheckoutModal');
             const totalEl = document.getElementById('cartTotal');
 
             if (!items.length) {
                 count.textContent = 'No tenés libros en el carrito';
                 footer.hidden = true;
+                checkoutButton.hidden = true;
                 totalEl.textContent = formatPrice(total);
                 list.innerHTML = '<p class="cart-empty">Agregá libros desde el catálogo para verlos acá.</p>';
                 return;
@@ -351,6 +423,7 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
 
             count.textContent = items.length + ' libro' + (items.length !== 1 ? 's' : '');
             footer.hidden = false;
+            checkoutButton.hidden = false;
             totalEl.textContent = formatPrice(total);
             list.innerHTML = items.map(item => `
                 <article class="cart-item" data-id="${item.id_libro}" data-uid="${escapeHtml(item.uid || '')}">
@@ -440,6 +513,57 @@ $initialSearch = isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_
             }
             renderCart(data.items || [], data.total ?? 0);
         }
+
+        const checkoutForm = document.getElementById('checkoutForm');
+        const checkoutModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('checkoutModal'));
+        const checkoutSubmit = document.getElementById('checkoutSubmit');
+
+        function updateCheckoutValidity() {
+            checkoutSubmit.disabled = !checkoutForm.checkValidity();
+        }
+
+        checkoutForm.querySelectorAll('[required]').forEach((input) => {
+            input.addEventListener('input', updateCheckoutValidity);
+            input.addEventListener('change', updateCheckoutValidity);
+        });
+        document.getElementById('openCheckoutModal').addEventListener('click', () => {
+            updateCheckoutValidity();
+            checkoutModal.show();
+        });
+
+        checkoutForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!checkoutForm.checkValidity()) {
+                checkoutForm.reportValidity();
+                updateCheckoutValidity();
+                return;
+            }
+            checkoutSubmit.disabled = true;
+            try {
+                const response = await fetch('php/scripts/crearPedido.php', {
+                    method: 'POST',
+                    body: new FormData(checkoutForm),
+                    credentials: 'same-origin'
+                });
+                const data = await response.json();
+                if (!response.ok || data.state !== 'success') {
+                    throw new Error(data.message || 'No se pudo confirmar el pedido');
+                }
+                showToast(`Pedido #${data.id_pedido} confirmado. Te contactaremos para coordinar.`);
+                checkoutForm.reset();
+                checkoutModal.hide();
+                renderCart([], 0);
+                try {
+                    await loadCart();
+                } catch (error) {
+                    showToast(`Pedido #${data.id_pedido} confirmado, pero no se pudo actualizar el carrito.`);
+                }
+            } catch (error) {
+                showToast(error.message || 'No se pudo confirmar el pedido');
+            } finally {
+                updateCheckoutValidity();
+            }
+        });
 
         async function loadFavorites() {
             const res = await fetch('php/scripts/obtenerFavoritos.php', { credentials: 'same-origin' });

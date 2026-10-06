@@ -1,0 +1,87 @@
+.pedidos-back {
+    padding: 0.65rem 0.9rem;
+    border-radius: var(--radius);
+    text-decoration: none;
+}
+
+.pedidos-wrapper {
+    padding-top: 1.25rem;
+}
+
+.pedidos-table {
+    min-width: 1050px;
+}
+
+.pedidos-table td > span,
+.pedido-date {
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.pedido-comments {
+    max-width: 220px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    white-space: normal;
+}
+
+.pedido-items {
+    min-width: 180px;
+    padding-left: 1.1rem;
+}
+
+.pedido-items li {
+    margin: 0.25rem 0;
+}
+
+.pedido-items small {
+    display: block;
+    color: var(--text-muted);
+}
+
+.pedido-status {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: #e1dfce;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-entregado {
+    color: #175c34;
+    background: #d7eadc;
+}
+
+.status-cancelado {
+    color: #8b2720;
+    background: #f3ddda;
+}
+
+.pedido-status-form {
+    display: grid;
+    gap: 0.45rem;
+    min-width: 170px;
+    margin-top: 0.65rem;
+}
+
+.pedido-status-form select {
+    max-width: 100%;
+    padding: 0.4rem;
+    border: 1px solid #b8b6a4;
+    border-radius: var(--radius);
+    background: var(--cream);
+    font: inherit;
+}
+
+.pedido-status-form .button {
+    padding: 0.45rem 0.7rem;
+    border: 0;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.pedido-status-form .button:disabled {
+    cursor: wait;
+}

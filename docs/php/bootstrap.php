@@ -24,7 +24,8 @@ spl_autoload_register(function (string $class) {
     $special_map = [
         'Classes\Usuario' => 'usuario.php',
         'Classes\Carrito' => 'carrito.php',
-        'Classes\Favoritos' => 'favoritos.php'
+        'Classes\Favoritos' => 'favoritos.php',
+        'Classes\Pedido' => 'pedido.php'
     ];
     
     if (isset($special_map[$relative_class])) {
