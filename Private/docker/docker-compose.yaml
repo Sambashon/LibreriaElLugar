@@ -36,9 +36,9 @@ services:
     container_name: php_fpm
     restart: unless-stopped
     environment:
-      DB_HOST: libreriadb
+      DB_HOST: ${DB_HOST}
       DB_NAME: ${DB_NAME}
-      DB_PORT: 3306
+      DB_PORT: ${DB_PORT}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       COVER_UPLOAD_DIR: /var/lib/el-lugar/portadas
