@@ -237,7 +237,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
                             <h1 id="checkoutModalTitle">Confirmar pedido</h1>
                             <p>Completá tus datos para reservar los libros y coordinar el retiro.</p>
                         </header>
-                        <p class="checkout-pickup">Entrega: retiro en la librería. No realizamos envíos.</p>
+                        <p class="checkout-pickup">Entrega: retiro en la librería, dentro de nuestros horarios de trabajo (Lunes a Viernes de 10:00 a 20:00, Sábados de 10:00 a 18:00). No realizamos envíos.</p>
                         <form id="checkoutForm" novalidate>
                             <div class="row">
                                 <div class="column">
@@ -539,14 +539,14 @@ $checkoutEmail = (string) $session->obtener('email', '');
                 if (!response.ok || data.state !== 'success') {
                     throw new Error(data.message || 'No se pudo confirmar el pedido');
                 }
-                showToast(`Pedido #${data.id_pedido} confirmado. Te contactaremos para coordinar.`);
+                showToast(`Pedido confirmado. Te contactaremos para coordinar.`);
                 checkoutForm.reset();
                 checkoutModal.hide();
                 renderCart([], 0);
                 try {
                     await loadCart();
                 } catch (error) {
-                    showToast(`Pedido #${data.id_pedido} confirmado, pero no se pudo actualizar el carrito.`);
+                    showToast(`Pedido confirmado, pero no se pudo actualizar el carrito.`);
                 }
             } catch (error) {
                 showToast(error.message || 'No se pudo confirmar el pedido');

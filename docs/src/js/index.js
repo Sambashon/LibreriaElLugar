@@ -525,7 +525,7 @@ if (indexSearchInput) {
         if (e.key === 'Enter') {
             if (suggestionsDropdown.classList.contains('open') && currentSuggestions[selectedIndex]) {
                 e.preventDefault();
-                goToCatalogue(currentSuggestions[selectedIndex].titulo);
+                goToBookDetail(currentSuggestions[selectedIndex].id);
             }
             return;
         }
@@ -559,7 +559,7 @@ if (indexSearchInput) {
     
     function renderSuggestions(suggestions, query) {
         suggestionsDropdown.innerHTML = suggestions.map((book, idx) => `
-            <div class="suggestion-item" data-index="${idx}" onclick="goToCatalogue('${book.titulo.replace(/'/g, "\\'")}')">
+            <div class="suggestion-item" data-index="${idx}">
                 <div class="suggestion-title">${book.titulo}</div>
                 <div class="suggestion-author">${book.autor}</div>
                 <div class="suggestion-price">$${book.precio.toLocaleString('es-AR')}</div>
@@ -569,6 +569,9 @@ if (indexSearchInput) {
         // Add hover event listeners
         const items = suggestionsDropdown.querySelectorAll('.suggestion-item');
         items.forEach((item, idx) => {
+            item.addEventListener('click', () => {
+                goToBookDetail(suggestions[idx].id);
+            });
             item.addEventListener('mouseenter', () => {
                 selectedIndex = idx;
                 updateSelection();
@@ -592,6 +595,10 @@ function goToCatalogue(query) {
 
     sessionStorage.setItem('catalogueSearch', searchTerm);
     window.location.href = '/catalogue.php';
+}
+
+function goToBookDetail(bookId) {
+    window.location.href = `book-detail.php?id=${encodeURIComponent(bookId)}`;
 }
 
 // ─────────────────────────────────────────────────────────────
