@@ -3,6 +3,33 @@ openCatalogueBtn.addEventListener("click", function(){
     window.location.href = "catalogue.php";
 })
 
+async function loadFeaturedBooks() {
+    const row = document.getElementById("row");
+    if (!row) return;
+
+    try {
+        const response = await fetch("php/scripts/obtenerLibrosDestacados.php");
+        const data = await response.json();
+        if (!response.ok || data.state !== "success") {
+            throw new Error(data.message || "No se pudieron cargar los libros destacados");
+        }
+
+        row.replaceChildren();
+        data.libros.forEach((book) => {
+            const card = document.createElement("a");
+            card.className = "card";
+            card.href = `book-detail.php?id=${encodeURIComponent(book.id)}`;
+            card.setAttribute("aria-label", `${book.titulo} — ${book.autor || "Autor desconocido"}`);
+            row.appendChild(card);
+            PortadasOL.aplicarPortada(card, book.titulo, book.autor, book.uid);
+        });
+    } catch (error) {
+        console.error("Error al cargar los libros destacados:", error);
+    }
+}
+
+loadFeaturedBooks();
+
 const cartBtn = document.getElementById("cartBtn");
 if (cartBtn) {
     cartBtn.addEventListener("click", function(){

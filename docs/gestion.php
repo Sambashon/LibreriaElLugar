@@ -78,6 +78,7 @@ $generos = array_column(
                 <th>Género</th>
                 <th>Precio</th>
                 <th>Stock</th>
+                <th>Destacado</th>
             </tr>
         </thead>
         <tbody id="tablaBody">
@@ -92,6 +93,7 @@ $generos = array_column(
                     <?= isset($libro['precio']) ? '$' . number_format((float)$libro['precio'], 2, ',', '.') : '—' ?>
                 </td>
                 <td class="stock"><?= htmlspecialchars($libro['stock'] ?? '0') ?></td>
+                <td class="destacado"><?= !empty($libro['destacado']) ? 'Sí' : 'No' ?></td>
                 <td class="acciones"><div title="Editar libro..." class="editBtn" data-id="<?= htmlspecialchars($libro['id_libro'] ?? $i + 1) ?>"><img src="Resources/icons/edit.svg" alt="Editar"></div></td>
             </tr>
             <?php endforeach; ?>
@@ -169,6 +171,12 @@ $generos = array_column(
                 </div>
             </div>
             <div class="form-group">
+                <label for="destacado">
+                    <input type="checkbox" id="destacado" name="destacado" value="1">
+                    Destacar en el inicio
+                </label>
+            </div>
+            <div class="form-group">
                 <label for="descripcion">Descripción</label>
                 <textarea id="descripcion" name="descripcion" rows="4" placeholder="Sinopsis, notas o información sobre el libro…"></textarea>
             </div>
@@ -192,6 +200,7 @@ $generos = array_column(
         'precio'      => (float)($l['precio']     ?? 0),
         'stock'       => (int)  ($l['stock']      ?? 0),
         'descripcion' =>        $l['descripcion'] ?? '',
+        'destacado'   => (bool) ($l['destacado'] ?? false),
     ], $libros), JSON_UNESCAPED_UNICODE) ?>;
 
     let editoriales = <?= json_encode(array_values($editoriales), JSON_UNESCAPED_UNICODE) ?>;
@@ -376,8 +385,9 @@ $generos = array_column(
             displayValue(libro.genero),
             formatPrecio(libro.precio),
             String(libro.stock),
+            libro.destacado ? 'Sí' : 'No',
         ];
-        const cellClasses = ['', 'titulo', '', '', '', 'precio', 'stock'];
+        const cellClasses = ['', 'titulo', '', '', '', 'precio', 'stock', 'destacado'];
 
         values.forEach((text, i) => {
             const td = document.createElement('td');
@@ -410,6 +420,7 @@ $generos = array_column(
         row.cells[4].textContent = displayValue(libro.genero);
         row.querySelector('.precio').textContent = formatPrecio(libro.precio);
         row.querySelector('.stock').textContent = libro.stock;
+        row.querySelector('.destacado').textContent = libro.destacado ? 'Sí' : 'No';
     }
 
     function appendTableRow(libro) {
@@ -463,6 +474,7 @@ $generos = array_column(
         document.getElementById('precio').value = libro?.precio ?? '';
         document.getElementById('stock').value = libro?.stock ?? '';
         document.getElementById('descripcion').value = libro?.descripcion ?? '';
+        document.getElementById('destacado').checked = Boolean(libro?.destacado);
     }
 
     function openPopUp(mode, id = null) {

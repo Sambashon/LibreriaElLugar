@@ -31,6 +31,7 @@ try {
         Response::error('Stock inválido', 400);
     }
     $stock = (int) $stockRaw;
+    $destacado = Request::getPost('destacado', '0') === '1' ? 1 : 0;
 
     $db = new LibreriaDB();
     $uid = BookUid::ensureExists($db, [
@@ -41,9 +42,9 @@ try {
     ]);
 
     $db->query(
-        "INSERT INTO libros (uid, titulo, autor, editorial, genero, precio, stock, descripcion, info_adicional)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $info_adicional]
+        "INSERT INTO libros (uid, titulo, autor, editorial, genero, precio, stock, descripcion, info_adicional, destacado)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $info_adicional, $destacado]
     );
 
     $idLibro = (int) $db->lastInsertId();
@@ -59,7 +60,8 @@ try {
             'precio'      => $precio,
             'stock'       => $stock,
             'descripcion' => $descripcion,
-            'info_adicional' => $info_adicional
+            'info_adicional' => $info_adicional,
+            'destacado' => (bool) $destacado,
         ],
     ]);
 } catch (Exception $e) {

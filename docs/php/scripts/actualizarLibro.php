@@ -35,6 +35,7 @@ try {
         Response::error('Stock inválido', 400);
     }
     $stock = (int) $stockRaw;
+    $destacado = Request::getPost('destacado', '0') === '1' ? 1 : 0;
 
     $db = new LibreriaDB();
 
@@ -55,9 +56,9 @@ try {
 
     $db->query(
         "UPDATE libros
-         SET uid = ?, titulo = ?, autor = ?, editorial = ?, genero = ?, precio = ?, stock = ?, descripcion = ?
+         SET uid = ?, titulo = ?, autor = ?, editorial = ?, genero = ?, precio = ?, stock = ?, descripcion = ?, destacado = ?
          WHERE id_libro = ?",
-        [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $idLibro]
+        [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $destacado, $idLibro]
     );
 
     Response::success('Libro actualizado correctamente', [
@@ -71,6 +72,7 @@ try {
             'precio'      => $precio,
             'stock'       => $stock,
             'descripcion' => $descripcion,
+            'destacado'   => (bool) $destacado,
         ],
     ]);
 } catch (Exception $e) {

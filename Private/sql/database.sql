@@ -40,6 +40,7 @@ CREATE TABLE libros (
     stock INT DEFAULT 0,
     descripcion TEXT,
     info_adicional TEXT,
+    destacado BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_libros_uid FOREIGN KEY (uid) REFERENCES libros_uid(uid)
 );
 
