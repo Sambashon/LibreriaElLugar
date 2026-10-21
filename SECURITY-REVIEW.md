@@ -18,6 +18,7 @@
 
 - **Severity:** Medium
 - **Confidence:** 8/10
+- **Status:** Fixed by encoding HTML-sensitive characters in the JSON embedded by `docs/catalogue.php`.
 - **Evidence:** `docs/php/clases/importador.php` lines 84 and 95–109 retains imported titles after checking only that they are non-empty. `docs/php/scripts/cargarLibros.php` lines 8–17 exposes the import flow to administrators. `docs/catalogue.php` lines 293–303 embeds the values in a script block using `json_encode` without escaping HTML-sensitive characters.
 - **Impact:** A malicious spreadsheet title containing a script-closing sequence such as `</script>` may terminate the script block and execute injected script in visitors' browsers after an administrator imports the file.
 - **Recommendation:** Escape `<` when embedding JSON in an HTML script element, use context-appropriate encoding, and avoid assembling HTML with unescaped catalogue values.
@@ -26,9 +27,12 @@
 
 - **Severity:** Medium
 - **Confidence:** 8/10
+- **Status:** Fixed by setting `Secure`, `HttpOnly`, and `SameSite=Lax` session cookie attributes, defaulting Docker to production, and limiting the direct HTTP port to localhost.
 - **Evidence:** `docs/php/clases/managers/SessionManager.php` lines 13–17 starts sessions without explicitly configuring cookie attributes. `Private/docker/docker-compose.yaml` lines 17–25 publishes Nginx on port `8080:80`; `Private/docker/nginx.conf` lines 1–3 and 13–18 serve HTTP without redirecting to HTTPS. `docs/php/config.php` lines 11 and 24–25 defaults `APP_ENV` to `development`.
 - **Impact:** If the published HTTP port is reachable, session cookies may be transmitted without transport encryption; PHP's default session cookie is not marked `Secure`.
 - **Recommendation:** Do not expose the HTTP origin directly; require HTTPS and configure session cookies with `Secure`, `HttpOnly`, and `SameSite` before starting the session.
+
+Set `APP_ENV=development` in the Compose environment only for local HTTP testing; the default is production mode.
 
 ## Areas reviewed without a confirmed finding
 

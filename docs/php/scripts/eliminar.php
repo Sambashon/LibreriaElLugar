@@ -1,7 +1,8 @@
 <?php
 
-require_once __DIR__ . "/../clases/usuario.php";
+require_once __DIR__ . "/../bootstrap.php";
 use App\Classes\Usuario;
+use App\Managers\SessionManager;
 header("Content-Type: application/json");
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -12,11 +13,11 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+$session = new SessionManager();
+$session->iniciar();
 
-if (!isset($_SESSION["id_usuario"])) {
+$idUsuario = $session->obtener("id_usuario");
+if ($idUsuario === null) {
     echo json_encode([
         "state" => "error",
         "message" => "Debes iniciar sesión"
@@ -37,7 +38,7 @@ if (!$password) {
 $usuario = new Usuario();
 
 $resultado = $usuario->eliminarUsuario(
-    (int) $_SESSION["id_usuario"],
+    (int) $idUsuario,
     $password
 );
 
