@@ -260,6 +260,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
                                         <option value="" selected disabled>Seleccioná una forma de pago</option>
                                         <option value="en_libreria">Pago en librería</option>
                                         <option value="transferencia_bancaria">Transferencia bancaria</option>
+                                        <option value="handy">Botón de pago Handy</option>
                                     </select>
                                 </div>
                             </div>
@@ -383,6 +384,10 @@ $checkoutEmail = (string) $session->obtener('email', '');
             toast.classList.add('show');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        if (new URLSearchParams(window.location.search).get('handy_return') === '1') {
+            showToast('Volviste de Handy. Te avisaremos cuando se confirme el pago.');
         }
 
         async function getSession() {
@@ -531,6 +536,13 @@ $checkoutEmail = (string) $session->obtener('email', '');
         const checkoutForm = document.getElementById('checkoutForm');
         const checkoutModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('checkoutModal'));
         const checkoutSubmit = document.getElementById('checkoutSubmit');
+        const checkoutPayment = document.getElementById('checkoutPayment');
+
+        checkoutPayment.addEventListener('change', () => {
+            checkoutSubmit.textContent = checkoutPayment.value === 'handy'
+                ? 'Pagar con Handy'
+                : 'Confirmar pedido';
+        });
 
         document.getElementById('openCheckoutModal').addEventListener('click', () => {
             checkoutModal.show();
@@ -553,8 +565,13 @@ $checkoutEmail = (string) $session->obtener('email', '');
                 if (!response.ok || data.state !== 'success') {
                     throw new Error(data.message || 'No se pudo confirmar el pedido');
                 }
+                if (data.checkout_url) {
+                    window.location.assign(data.checkout_url);
+                    return;
+                }
                 showToast(`Pedido confirmado. Te contactaremos para coordinar.`);
                 checkoutForm.reset();
+                checkoutSubmit.textContent = 'Confirmar pedido';
                 checkoutModal.hide();
                 renderCart([], 0);
                 try {

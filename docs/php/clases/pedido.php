@@ -18,7 +18,7 @@ class Pedido extends \LibreriaDB
         'cancelado',
     ];
 
-    public function crear(int $idUsuario, array $cliente): array
+    public function crear(int $idUsuario, array $cliente, ?callable $crearPagoHandy = null): array
     {
         $this->beginTransaction();
 
@@ -120,16 +120,48 @@ class Pedido extends \LibreriaDB
                 }
             }
 
+            if ($cliente['metodo_pago'] === 'handy') {
+                if ($crearPagoHandy === null) {
+                    throw new \RuntimeException('Falta configurar la creación del pago Handy');
+                }
+                $pago = $crearPagoHandy($idPedido, $totalCentavos, $items);
+                if (
+                    !is_array($pago)
+                    || !isset($pago['transaction_external_id'], $pago['url'])
+                    || !is_string($pago['transaction_external_id'])
+                    || !is_string($pago['url'])
+                ) {
+                    throw new \RuntimeException('Handy devolvió datos de pago inválidos');
+                }
+                $this->query(
+                    "UPDATE pedidos
+                     SET handy_transaction_external_id = :transaction_external_id,
+                         handy_payment_url = :payment_url,
+                         handy_payment_status = 'pending'
+                     WHERE id_pedido = :id_pedido",
+                    [
+                        'transaction_external_id' => $pago['transaction_external_id'],
+                        'payment_url' => $pago['url'],
+                        'id_pedido' => $idPedido,
+                    ]
+                );
+            }
+
             $this->query(
                 'DELETE FROM carrito_libros WHERE id_carrito = :id_carrito',
                 ['id_carrito' => $carrito['id_carrito']]
             );
             $this->commit();
 
-            return Result::success('Pedido registrado correctamente', [
+            $datos = [
                 'id_pedido' => $idPedido,
                 'total' => $this->aDecimal($totalCentavos),
-            ])->toArray();
+            ];
+            if ($cliente['metodo_pago'] === 'handy') {
+                $datos['checkout_url'] = $pago['url'];
+            }
+
+            return Result::success('Pedido registrado correctamente', $datos)->toArray();
         } catch (\Throwable $error) {
             $this->rollback();
             throw $error;
@@ -140,7 +172,7 @@ class Pedido extends \LibreriaDB
     {
         $pedidos = $this->fetchAll(
             "SELECT id_pedido, nombre_cliente, telefono, email, comentarios,
-                    tipo_entrega, metodo_pago, estado, total, fecha_creacion
+                    tipo_entrega, metodo_pago, handy_payment_status, estado, total, fecha_creacion
              FROM pedidos
              ORDER BY fecha_creacion DESC, id_pedido DESC"
         );
@@ -174,7 +206,8 @@ class Pedido extends \LibreriaDB
         $this->beginTransaction();
         try {
             $pedido = $this->fetch(
-                'SELECT estado FROM pedidos WHERE id_pedido = :id_pedido FOR UPDATE',
+                'SELECT estado, metodo_pago, handy_payment_status
+                 FROM pedidos WHERE id_pedido = :id_pedido FOR UPDATE',
                 ['id_pedido' => $idPedido]
             );
             if (!$pedido) {
@@ -183,9 +216,27 @@ class Pedido extends \LibreriaDB
             }
 
             $estadoActual = $pedido['estado'];
+            if (
+                $nuevoEstado === 'cancelado'
+                && $pedido['metodo_pago'] === 'handy'
+                && $pedido['handy_payment_status'] !== 'failed'
+            ) {
+                $this->rollback();
+                return Result::error(
+                    'No se puede cancelar un pedido Handy sin un pago fallido confirmado'
+                )->toArray();
+            }
             if ($estadoActual === $nuevoEstado) {
                 $this->commit();
                 return Result::success('El pedido ya tenía ese estado')->toArray();
+            }
+            if (
+                $pedido['metodo_pago'] === 'handy'
+                && $pedido['handy_payment_status'] !== 'paid'
+                && $nuevoEstado !== 'cancelado'
+            ) {
+                $this->rollback();
+                return Result::error('El pedido Handy solo puede avanzar con el pago confirmado')->toArray();
             }
             if ($estadoActual === 'entregado' || $estadoActual === 'cancelado') {
                 $this->rollback();
@@ -218,6 +269,64 @@ class Pedido extends \LibreriaDB
             $this->commit();
 
             return Result::success('Estado del pedido actualizado')->toArray();
+        } catch (\Throwable $error) {
+            $this->rollback();
+            throw $error;
+        }
+    }
+
+    public function actualizarPagoHandy(string $transactionId, int $status, int $totalCentavos): array
+    {
+        $estadosHandy = [
+            0 => 'pending',
+            1 => 'paid',
+            2 => 'failed',
+            3 => 'pending',
+        ];
+        if (!isset($estadosHandy[$status])) {
+            return Result::error('Estado de pago Handy inválido')->toArray();
+        }
+
+        $this->beginTransaction();
+        try {
+            $pedido = $this->fetch(
+                "SELECT id_pedido, metodo_pago, handy_payment_status, estado, total
+                 FROM pedidos
+                 WHERE handy_transaction_external_id = :transaction_id
+                 FOR UPDATE",
+                ['transaction_id' => $transactionId]
+            );
+            if (!$pedido || $pedido['metodo_pago'] !== 'handy') {
+                $this->rollback();
+                return Result::error('No se encontró el pago Handy', 404)->toArray();
+            }
+            if ($this->aCentavos((string) $pedido['total']) !== $totalCentavos) {
+                $this->rollback();
+                return Result::error('El monto notificado por Handy no coincide')->toArray();
+            }
+
+            $nuevoEstadoPago = $estadosHandy[$status];
+            $prioridad = ['not_applicable' => -1, 'pending' => 0, 'failed' => 1, 'paid' => 2];
+            $actualizar = $prioridad[$nuevoEstadoPago] > $prioridad[$pedido['handy_payment_status']];
+            if ($actualizar) {
+                $this->query(
+                    "UPDATE pedidos
+                     SET handy_payment_status = :payment_status,
+                         estado = CASE
+                             WHEN :is_paid = 'paid' AND estado = 'pendiente' THEN 'confirmado'
+                             ELSE estado
+                         END
+                     WHERE id_pedido = :id_pedido",
+                    [
+                        'payment_status' => $nuevoEstadoPago,
+                        'is_paid' => $nuevoEstadoPago,
+                        'id_pedido' => $pedido['id_pedido'],
+                    ]
+                );
+            }
+            $this->commit();
+
+            return Result::success('Notificación de pago Handy procesada')->toArray();
         } catch (\Throwable $error) {
             $this->rollback();
             throw $error;

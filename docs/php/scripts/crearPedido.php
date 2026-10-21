@@ -3,7 +3,7 @@
 require_once '../bootstrap.php';
 
 use App\Classes\Pedido;
-use App\Helpers\{Request, Response};
+use App\Helpers\{HandyPayment, Request, Response};
 use App\Managers\SessionManager;
 
 Request::requireMethod('POST');
@@ -49,21 +49,30 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $longitud($email) > 150) {
 if ($longitud($comentarios) > 2000) {
     Response::error('Los comentarios no pueden superar los 2000 caracteres');
 }
-if (!in_array($metodoPago, ['en_libreria', 'transferencia_bancaria'], true)) {
+if (!in_array($metodoPago, ['en_libreria', 'transferencia_bancaria', 'handy'], true)) {
     Response::error('Método de pago inválido');
 }
 
 try {
     $pedido = new Pedido();
+    $crearPagoHandy = $metodoPago === 'handy'
+        ? static fn (int $idPedido, int $totalCentavos, array $items): array =>
+            (new HandyPayment())->crearLink($idPedido, $totalCentavos, $items)
+        : null;
     $resultado = $pedido->crear((int) $idUsuario, [
         'nombre' => $nombre,
         'telefono' => $telefono,
         'email' => $email,
         'comentarios' => $comentarios,
         'metodo_pago' => $metodoPago,
-    ]);
+    ], $crearPagoHandy);
     Response::json($resultado, $resultado['state'] === 'success' ? 201 : 400);
 } catch (Throwable $error) {
-    error_log('No se pudo registrar el pedido: ' . $error->getMessage());
-    Response::error('No se pudo registrar el pedido. Intentá nuevamente.', 500);
+    error_log('No se pudo procesar el pedido: ' . $error->getMessage());
+    Response::error(
+        $metodoPago === 'handy'
+            ? 'No se pudo iniciar el pago con Handy. No se registró el pedido; intentá nuevamente.'
+            : 'No se pudo registrar el pedido. Intentá nuevamente.',
+        500
+    );
 }
