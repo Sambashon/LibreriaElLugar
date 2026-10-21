@@ -41,6 +41,10 @@ services:
       DB_PORT: ${DB_PORT}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      APP_BASE_URL: ${APP_BASE_URL:-}
+      HANDY_API_BASE_URL: ${HANDY_API_BASE_URL:-https://api.payments.arriba.uy/api/v2}
+      HANDY_MERCHANT_SECRET_KEY: ${HANDY_MERCHANT_SECRET_KEY:-}
+      HANDY_TAX_RATE: ${HANDY_TAX_RATE:-22}
       COVER_UPLOAD_DIR: /var/lib/el-lugar/portadas
     volumes:
       - ../../docs:/var/www/html

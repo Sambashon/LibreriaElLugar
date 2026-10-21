@@ -66,7 +66,14 @@ $escapar = static fn ($value): string => htmlspecialchars((string) $value, ENT_Q
                         <?php
                         $estado = $pedido['estado'];
                         $destino = $siguientesEstados[$estado] ?? null;
-                        $puedeCancelar = !in_array($estado, ['entregado', 'cancelado'], true);
+                        if (
+                            $pedido['metodo_pago'] === 'handy'
+                            && $pedido['handy_payment_status'] !== 'paid'
+                        ) {
+                            $destino = null;
+                        }
+                        $puedeCancelar = !in_array($estado, ['entregado', 'cancelado'], true)
+                            && ($pedido['metodo_pago'] !== 'handy' || $pedido['handy_payment_status'] === 'failed');
                         ?>
                         <tr>
                             <td>
@@ -93,7 +100,18 @@ $escapar = static fn ($value): string => htmlspecialchars((string) $value, ENT_Q
                             </td>
                             <td>
                                 <span>Retiro en librería</span>
-                                <span><?= $pedido['metodo_pago'] === 'transferencia_bancaria' ? 'Transferencia bancaria' : 'Pago en librería' ?></span>
+                                <?php if ($pedido['metodo_pago'] === 'handy'): ?>
+                                    <span>Botón de pago Handy</span>
+                                    <span>
+                                        <?= match ($pedido['handy_payment_status']) {
+                                            'paid' => 'Pago confirmado',
+                                            'failed' => 'Pago fallido',
+                                            default => 'Pago pendiente',
+                                        } ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span><?= $pedido['metodo_pago'] === 'transferencia_bancaria' ? 'Transferencia bancaria' : 'Pago en librería' ?></span>
+                                <?php endif; ?>
                             </td>
                             <td class="precio">$<?= number_format((float) $pedido['total'], 2, ',', '.') ?></td>
                             <td>

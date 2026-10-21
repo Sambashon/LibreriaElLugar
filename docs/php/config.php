@@ -24,3 +24,9 @@ define('RESPONSE_DEFAULT_CONTENT_TYPE', 'application/json');
 // Ambiente
 define('APP_ENV', getenv('APP_ENV') ?: 'development');
 define('APP_DEBUG', getenv('APP_DEBUG') === 'true');
+
+// Handy payment configuration
+define('HANDY_API_BASE_URL', getenv('HANDY_API_BASE_URL') ?: 'https://api.payments.arriba.uy/api/v2');
+define('HANDY_MERCHANT_SECRET_KEY', getenv('HANDY_MERCHANT_SECRET_KEY') ?: '');
+define('APP_BASE_URL', rtrim(getenv('APP_BASE_URL') ?: '', '/'));
+define('HANDY_TAX_RATE', getenv('HANDY_TAX_RATE') !== false ? getenv('HANDY_TAX_RATE') : '22');

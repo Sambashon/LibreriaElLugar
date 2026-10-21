@@ -87,7 +87,11 @@ CREATE TABLE pedidos (
     email VARCHAR(150) NOT NULL,
     comentarios TEXT NULL,
     tipo_entrega ENUM('retiro_en_libreria') NOT NULL DEFAULT 'retiro_en_libreria',
-    metodo_pago ENUM('en_libreria', 'transferencia_bancaria') NOT NULL,
+    metodo_pago ENUM('en_libreria', 'transferencia_bancaria', 'handy') NOT NULL,
+    handy_transaction_external_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NULL UNIQUE,
+    handy_payment_url VARCHAR(2048) NULL,
+    handy_payment_status ENUM('not_applicable', 'pending', 'paid', 'failed')
+        NOT NULL DEFAULT 'not_applicable',
     estado ENUM(
         'pendiente',
         'confirmado',
