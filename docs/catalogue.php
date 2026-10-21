@@ -330,6 +330,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
         });
         let   activeGenres   = new Set();
         let   filteredLibros = [...librosDB];
+        const CATALOGUE_FILTERS_KEY = 'catalogueFilters';
 
         const catalogueView   = document.getElementById('catalogueView');
         const cartView        = document.getElementById('cartView');
@@ -339,6 +340,19 @@ $checkoutEmail = (string) $session->obtener('email', '');
         const productShell    = document.querySelector('.product-shell');
         const mainWrapper     = document.querySelector('.main-wrapper');
         let toastTimer = null;
+
+        function scrollCatalogueToTop() {
+            if (window.matchMedia('(max-width: 767px)').matches) {
+                const topbarHeight = document.querySelector('.mobile-topbar')?.offsetHeight ?? 0;
+                window.scrollTo({
+                    top: Math.max(0, window.scrollY + productShell.getBoundingClientRect().top - topbarHeight),
+                    behavior: 'smooth'
+                });
+                return;
+            }
+
+            mainWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         const COVER_COLORS = ['#2a6644', '#2a5c40', '#1e4a35', '#2f5e45', '#234d38', '#335c43', '#244d38', '#355f48'];
 
@@ -663,7 +677,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
             body.style.opacity = '0';
             setTimeout(() => {
                 renderPage();
-                document.querySelector('.main-wrapper').scrollTo({ top: 0 });
+                scrollCatalogueToTop();
                 body.style.opacity = '1';
             }, 200);
         }
@@ -690,6 +704,47 @@ $checkoutEmail = (string) $session->obtener('email', '');
         }
 
         renderGenres(genres);
+
+        function saveCatalogueFilters() {
+            sessionStorage.setItem(CATALOGUE_FILTERS_KEY, JSON.stringify({
+                genres: [...activeGenres],
+                priceMin: document.getElementById('priceMin').value,
+                priceMax: document.getElementById('priceMax').value,
+                stock: document.getElementById('filterStock').checked,
+                agotado: document.getElementById('filterAgotado').checked,
+                search: document.getElementById('searchInput').value,
+                sort: document.getElementById('sortSelect').value,
+                genreSearch: document.querySelector('.filter-search input').value
+            }));
+        }
+
+        function restoreCatalogueFilters() {
+            const saved = sessionStorage.getItem(CATALOGUE_FILTERS_KEY);
+            if (!saved) return false;
+
+            sessionStorage.removeItem(CATALOGUE_FILTERS_KEY);
+            const state = JSON.parse(saved);
+            if (!state || typeof state !== 'object') return false;
+
+            activeGenres = new Set(
+                Array.isArray(state.genres) ? state.genres.filter(genre => genres.includes(genre)) : []
+            );
+            document.getElementById('priceMin').value = state.priceMin ?? '';
+            document.getElementById('priceMax').value = state.priceMax ?? '';
+            document.getElementById('filterStock').checked = state.stock !== false;
+            document.getElementById('filterAgotado').checked = state.agotado === true;
+            document.getElementById('searchInput').value = state.search ?? '';
+
+            const sortSelect = document.getElementById('sortSelect');
+            if ([...sortSelect.options].some(option => option.value === state.sort)) {
+                sortSelect.value = state.sort;
+            }
+
+            const genreSearch = document.querySelector('.filter-search input');
+            genreSearch.value = state.genreSearch ?? '';
+            filterGenres(genreSearch.value);
+            return true;
+        }
 
         // ── RENDER CARDS ────────────────────────────────────────────
         function renderPage() {
@@ -729,6 +784,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
                         addToCart(book.id, 1);
                         return;
                     }
+                    saveCatalogueFilters();
                     window.location.href = `book-detail.php?id=${encodeURIComponent(book.id)}`;
                 });
                 body.appendChild(card);
@@ -743,6 +799,8 @@ $checkoutEmail = (string) $session->obtener('email', '');
             const total   = Math.ceil(filteredLibros.length / PER_PAGE);
             const footer  = document.getElementById('footerPages');
             footer.innerHTML = '';
+            footer.hidden = total <= 1;
+            productShell.classList.toggle('has-pagination', total > 1);
 
             if (total <= 1) return;
 
@@ -758,7 +816,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
                     setTimeout(() => {
                         currentPage = page;
                         renderPage();
-                        document.querySelector('.main-wrapper').scrollTo({ top: 0 });
+                        scrollCatalogueToTop();
                         body.style.opacity = '1';
                     }, 200);
                 };
@@ -809,22 +867,30 @@ $checkoutEmail = (string) $session->obtener('email', '');
         }
 
         // ── ARRANCAR ────────────────────────────────────────────────
-        const catalogueSearch = sessionStorage.getItem('catalogueSearch');
-        if (catalogueSearch) {
-            document.getElementById('searchInput').value = catalogueSearch;
-            sessionStorage.removeItem('catalogueSearch');
-        }
-        applyFilters();
-        
-        // Apply initial search if provided
-        if ('<?= $initialSearch ?>') {
-            document.getElementById('searchInput').value = '<?= $initialSearch ?>';
+        if (restoreCatalogueFilters()) {
             applyFilters();
+        } else {
+            const catalogueSearch = sessionStorage.getItem('catalogueSearch');
+            if (catalogueSearch) {
+                document.getElementById('searchInput').value = catalogueSearch;
+                sessionStorage.removeItem('catalogueSearch');
+            }
+            applyFilters();
+
+            // Apply initial search if provided
+            if ('<?= $initialSearch ?>') {
+                document.getElementById('searchInput').value = '<?= $initialSearch ?>';
+                applyFilters();
+            }
         }
 
         //para hacer funcionar mi reset
         document.querySelector('.catalogue-searchbar').addEventListener('reset', () => {
             setTimeout(() => applyFilters(), 0);
+        });
+
+        window.addEventListener('pageshow', event => {
+            if (event.persisted) sessionStorage.removeItem(CATALOGUE_FILTERS_KEY);
         });
 
         const viewParam = new URLSearchParams(window.location.search).get('view');

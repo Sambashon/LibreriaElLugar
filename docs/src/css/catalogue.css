@@ -523,6 +523,10 @@ h3{
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
+.footer-pages[hidden] {
+    display: none;
+}
+
 .page-btn {
     width: 32px;
     height: 32px;
@@ -792,22 +796,34 @@ h3{
 
     /* Touch: always show the cart button */
     .product-card .card-btn {
+        display: none;
         opacity: 1;
         transform: translateY(0);
         font-size: 9px;
         padding: 5px;
     }
     /* Lift price above the always-visible btn */
-    .product-card .card-price { bottom: 28px; left: unset; right: 10px;}
+    .product-card .card-price { bottom: 10px; left: unset; right: 10px;}
 
     /* Slightly smaller title on small cards */
     .product-card .card-title { font-size: 13px; }
     .product-card .card-author { font-size: 11px; }
 
     /* ── Pagination ── */
+    .product-shell.has-pagination {
+        padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+    }
     .footer-pages {
-        padding: 0.5rem 0 1.5rem;
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 890;
+        box-sizing: border-box;
+        padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px));
         flex-wrap: wrap;
+        background-color: #1a4d2e;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
     }
     .page-btn {
         width: 36px;
@@ -823,7 +839,7 @@ h3{
     }
     .product-card { height: 245px; }
     .product-card .card-cover { height: 165px; }
-    .product-card .card-price { bottom: 28px; }
+    .product-card .card-price { bottom: -10px; }
 }
 
 /* ── CART VIEW ── */
