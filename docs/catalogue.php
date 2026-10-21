@@ -300,7 +300,7 @@ $checkoutEmail = (string) $session->obtener('email', '');
             'precio'      => (float)$l['precio'],
             'stock'       => (int)  $l['stock'],
             'descripcion' =>        $l['descripcion'] ?? '',
-        ], $libros), JSON_UNESCAPED_UNICODE) ?>;
+        ], $libros), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR) ?>;
 
         // Géneros únicos extraídos de la DB
         const genres = [...new Set(

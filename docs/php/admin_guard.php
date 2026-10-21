@@ -1,10 +1,10 @@
 <?php
 
+require_once __DIR__ . '/bootstrap.php';
+
 function requireAdmin(bool $jsonResponse = true): void
 {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    (new \App\Managers\SessionManager())->iniciar();
 
     if (isset($_SESSION['id_usuario']) && filter_var($_SESSION['admin'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
         return;

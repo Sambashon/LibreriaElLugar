@@ -13,6 +13,13 @@ class SessionManager
     public function iniciar(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => COOKIE_PATH,
+                'secure' => COOKIE_SECURE,
+                'httponly' => COOKIE_HTTPONLY,
+                'samesite' => COOKIE_SAMESITE,
+            ]);
             session_start();
         }
     }
@@ -76,11 +83,14 @@ class SessionManager
             setcookie(
                 session_name(),
                 '',
-                time() - 42000,
-                $params['path'],
-                $params['domain'],
-                $params['secure'],
-                $params['httponly']
+                [
+                    'expires' => time() - 42000,
+                    'path' => $params['path'],
+                    'domain' => $params['domain'],
+                    'secure' => $params['secure'],
+                    'httponly' => $params['httponly'],
+                    'samesite' => $params['samesite'],
+                ]
             );
         }
 
