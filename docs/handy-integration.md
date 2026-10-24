@@ -24,3 +24,12 @@ Las instalaciones nuevas reciben las columnas desde `Private/sql/database.sql`. 
 ## Notificaciones
 
 El endpoint público `POST /php/scripts/handyWebhook.php` procesa los estados documentados por Handy (iniciado, exitoso, fallido y pendiente). Comprueba el identificador externo, la moneda y el monto frente al pedido persistido, y no permite que una notificación posterior revierta un pago ya confirmado. Mantener el sitio y el endpoint disponibles por HTTPS. Los pedidos con pago pendiente o exitoso no se pueden cancelar desde la gestión; los pagos fallidos sí permiten cancelar y reponer stock. Las devoluciones de Handy no forman parte de esta integración.
+
+## Prueba y confirmación
+
+1. Para la prueba, configurar la clave y la URL API del ambiente de pruebas de Handy. `APP_BASE_URL` debe ser la URL HTTPS pública del sitio; el backend envía a Handy el callback completo al crear cada pago.
+2. Aplicar la migración si la base de datos ya existía y crear un pedido eligiendo **Botón de pago Handy**.
+3. Completar el pago de prueba siguiendo las tarjetas y pasos del manual oficial. Handy notificará el resultado al callback; no se debe tomar el regreso del navegador como comprobante de pago.
+4. En la gestión de pedidos, verificar que el pago pase de **Pago pendiente** a **Pago confirmado** y que el pedido pase a **Confirmado**. Un pago pendiente de Redpagos continúa pendiente hasta recibir una notificación exitosa.
+
+Si no cambia el estado, comprobar que el callback puede recibirse desde Internet por HTTPS, que la migración fue aplicada y que `HANDY_MERCHANT_SECRET_KEY` y `HANDY_API_BASE_URL` corresponden al mismo ambiente. El endpoint responde con error si el identificador del pedido no existe o si el monto o la moneda notificados no coinciden; ante un HTTP 500, revisar los logs de PHP, y ante otros códigos no exitosos, revisar los logs de acceso del servidor y la entrega de notificaciones en Handy.

@@ -54,7 +54,7 @@ try {
         (int) $status,
         $totalCentavos
     );
-    Response::json($resultado, $resultado['state'] === 'success' ? 200 : 400);
+    Response::json($resultado->toArray(), $resultado->httpCode);
 } catch (Throwable $error) {
     error_log('No se pudo procesar la notificación de Handy: ' . $error->getMessage());
     Response::error('No se pudo procesar la notificación de pago', 500);
