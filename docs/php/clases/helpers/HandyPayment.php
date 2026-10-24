@@ -42,8 +42,8 @@ class HandyPayment
             $productos[] = [
                 'Name' => (string) $item['titulo'],
                 'Quantity' => $cantidad,
-                'Amount' => $this->aDecimal($montoCentavos),
-                'TaxedAmount' => $this->aDecimal($gravadoUnitarioCentavos),
+                'Amount' => $this->aNumero($montoCentavos),
+                'TaxedAmount' => $this->aNumero($gravadoUnitarioCentavos),
             ];
         }
         if (!$productos || $totalCentavos < 1) {
@@ -55,13 +55,13 @@ class HandyPayment
             'Cart' => [
                 'InvoiceNumber' => $idPedido,
                 'Currency' => 858,
-                'TotalAmount' => $this->aDecimal($totalCentavos),
-                'TaxedAmount' => $this->aDecimal($totalGravadoCentavos),
+                'TotalAmount' => $this->aNumero($totalCentavos),
+                'TaxedAmount' => $this->aNumero($totalGravadoCentavos),
                 'TransactionExternalId' => $transactionId,
                 'Products' => $productos,
             ],
             'Client' => [
-                'CommerceName' => 'Librería El Lugar',
+                'CommerceName' => 'LIBRERIA EL LUGAR',
                 'SiteUrl' => APP_BASE_URL . '/catalogue.php?handy_return=1',
             ],
             'CallbackURL' => APP_BASE_URL . '/php/scripts/handyWebhook.php',
@@ -226,5 +226,14 @@ class HandyPayment
     private function aDecimal(int $centavos): string
     {
         return intdiv($centavos, 100) . '.' . str_pad((string) ($centavos % 100), 2, '0', STR_PAD_LEFT);
+    }
+
+    private function aNumero(int $centavos): int|float
+    {
+        if ($centavos % 100 === 0) {
+            return intdiv($centavos, 100);
+        }
+
+        return $centavos / 100;
     }
 }

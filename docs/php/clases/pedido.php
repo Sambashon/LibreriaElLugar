@@ -275,7 +275,7 @@ class Pedido extends \LibreriaDB
         }
     }
 
-    public function actualizarPagoHandy(string $transactionId, int $status, int $totalCentavos): array
+    public function actualizarPagoHandy(string $transactionId, int $status, int $totalCentavos): Result
     {
         $estadosHandy = [
             0 => 'pending',
@@ -284,7 +284,7 @@ class Pedido extends \LibreriaDB
             3 => 'pending',
         ];
         if (!isset($estadosHandy[$status])) {
-            return Result::error('Estado de pago Handy inválido')->toArray();
+            return Result::error('Estado de pago Handy inválido');
         }
 
         $this->beginTransaction();
@@ -298,11 +298,11 @@ class Pedido extends \LibreriaDB
             );
             if (!$pedido || $pedido['metodo_pago'] !== 'handy') {
                 $this->rollback();
-                return Result::error('No se encontró el pago Handy', 404)->toArray();
+                return Result::error('No se encontró el pago Handy', 404);
             }
             if ($this->aCentavos((string) $pedido['total']) !== $totalCentavos) {
                 $this->rollback();
-                return Result::error('El monto notificado por Handy no coincide')->toArray();
+                return Result::error('El monto notificado por Handy no coincide');
             }
 
             $nuevoEstadoPago = $estadosHandy[$status];
@@ -326,7 +326,7 @@ class Pedido extends \LibreriaDB
             }
             $this->commit();
 
-            return Result::success('Notificación de pago Handy procesada')->toArray();
+            return Result::success('Notificación de pago Handy procesada');
         } catch (\Throwable $error) {
             $this->rollback();
             throw $error;
