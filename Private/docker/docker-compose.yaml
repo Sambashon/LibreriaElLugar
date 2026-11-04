@@ -19,7 +19,7 @@ services:
     container_name: nginx_web
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8080:80"
+      - "8080:80"
     volumes:
       - ../../docs:/var/www/html
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
@@ -41,11 +41,6 @@ services:
       DB_PORT: ${DB_PORT}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      APP_ENV: ${APP_ENV:-production}
-      APP_BASE_URL: ${APP_BASE_URL:-}
-      HANDY_API_BASE_URL: ${HANDY_API_BASE_URL:-https://api.payments.arriba.uy/api/v2}
-      HANDY_MERCHANT_SECRET_KEY: ${HANDY_MERCHANT_SECRET_KEY:-}
-      HANDY_TAX_RATE: ${HANDY_TAX_RATE:-22}
       COVER_UPLOAD_DIR: /var/lib/el-lugar/portadas
     volumes:
       - ../../docs:/var/www/html
@@ -69,7 +64,15 @@ services:
       - ../sql:/docker-entrypoint-initdb.d
     networks:
       - app-network
-
+  cloudflare-ddns:
+    image: favonia/cloudflare-ddns:1
+    container_name: cloudflare-ddns
+    restart: unless-stopped
+    environment:
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+      DOMAINS: libreriaellugar.uy,www.libreriaellugar.uy
+      IP6_PROVIDER: none
+      
 volumes:
   mariadb_data:
   portadas_data:
