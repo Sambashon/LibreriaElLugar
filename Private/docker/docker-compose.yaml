@@ -64,15 +64,7 @@ services:
       - ../sql:/docker-entrypoint-initdb.d
     networks:
       - app-network
-  cloudflare-ddns:
-    image: favonia/cloudflare-ddns:1
-    container_name: cloudflare-ddns
-    restart: unless-stopped
-    environment:
-      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
-      DOMAINS: libreriaellugar.uy,www.libreriaellugar.uy
-      IP6_PROVIDER: none
-      
+
 volumes:
   mariadb_data:
   portadas_data:
