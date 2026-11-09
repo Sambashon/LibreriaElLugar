@@ -17,6 +17,6 @@ try {
 
     $carrito = new Carrito();
     Response::json($carrito->listar((int) $idUsuario));
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudo obtener el carrito', 'No se pudo cargar el carrito.');
 }

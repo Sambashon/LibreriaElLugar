@@ -5,13 +5,14 @@ namespace App\Classes;
 require_once __DIR__ . "/libreriaDb.php";
 require_once __DIR__ . "/../bootstrap.php";
 
-use App\Managers\{SessionManager, TokenManager};
+use App\Managers\{LoginRateLimiter, SessionManager, TokenManager};
 use App\Helpers\Result;
 
 class Usuario extends \LibreriaDB
 {
     private SessionManager $sessionManager;
     private TokenManager $tokenManager;
+    private LoginRateLimiter $loginRateLimiter;
 
     public function __construct(
         ?SessionManager $sessionManager = null,
@@ -20,6 +21,7 @@ class Usuario extends \LibreriaDB
         parent::__construct();
         $this->sessionManager = $sessionManager ?? new SessionManager();
         $this->tokenManager = $tokenManager ?? new TokenManager();
+        $this->loginRateLimiter = new LoginRateLimiter($this);
     }
     /**
      * Verifica si un nombre de usuario y email están disponibles
@@ -72,6 +74,10 @@ class Usuario extends \LibreriaDB
         string $password,
         string $email
     ): array {
+        if (strlen($password) < 8 || strlen($password) > 1024) {
+            return Result::error('La contraseña debe tener entre 8 y 1024 caracteres')->toArray();
+        }
+
         // Verificar si email ya existe
         if ($this->emailExiste($email)) {
             return Result::error("El email ya está registrado")->toArray();
@@ -128,6 +134,13 @@ class Usuario extends \LibreriaDB
         string $email,
         string $password
     ): array {
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        if ($this->loginRateLimiter->isBlocked($email, $ipAddress)) {
+            return Result::error(
+                'Demasiados intentos. Esperá 15 minutos e intentá nuevamente.',
+                429
+            )->toArray();
+        }
 
         $usuarioDB = $this->fetch(
             "SELECT *
@@ -139,6 +152,7 @@ class Usuario extends \LibreriaDB
         );
 
         if (!$usuarioDB) {
+            $this->loginRateLimiter->recordFailure($email, $ipAddress);
             return Result::error("Credenciales inválidas")->toArray();
         }
 
@@ -148,9 +162,11 @@ class Usuario extends \LibreriaDB
                 $usuarioDB["password"]
             )
         ) {
+            $this->loginRateLimiter->recordFailure($email, $ipAddress);
             return Result::error("Credenciales inválidas")->toArray();
         }
 
+        $this->loginRateLimiter->clearEmail($email);
         unset($usuarioDB["password"]);
 
         // Usar SessionManager para iniciar sesión
@@ -167,7 +183,10 @@ class Usuario extends \LibreriaDB
 
         return Result::success(
             "Login exitoso",
-            ["user" => $usuarioDB]
+            [
+                "user" => $usuarioDB,
+                "csrf_token" => $this->sessionManager->obtenerCsrfToken(),
+            ]
         )->toArray();
     }
 

@@ -17,6 +17,6 @@ try {
     $db->execute("SET FOREIGN_KEY_CHECKS = 1");
 
     Response::success('Todos los libros fueron eliminados');
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudieron eliminar los libros', 'No se pudieron eliminar los libros.');
 }

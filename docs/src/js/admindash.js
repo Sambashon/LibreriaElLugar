@@ -1,7 +1,10 @@
 document.getElementById("adminLogoutBtn")?.addEventListener("click", async () => {
     try {
+        const body = new FormData();
+        body.set("csrf_token", document.querySelector('meta[name="csrf-token"]').content);
         const response = await fetch("php/scripts/logout.php", {
-            method: "POST"
+            method: "POST",
+            body
         });
         const result = await response.json();
 

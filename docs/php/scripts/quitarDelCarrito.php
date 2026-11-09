@@ -25,6 +25,6 @@ try {
 
     $carrito = new Carrito();
     Response::json($carrito->quitarLibro((int) $idUsuario, $idLibro));
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudo quitar el libro del carrito', 'No se pudo actualizar el carrito.');
 }

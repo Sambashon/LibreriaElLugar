@@ -25,6 +25,6 @@ try {
 
     $favoritos = new Favoritos();
     Response::json($favoritos->agregarLibro((int) $idUsuario, $idLibro));
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudo agregar el favorito', 'No se pudo actualizar favoritos.');
 }

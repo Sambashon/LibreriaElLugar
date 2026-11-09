@@ -22,6 +22,6 @@ try {
     }
 
     Response::success('Libro eliminado correctamente');
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudo eliminar el libro', 'No se pudo eliminar el libro.');
 }

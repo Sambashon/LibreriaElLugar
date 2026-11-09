@@ -21,6 +21,9 @@ try {
         'insertados' => $resultado['insertados'],
         'errores' => $resultado['errores']
     ]);
-} catch (RuntimeException $e) {
-    Response::error($e->getMessage());
+} catch (InvalidArgumentException $error) {
+    Response::error($error->getMessage(), 400);
+} catch (Throwable $error) {
+    error_log('No se pudo importar el archivo de libros: ' . $error->getMessage());
+    Response::error('No se pudo procesar el archivo de importación.', 500);
 }

@@ -2,7 +2,7 @@
 
 require_once __DIR__ . "/../bootstrap.php";
 
-use App\Helpers\Search;
+use App\Helpers\{Response, Search};
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -43,11 +43,6 @@ try {
     ], JSON_UNESCAPED_UNICODE);
     exit;
     
-} catch (Exception $e) {
-    http_response_code(400);
-    echo json_encode([
-        'state' => 'error',
-        'message' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudieron buscar libros', 'No se pudieron buscar libros.');
 }

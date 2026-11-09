@@ -14,6 +14,7 @@ class Response
     {
         http_response_code($httpCode);
         header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store, private');
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -44,5 +45,11 @@ class Response
         }
 
         self::json($response, $httpCode);
+    }
+
+    public static function serverError(\Throwable $error, string $context, string $message = 'Ocurrió un error interno.'): never
+    {
+        error_log($context . ': ' . $error->getMessage());
+        self::error($message, 500);
     }
 }

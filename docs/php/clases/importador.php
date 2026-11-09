@@ -124,28 +124,45 @@ class Importador extends LibreriaDB
      */
     public function verificarArchivos(array $file): bool
     {
-        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-        if (!in_array($ext, ['xlsx', 'xls', 'csv'])) {
-            throw new RuntimeException("Extensión inválida");
+        if (
+            !isset($file['error'], $file['size'], $file['tmp_name'], $file['name'])
+            || $file['error'] !== UPLOAD_ERR_OK
+            || !is_uploaded_file($file['tmp_name'])
+            || (int) $file['size'] < 1
+            || (int) $file['size'] > 8 * 1024 * 1024
+        ) {
+            throw new \InvalidArgumentException('El archivo debe tener un tamaño máximo de 8 MB.');
+        }
+        $actualSize = filesize($file['tmp_name']);
+        if ($actualSize === false || $actualSize < 1 || $actualSize > 8 * 1024 * 1024) {
+            throw new \InvalidArgumentException('El archivo debe tener un tamaño máximo de 8 MB.');
         }
 
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($ext, ['xlsx', 'xls', 'csv'], true)) {
+            throw new \InvalidArgumentException("Extensión inválida");
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($file['tmp_name']);
 
         $validos = [
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/vnd.ms-excel',
-            'text/csv'
+            'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip'],
+            'xls' => ['application/vnd.ms-excel', 'application/x-ole-storage'],
+            'csv' => ['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'],
         ];
 
-        if (!in_array($mime, $validos)) {
-            throw new RuntimeException("Tipo MIME inválido");
+        if (!in_array($mime, $validos[$ext], true)) {
+            throw new \InvalidArgumentException("Tipo MIME inválido");
         }
 
         // validación real del archivo
-        IOFactory::load($file['tmp_name']);
+        try {
+            IOFactory::load($file['tmp_name']);
+        } catch (\Throwable $error) {
+            throw new \InvalidArgumentException('El archivo no contiene una planilla válida.', 0, $error);
+        }
 
         return true;
     }

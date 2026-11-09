@@ -16,6 +16,25 @@ class Request
         if ($_SERVER['REQUEST_METHOD'] !== strtoupper($method)) {
             Response::error('Método no permitido', 405);
         }
+
+        if (in_array(strtoupper($method), ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
+            self::requireCsrfToken();
+        }
+    }
+
+    public static function requireCsrfToken(): void
+    {
+        $session = new \App\Managers\SessionManager();
+        $expected = $session->obtenerCsrfToken();
+        $provided = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? $_POST['csrf_token'] ?? '';
+
+        if (
+            !is_string($provided)
+            || $provided === ''
+            || !hash_equals($expected, $provided)
+        ) {
+            Response::error('La solicitud expiró. Recarga la página e inténtalo nuevamente.', 403);
+        }
     }
 
     /**

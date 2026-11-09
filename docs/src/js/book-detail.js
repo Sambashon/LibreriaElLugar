@@ -8,6 +8,7 @@ let detailQuantity = Number(quantityValue.textContent) || 1;
 let quantityReady = false;
 let quantitySyncSequence = 0;
 let toastTimer = null;
+let csrfToken = null;
 
 function formatPrice(value) {
     return '$' + Number(value).toLocaleString('es-AR');
@@ -30,7 +31,9 @@ function updateWishlistButton() {
 
 async function getSession() {
     const response = await fetch('php/scripts/sesion.php', { credentials: 'same-origin' });
-    return response.json();
+    const session = await response.json();
+    csrfToken = session.csrf_token || csrfToken;
+    return session;
 }
 
 async function requireLogin(message) {
@@ -41,7 +44,9 @@ async function requireLogin(message) {
 }
 
 async function postLibro(url, idLibro, extra = {}) {
+    if (!csrfToken) await getSession();
     const body = new FormData();
+    body.append('csrf_token', csrfToken);
     body.append('id_libro', String(idLibro));
     Object.entries(extra).forEach(([key, value]) => body.append(key, String(value)));
 

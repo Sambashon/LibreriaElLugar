@@ -390,9 +390,12 @@ $checkoutEmail = (string) $session->obtener('email', '');
             showToast('Volviste de Handy. Te avisaremos cuando se confirme el pago.');
         }
 
+        let csrfToken = null;
         async function getSession() {
             const res = await fetch('php/scripts/sesion.php', { credentials: 'same-origin' });
-            return res.json();
+            const session = await res.json();
+            csrfToken = session.csrf_token || csrfToken;
+            return session;
         }
 
         async function requireLogin(message) {
@@ -403,7 +406,9 @@ $checkoutEmail = (string) $session->obtener('email', '');
         }
 
         async function postLibro(url, idLibro, extra = {}) {
+            if (!csrfToken) await getSession();
             const body = new FormData();
+            body.append('csrf_token', csrfToken);
             body.append('id_libro', String(idLibro));
             Object.entries(extra).forEach(([k, v]) => body.append(k, String(v)));
             const res = await fetch(url, { method: 'POST', body, credentials: 'same-origin' });
@@ -556,9 +561,12 @@ $checkoutEmail = (string) $session->obtener('email', '');
             }
             checkoutSubmit.disabled = true;
             try {
+                if (!csrfToken) await getSession();
+                const body = new FormData(checkoutForm);
+                body.set('csrf_token', csrfToken);
                 const response = await fetch('php/scripts/crearPedido.php', {
                     method: 'POST',
-                    body: new FormData(checkoutForm),
+                    body,
                     credentials: 'same-origin'
                 });
                 const data = await response.json();

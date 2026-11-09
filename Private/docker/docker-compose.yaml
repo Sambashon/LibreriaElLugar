@@ -36,6 +36,7 @@ services:
     container_name: php_fpm
     restart: unless-stopped
     environment:
+      APP_ENV: ${APP_ENV:-production}
       DB_HOST: ${DB_HOST}
       DB_NAME: ${DB_NAME}
       DB_PORT: ${DB_PORT}

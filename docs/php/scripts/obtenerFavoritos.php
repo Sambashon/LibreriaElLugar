@@ -17,6 +17,6 @@ try {
 
     $favoritos = new Favoritos();
     Response::json($favoritos->listar((int) $idUsuario));
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudieron obtener los favoritos', 'No se pudieron cargar los favoritos.');
 }

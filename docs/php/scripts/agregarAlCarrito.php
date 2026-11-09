@@ -28,6 +28,6 @@ try {
 
     $carrito = new Carrito();
     Response::json($carrito->agregarLibro((int) $idUsuario, $idLibro, $cantidad));
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudo agregar al carrito', 'No se pudo actualizar el carrito.');
 }

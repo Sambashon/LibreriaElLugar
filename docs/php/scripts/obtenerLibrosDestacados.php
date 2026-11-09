@@ -21,6 +21,6 @@ try {
             'autor' => $libro['autor'],
         ], $libros),
     ]);
-} catch (Exception $e) {
-    Response::error($e->getMessage(), 500);
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudieron cargar los libros destacados', 'No se pudieron cargar los libros destacados.');
 }

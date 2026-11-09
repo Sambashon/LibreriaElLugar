@@ -5,8 +5,13 @@
  */
 
 // Ambiente
-define('APP_ENV', getenv('APP_ENV') ?: 'development');
+define('APP_ENV', getenv('APP_ENV') ?: 'production');
 define('APP_DEBUG', getenv('APP_DEBUG') === 'true');
+
+ini_set('display_errors', '0');
+ini_set('display_startup_errors', '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
 
 // Constantes de Cookie
 define('COOKIE_NAME', getenv('COOKIE_NAME') ?: 'auth_token');

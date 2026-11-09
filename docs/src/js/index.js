@@ -102,6 +102,19 @@ function bindClick(id, callback) {
 // ─────────────────────────────────────────────────────────────
 
 let currentUser = null;
+let csrfToken = "";
+
+async function ensureCsrfToken() {
+    if (csrfToken) return csrfToken;
+
+    const response = await fetch("php/scripts/sesion.php", { credentials: "same-origin" });
+    const data = await response.json();
+    if (!response.ok || typeof data.csrf_token !== "string") {
+        throw new Error("No se pudo validar la solicitud. Recargá la página.");
+    }
+    csrfToken = data.csrf_token;
+    return csrfToken;
+}
 
 // ─────────────────────────────────────────────────────────────
 // Session
@@ -131,6 +144,7 @@ async function checkSession() {
         if (data && data.logged) {
             setCurrentUser(data.user);
         }
+        csrfToken = data.csrf_token || "";
 
     } catch (error) {
         console.error("Error checking session:", error);
@@ -216,10 +230,12 @@ async function handleAuthForm(form, endpoint) {
         e.preventDefault();
 
         try {
+            const body = new FormData(this);
+            body.set("csrf_token", await ensureCsrfToken());
 
             const res = await fetch(endpoint, {
                 method: "POST",
-                body: new FormData(this)
+                body
             });
 
             if (!res.ok) {
@@ -240,6 +256,7 @@ async function handleAuthForm(form, endpoint) {
             }
 
             if (data && data.state === "success") {
+                csrfToken = data.csrf_token || csrfToken;
 
                 showSuccessNotification(
                     data.message
@@ -296,11 +313,14 @@ if (loginForm) {
 async function logout(modalId) {
 
     try {
+        const body = new FormData();
+        body.set("csrf_token", await ensureCsrfToken());
 
         const res = await fetch(
             "php/scripts/logout.php",
             {
-                method: "POST"
+                method: "POST",
+                body
             }
         );
 
@@ -400,6 +420,7 @@ if (deleteForm) {
             const formData =
                 new FormData();
 
+            formData.set("csrf_token", await ensureCsrfToken());
             formData.append(
                 "password",
                 password ?? ""

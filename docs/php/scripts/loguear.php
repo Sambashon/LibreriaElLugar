@@ -17,7 +17,11 @@ try {
         $fields['password']
     );
 
-    Response::json($resultado);
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+    $status = $resultado['message'] === 'Demasiados intentos. Esperá 15 minutos e intentá nuevamente.'
+        ? 429
+        : 200;
+    Response::json($resultado, $status);
+} catch (Throwable $error) {
+    error_log('No se pudo iniciar sesión: ' . $error->getMessage());
+    Response::error('No se pudo iniciar sesión. Intentá nuevamente.', 500);
 }

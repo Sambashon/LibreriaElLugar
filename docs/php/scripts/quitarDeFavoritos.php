@@ -25,6 +25,6 @@ try {
 
     $favoritos = new Favoritos();
     Response::json($favoritos->quitarLibro((int) $idUsuario, $idLibro));
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudo quitar el favorito', 'No se pudo actualizar favoritos.');
 }

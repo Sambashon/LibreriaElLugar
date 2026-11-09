@@ -15,6 +15,9 @@ class SessionManager
         if (session_status() === PHP_SESSION_NONE) {
             $lifetime = SESSION_LIFETIME_DAYS * 86400;
             ini_set('session.gc_maxlifetime', (string) $lifetime);
+            ini_set('session.use_strict_mode', '1');
+            ini_set('session.use_only_cookies', '1');
+            ini_set('session.use_trans_sid', '0');
             session_set_cookie_params([
                 'lifetime' => $lifetime,
                 'path' => COOKIE_PATH,
@@ -45,6 +48,7 @@ class SessionManager
     {
         $this->iniciar();
         session_regenerate_id(true);
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
 
     /**
@@ -127,15 +131,18 @@ class SessionManager
     public function obtenerEstado(): array
     {
         $this->iniciar();
+        $csrfToken = $this->obtenerCsrfToken();
 
         if (!$this->existe('id_usuario')) {
             return [
-                'logged' => false
+                'logged' => false,
+                'csrf_token' => $csrfToken,
             ];
         }
 
         return [
             'logged' => true,
+            'csrf_token' => $csrfToken,
             'user' => [
                 'id_usuario' => $this->obtener('id_usuario'),
                 'nombre' => $this->obtener('nombre'),
@@ -144,5 +151,15 @@ class SessionManager
                 'admin' => (bool) $this->obtener('admin', false)
             ]
         ];
+    }
+
+    public function obtenerCsrfToken(): string
+    {
+        $this->iniciar();
+        if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+
+        return $_SESSION['csrf_token'];
     }
 }

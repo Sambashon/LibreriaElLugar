@@ -21,6 +21,10 @@ class AdminAccess
             header('Content-Type: text/plain; charset=utf-8');
             exit('Forbidden');
         }
+
+        if (!in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD', 'OPTIONS'], true)) {
+            Request::requireCsrfToken();
+        }
     }
 
     public static function requireAdminPage(): void

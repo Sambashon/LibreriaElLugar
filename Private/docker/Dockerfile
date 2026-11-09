@@ -43,7 +43,7 @@ RUN mkdir -p /var/lib/el-lugar/portadas \
  && chown www-data:www-data /var/lib/el-lugar/portadas \
  && chmod 0755 /var/lib/el-lugar/portadas
 
-RUN printf "upload_max_filesize=9M\npost_max_size=10M\n" \
+RUN printf "upload_max_filesize=9M\npost_max_size=10M\ndisplay_errors=Off\ndisplay_startup_errors=Off\nlog_errors=On\n" \
     > /usr/local/etc/php/conf.d/uploads.ini
 
 # Application code will be mounted here

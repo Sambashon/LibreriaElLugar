@@ -8,9 +8,7 @@ use App\Managers\SessionManager;
 AdminAccess::requireAdminPage();
 
 $session = new SessionManager();
-if (!$session->obtener('csrf_token')) {
-    $session->establecer('csrf_token', bin2hex(random_bytes(32)));
-}
+$csrfToken = $session->obtenerCsrfToken();
 $usuarios = (new Usuario())->listarUsuariosAdmin();
 $escapar = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 ?>
@@ -38,7 +36,7 @@ $escapar = static fn ($value): string => htmlspecialchars((string) $value, ENT_Q
             <a class="button pedidos-back" href="admindash.php">Volver al panel</a>
         </div>
     </header>
-    <main class="wrapper pedidos-wrapper usuarios-wrapper" id="usuariosApp" data-csrf-token="<?= $escapar($session->obtener('csrf_token')) ?>">
+    <main class="wrapper pedidos-wrapper usuarios-wrapper" id="usuariosApp" data-csrf-token="<?= $escapar($csrfToken) ?>">
         <div class="toolbar usuarios-toolbar">
             <label for="buscarUsuario">Buscar usuario</label>
             <input id="buscarUsuario" type="search" placeholder="Nombre o email...">

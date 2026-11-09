@@ -16,6 +16,19 @@ try {
     }
 
     $fields = Request::requireFields(['nombre', 'apellido', 'password', 'email']);
+    foreach (['nombre', 'apellido', 'password', 'email'] as $field) {
+        if (!is_string($fields[$field])) {
+            Response::error('Los datos del formulario no son válidos.', 400);
+        }
+    }
+
+    if (
+        strlen($fields['password']) < 8
+        || strlen($fields['password']) > 1024
+        || !filter_var(trim($fields['email']), FILTER_VALIDATE_EMAIL)
+    ) {
+        Response::error('Revisá el email y la contraseña (entre 8 y 1024 caracteres).', 400);
+    }
 
     $usuario = new Usuario();
 
@@ -37,7 +50,10 @@ try {
         if ($loginResult['state'] === 'success') {
             Response::success(
                 '¡Cuenta creada! Sesión iniciada automáticamente',
-                ['user' => $loginResult['user']]
+                [
+                    'user' => $loginResult['user'],
+                    'csrf_token' => $loginResult['csrf_token'],
+                ]
             );
         } else {
             Response::json($resultado);
@@ -45,6 +61,7 @@ try {
     } else {
         Response::json($resultado);
     }
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    error_log('No se pudo registrar el usuario: ' . $error->getMessage());
+    Response::error('No se pudo completar el registro. Intentá nuevamente.', 500);
 }

@@ -22,22 +22,32 @@ try {
     }
 
     $upload = $_FILES['portada'];
-    if ($upload['size'] > 8 * 1024 * 1024) {
+    if (
+        !is_uploaded_file($upload['tmp_name'])
+        || (int) $upload['size'] < 1
+        || (int) $upload['size'] > 8 * 1024 * 1024
+    ) {
+        Response::error('La portada no puede superar los 8 MB', 400);
+    }
+    $actualSize = filesize($upload['tmp_name']);
+    if ($actualSize === false || $actualSize < 1 || $actualSize > 8 * 1024 * 1024) {
         Response::error('La portada no puede superar los 8 MB', 400);
     }
 
+    $extension = strtolower(pathinfo($upload['name'], PATHINFO_EXTENSION));
     $imageInfo = getimagesize($upload['tmp_name']);
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($upload['tmp_name']);
     $extensions = [
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/webp' => 'webp',
+        'image/jpeg' => ['jpg', 'jpeg'],
+        'image/png' => ['png'],
+        'image/webp' => ['webp'],
     ];
 
     if (
         $imageInfo === false
         || !isset($extensions[$mime])
+        || !in_array($extension, $extensions[$mime], true)
         || $imageInfo['mime'] !== $mime
     ) {
         Response::error('Formato de imagen inválido. Usá JPG, PNG o WebP.', 400);
@@ -111,5 +121,6 @@ try {
         'url' => 'php/scripts/portadaLibro.php?uid=' . rawurlencode($uid),
     ]);
 } catch (Throwable $e) {
-    Response::error($e->getMessage(), 500);
+    error_log('No se pudo subir la portada: ' . $e->getMessage());
+    Response::error('No se pudo procesar la portada. Intentá nuevamente.', 500);
 }

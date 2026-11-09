@@ -11,6 +11,7 @@ try {
     $usuario = new Usuario();
     $resultado = $usuario->obtenerSesion();
     Response::json($resultado);
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    error_log('No se pudo obtener el estado de sesión: ' . $error->getMessage());
+    Response::error('No se pudo consultar la sesión.', 500);
 }

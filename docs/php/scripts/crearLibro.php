@@ -71,6 +71,6 @@ try {
             'destacado' => (bool) $destacado,
         ],
     ]);
-} catch (Exception $e) {
-    Response::error($e->getMessage());
+} catch (Throwable $error) {
+    Response::serverError($error, 'No se pudo crear el libro', 'No se pudo crear el libro.');
 }

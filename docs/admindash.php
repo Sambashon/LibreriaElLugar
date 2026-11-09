@@ -2,6 +2,7 @@
 require_once __DIR__ . '/php/admin_guard.php';
 requireAdmin(false);
 
+$csrfToken = (new \App\Managers\SessionManager())->obtenerCsrfToken();
 $adminNombre = htmlspecialchars($_SESSION['nombre'] ?? 'Administrador', ENT_QUOTES, 'UTF-8');
 ?>
 <!DOCTYPE html>
@@ -9,6 +10,7 @@ $adminNombre = htmlspecialchars($_SESSION['nombre'] ?? 'Administrador', ENT_QUOT
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
     <title>Panel de Administrador | Librería El Lugar</title>
     <link rel="icon" href="Resources/logos/libreriasimple.jpg" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">

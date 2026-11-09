@@ -3,8 +3,10 @@ require_once __DIR__ . '/php/bootstrap.php';
 
 use App\Classes\Pedido;
 use App\Helpers\AdminAccess;
+use App\Managers\SessionManager;
 
 AdminAccess::requireAdminPage();
+$csrfToken = (new SessionManager())->obtenerCsrfToken();
 
 $pedidos = (new Pedido())->listar();
 $estados = [
@@ -28,6 +30,7 @@ $escapar = static fn ($value): string => htmlspecialchars((string) $value, ENT_Q
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
     <title>Pedidos | Librería El Lugar</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -139,15 +142,18 @@ $escapar = static fn ($value): string => htmlspecialchars((string) $value, ENT_Q
     </main>
     <footer><?= count($pedidos) ?> pedidos · <?= date('d/m/Y H:i') ?></footer>
     <script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         document.querySelectorAll('.pedido-status-form').forEach((form) => {
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
                 const button = form.querySelector('button');
                 button.disabled = true;
                 try {
+                    const body = new FormData(form);
+                    body.set('csrf_token', csrfToken);
                     const response = await fetch('php/scripts/actualizarEstadoPedido.php', {
                         method: 'POST',
-                        body: new FormData(form),
+                        body,
                         credentials: 'same-origin'
                     });
                     const data = await response.json();
