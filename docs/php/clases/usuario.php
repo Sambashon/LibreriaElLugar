@@ -160,6 +160,10 @@ class Usuario extends \LibreriaDB
         $this->sessionManager->establecer("apellido", $usuarioDB["apellido"]);
         $this->sessionManager->establecer("email", $usuarioDB["email"]);
         $this->sessionManager->establecer("admin", (bool) $usuarioDB["admin"]);
+        $this->sessionManager->establecer(
+            "auth_expires_at",
+            time() + (SESSION_LIFETIME_DAYS * 86400)
+        );
 
         return Result::success(
             "Login exitoso",
