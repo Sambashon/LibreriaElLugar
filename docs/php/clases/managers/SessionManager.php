@@ -13,14 +13,28 @@ class SessionManager
     public function iniciar(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
+            $lifetime = SESSION_LIFETIME_DAYS * 86400;
+            ini_set('session.gc_maxlifetime', (string) $lifetime);
             session_set_cookie_params([
-                'lifetime' => 0,
+                'lifetime' => $lifetime,
                 'path' => COOKIE_PATH,
                 'secure' => COOKIE_SECURE,
                 'httponly' => COOKIE_HTTPONLY,
                 'samesite' => COOKIE_SAMESITE,
             ]);
             session_start();
+
+            if (
+                isset($_SESSION['id_usuario'])
+                && (
+                    !isset($_SESSION['auth_expires_at'])
+                    || !is_numeric($_SESSION['auth_expires_at'])
+                    || (int) $_SESSION['auth_expires_at'] <= time()
+                )
+            ) {
+                $this->destruirSesionActual();
+                session_start();
+            }
         }
     }
 
@@ -76,6 +90,16 @@ class SessionManager
     {
         $this->iniciar();
 
+        $this->destruirSesionActual();
+
+        return [
+            'state' => 'success',
+            'message' => 'Sesión cerrada correctamente'
+        ];
+    }
+
+    private function destruirSesionActual(): void
+    {
         $_SESSION = [];
 
         if (ini_get('session.use_cookies')) {
@@ -95,11 +119,6 @@ class SessionManager
         }
 
         session_destroy();
-
-        return [
-            'state' => 'success',
-            'message' => 'Sesión cerrada correctamente'
-        ];
     }
 
     /**

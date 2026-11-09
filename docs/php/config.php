@@ -11,6 +11,7 @@ define('APP_DEBUG', getenv('APP_DEBUG') === 'true');
 // Constantes de Cookie
 define('COOKIE_NAME', getenv('COOKIE_NAME') ?: 'auth_token');
 define('COOKIE_DAYS', (int) (getenv('COOKIE_DAYS') ?: 30));
+define('SESSION_LIFETIME_DAYS', (int) (getenv('SESSION_LIFETIME_DAYS') ?: 30));
 define('COOKIE_PATH', getenv('COOKIE_PATH') ?: '/');
 define('COOKIE_SECURE', APP_ENV === 'production');
 define('COOKIE_HTTPONLY', true);
