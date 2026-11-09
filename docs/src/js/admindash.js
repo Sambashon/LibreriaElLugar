@@ -15,7 +15,3 @@ document.getElementById("adminLogoutBtn")?.addEventListener("click", async () =>
         window.alert(error.message || "Error al cerrar sesión");
     }
 });
-
-document.getElementById("adminUsuariosBtn")?.addEventListener("click", () => {
-    window.alert("Función 'Gestionar Usuarios' en construcción");
-});

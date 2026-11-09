@@ -197,6 +197,40 @@ class Pedido extends \LibreriaDB
         return $pedidos;
     }
 
+    public function listarPorUsuario(int $idUsuario): array
+    {
+        $pedidos = $this->fetchAll(
+            "SELECT id_pedido, nombre_cliente, email, metodo_pago,
+                    handy_payment_status, estado, total, fecha_creacion
+             FROM pedidos
+             WHERE id_usuario = :id_usuario
+             ORDER BY fecha_creacion DESC, id_pedido DESC",
+            ['id_usuario' => $idUsuario]
+        );
+        if (!$pedidos) {
+            return [];
+        }
+
+        $detalles = $this->fetchAll(
+            "SELECT d.id_pedido, d.titulo_libro, d.cantidad, d.precio_unitario
+             FROM detalle_pedido d
+             INNER JOIN pedidos p ON p.id_pedido = d.id_pedido
+             WHERE p.id_usuario = :id_usuario
+             ORDER BY d.id_detalle",
+            ['id_usuario' => $idUsuario]
+        );
+        $porPedido = [];
+        foreach ($detalles as $detalle) {
+            $porPedido[(int) $detalle['id_pedido']][] = $detalle;
+        }
+        foreach ($pedidos as &$pedido) {
+            $pedido['detalles'] = $porPedido[(int) $pedido['id_pedido']] ?? [];
+        }
+        unset($pedido);
+
+        return $pedidos;
+    }
+
     public function actualizarEstado(int $idPedido, string $nuevoEstado): array
     {
         if (!in_array($nuevoEstado, self::ESTADOS, true)) {
