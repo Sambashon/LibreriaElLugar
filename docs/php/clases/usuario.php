@@ -229,6 +229,128 @@ class Usuario extends \LibreriaDB
         return $usuario ?: null;
     }
 
+    public function listarUsuariosAdmin(): array
+    {
+        return $this->fetchAll(
+            "SELECT id_usuario, nombre, apellido, email, admin, fecha_registro
+             FROM usuarios
+             ORDER BY id_usuario DESC"
+        );
+    }
+
+    public function actualizarUsuarioAdmin(
+        int $idUsuario,
+        string $nombre,
+        string $apellido,
+        string $email,
+        ?string $password = null
+    ): array {
+        $this->beginTransaction();
+        try {
+            $usuario = $this->fetch(
+                'SELECT admin FROM usuarios WHERE id_usuario = :id_usuario FOR UPDATE',
+                ['id_usuario' => $idUsuario]
+            );
+            if (!$usuario) {
+                $this->rollback();
+                return Result::error('Usuario no encontrado')->toArray();
+            }
+            if ((bool) $usuario['admin']) {
+                $this->rollback();
+                return Result::error('No se pueden editar cuentas de administrador')->toArray();
+            }
+
+            $emailExistente = $this->fetch(
+                'SELECT id_usuario FROM usuarios
+                 WHERE email = :email AND id_usuario <> :id_usuario',
+                ['email' => $email, 'id_usuario' => $idUsuario]
+            );
+            if ($emailExistente) {
+                $this->rollback();
+                return Result::error('El email ya está registrado')->toArray();
+            }
+
+            if ($password !== null) {
+                $this->execute(
+                    'UPDATE usuarios
+                     SET nombre = :nombre, apellido = :apellido, email = :email, password = :password
+                     WHERE id_usuario = :id_usuario',
+                    [
+                        'nombre' => $nombre,
+                        'apellido' => $apellido,
+                        'email' => $email,
+                        'password' => password_hash($password, PASSWORD_DEFAULT),
+                        'id_usuario' => $idUsuario,
+                    ]
+                );
+                $this->execute(
+                    'DELETE FROM user_tokens WHERE id_usuario = :id_usuario',
+                    ['id_usuario' => $idUsuario]
+                );
+            } else {
+                $this->execute(
+                    'UPDATE usuarios
+                     SET nombre = :nombre, apellido = :apellido, email = :email
+                     WHERE id_usuario = :id_usuario',
+                    [
+                        'nombre' => $nombre,
+                        'apellido' => $apellido,
+                        'email' => $email,
+                        'id_usuario' => $idUsuario,
+                    ]
+                );
+            }
+            $this->commit();
+        } catch (\PDOException $error) {
+            $this->rollback();
+            if ($error->getCode() === '23000') {
+                return Result::error('El email ya está registrado')->toArray();
+            }
+            throw $error;
+        } catch (\Throwable $error) {
+            $this->rollback();
+            throw $error;
+        }
+
+        return Result::success('Usuario actualizado correctamente')->toArray();
+    }
+
+    public function eliminarUsuarioAdmin(int $idUsuario): array
+    {
+        $this->beginTransaction();
+        try {
+            $usuario = $this->fetch(
+                'SELECT admin FROM usuarios WHERE id_usuario = :id_usuario FOR UPDATE',
+                ['id_usuario' => $idUsuario]
+            );
+            if (!$usuario) {
+                $this->rollback();
+                return Result::error('Usuario no encontrado')->toArray();
+            }
+            if ((bool) $usuario['admin']) {
+                $this->rollback();
+                return Result::error('No se pueden eliminar cuentas de administrador')->toArray();
+            }
+
+            $this->execute(
+                'DELETE FROM user_tokens WHERE id_usuario = :id_usuario',
+                ['id_usuario' => $idUsuario]
+            );
+            if (!$this->execute(
+                'DELETE FROM usuarios WHERE id_usuario = :id_usuario',
+                ['id_usuario' => $idUsuario]
+            )) {
+                throw new \RuntimeException('No se pudo eliminar el usuario');
+            }
+            $this->commit();
+        } catch (\Throwable $error) {
+            $this->rollback();
+            throw $error;
+        }
+
+        return Result::success('Usuario eliminado correctamente')->toArray();
+    }
+
     public function obtenerSesion(): array
     {
         return $this->sessionManager->obtenerEstado();
