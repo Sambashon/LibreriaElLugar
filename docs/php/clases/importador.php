@@ -41,12 +41,13 @@ class Importador extends LibreriaDB
                 }
 
                 $uid = BookUid::ensureExists($this, $data);
+                $metadata = BookUid::getMetadata($this, $uid);
 
                 $this->execute(
                     "INSERT INTO libros 
-                    (uid, titulo, autor, editorial, genero, precio, stock, info_adicional)
+                    (uid, titulo, autor, editorial, genero, precio, stock, descripcion, destacado, info_adicional)
                     VALUES 
-                    (:uid, :titulo, :autor, :editorial, :genero, :precio, :stock, :info_adicional)",
+                    (:uid, :titulo, :autor, :editorial, :genero, :precio, :stock, :descripcion, :destacado, :info_adicional)",
                     [
                         "uid"         => $uid,
                         "titulo"     => $data['titulo'],
@@ -55,6 +56,8 @@ class Importador extends LibreriaDB
                         "genero"     => $data['genero'],
                         "precio"     => $data['precio'],
                         "stock"      => $data['stock'],
+                        "descripcion" => $metadata['descripcion'],
+                        "destacado" => $metadata['destacado'] ? 1 : 0,
                         "info_adicional" => $data['info_adicional']
                     ]
                 );

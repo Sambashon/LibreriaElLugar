@@ -18,9 +18,31 @@ $db->query(
         titulo TEXT NOT NULL,
         autor TEXT NOT NULL,
         editorial TEXT NOT NULL,
-        genero TEXT NOT NULL
+        genero TEXT NOT NULL,
+        descripcion TEXT NULL,
+        destacado BOOLEAN NULL
     )"
 );
+
+$metadataColumns = [
+    'descripcion' => 'TEXT NULL',
+    'destacado' => 'BOOLEAN NULL',
+];
+
+foreach ($metadataColumns as $columnName => $columnDefinition) {
+    $column = $db->fetch(
+        "SELECT COLUMN_NAME
+         FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'libros_uid'
+           AND COLUMN_NAME = ?",
+        [$columnName]
+    );
+
+    if (!$column) {
+        $db->query("ALTER TABLE libros_uid ADD COLUMN {$columnName} {$columnDefinition}");
+    }
+}
 
 $uidColumn = $db->fetch(
     "SELECT COLUMN_NAME
@@ -48,6 +70,30 @@ $infoAdicionalColumn = $db->fetch(
 
 if (!$infoAdicionalColumn) {
     $db->query("ALTER TABLE libros ADD COLUMN info_adicional TEXT NULL");
+}
+
+$descriptionColumn = $db->fetch(
+    "SELECT COLUMN_NAME
+     FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'libros'
+       AND COLUMN_NAME = 'descripcion'"
+);
+
+if (!$descriptionColumn) {
+    $db->query("ALTER TABLE libros ADD COLUMN descripcion TEXT NULL");
+}
+
+$featuredColumn = $db->fetch(
+    "SELECT COLUMN_NAME
+     FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'libros'
+       AND COLUMN_NAME = 'destacado'"
+);
+
+if (!$featuredColumn) {
+    $db->query("ALTER TABLE libros ADD COLUMN destacado BOOLEAN NOT NULL DEFAULT FALSE");
 }
 
 $portadaColumn = $db->fetch(
@@ -90,6 +136,14 @@ try {
             ['uid' => $uid, 'id_libro' => $libro['id_libro']]
         );
     }
+
+    $db->query(
+        "UPDATE libros_uid u
+         INNER JOIN libros l ON l.uid = u.uid
+         SET u.descripcion = CASE WHEN u.descripcion IS NULL THEN l.descripcion ELSE u.descripcion END,
+             u.destacado = CASE WHEN u.destacado IS NULL THEN l.destacado ELSE u.destacado END
+         WHERE u.descripcion IS NULL OR u.destacado IS NULL"
+    );
 
     $db->commit();
 } catch (Throwable $e) {

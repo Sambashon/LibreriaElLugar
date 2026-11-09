@@ -26,7 +26,9 @@ CREATE TABLE libros_uid (
     titulo TEXT NOT NULL,
     autor TEXT NOT NULL,
     editorial TEXT NOT NULL,
-    genero TEXT NOT NULL
+    genero TEXT NOT NULL,
+    descripcion TEXT NULL,
+    destacado BOOLEAN NOT NULL DEFAULT 0
 );
 
 CREATE TABLE libros (

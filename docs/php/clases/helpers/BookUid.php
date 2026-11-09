@@ -49,4 +49,38 @@ class BookUid
 
         return $uid;
     }
+
+    public static function saveMetadata(\LibreriaDB $db, string $uid, string $description, bool $featured): void
+    {
+        $db->query(
+            "UPDATE libros_uid
+             SET descripcion = :descripcion, destacado = :destacado
+             WHERE uid = :uid",
+            [
+                'uid' => $uid,
+                'descripcion' => $description,
+                'destacado' => $featured ? 1 : 0,
+            ]
+        );
+    }
+
+    public static function getMetadata(\LibreriaDB $db, string $uid): array
+    {
+        $metadata = $db->fetch(
+            "SELECT COALESCE(descripcion, '') AS descripcion,
+                    COALESCE(destacado, 0) AS destacado
+             FROM libros_uid
+             WHERE uid = ?",
+            [$uid]
+        );
+
+        if ($metadata === null) {
+            throw new \RuntimeException("No se encontró metadata para el UID {$uid}");
+        }
+
+        return [
+            'descripcion' => $metadata['descripcion'],
+            'destacado' => (bool) $metadata['destacado'],
+        ];
+    }
 }

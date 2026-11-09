@@ -34,20 +34,27 @@ try {
     $destacado = Request::getPost('destacado', '0') === '1' ? 1 : 0;
 
     $db = new LibreriaDB();
-    $uid = BookUid::ensureExists($db, [
-        'titulo' => $titulo,
-        'autor' => $autor,
-        'editorial' => $editorial,
-        'genero' => $genero,
-    ]);
+    $db->beginTransaction();
+    try {
+        $uid = BookUid::ensureExists($db, [
+            'titulo' => $titulo,
+            'autor' => $autor,
+            'editorial' => $editorial,
+            'genero' => $genero,
+        ]);
 
-    $db->query(
-        "INSERT INTO libros (uid, titulo, autor, editorial, genero, precio, stock, descripcion, info_adicional, destacado)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $info_adicional, $destacado]
-    );
-
-    $idLibro = (int) $db->lastInsertId();
+        $db->query(
+            "INSERT INTO libros (uid, titulo, autor, editorial, genero, precio, stock, descripcion, info_adicional, destacado)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $info_adicional, $destacado]
+        );
+        BookUid::saveMetadata($db, $uid, $descripcion, (bool) $destacado);
+        $idLibro = (int) $db->lastInsertId();
+        $db->commit();
+    } catch (Throwable $e) {
+        $db->rollback();
+        throw $e;
+    }
 
     Response::success('Libro creado correctamente', [
         'libro' => [

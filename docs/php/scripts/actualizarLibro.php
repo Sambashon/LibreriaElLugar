@@ -47,19 +47,27 @@ try {
         Response::error('Libro no encontrado', 404);
     }
 
-    $uid = BookUid::ensureExists($db, [
-        'titulo' => $titulo,
-        'autor' => $autor,
-        'editorial' => $editorial,
-        'genero' => $genero,
-    ]);
+    $db->beginTransaction();
+    try {
+        $uid = BookUid::ensureExists($db, [
+            'titulo' => $titulo,
+            'autor' => $autor,
+            'editorial' => $editorial,
+            'genero' => $genero,
+        ]);
 
-    $db->query(
-        "UPDATE libros
-         SET uid = ?, titulo = ?, autor = ?, editorial = ?, genero = ?, precio = ?, stock = ?, descripcion = ?, destacado = ?
-         WHERE id_libro = ?",
-        [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $destacado, $idLibro]
-    );
+        $db->query(
+            "UPDATE libros
+             SET uid = ?, titulo = ?, autor = ?, editorial = ?, genero = ?, precio = ?, stock = ?, descripcion = ?, destacado = ?
+             WHERE id_libro = ?",
+            [$uid, $titulo, $autor, $editorial, $genero, $precio, $stock, $descripcion, $destacado, $idLibro]
+        );
+        BookUid::saveMetadata($db, $uid, $descripcion, (bool) $destacado);
+        $db->commit();
+    } catch (Throwable $e) {
+        $db->rollback();
+        throw $e;
+    }
 
     Response::success('Libro actualizado correctamente', [
         'libro' => [
